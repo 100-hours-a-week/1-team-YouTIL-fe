@@ -1,7 +1,9 @@
+import GithubLoginButton from "@/components/login/githubloginbuttion/GithubLoginButtion";
+
 const login =() =>{
     return(
         <div>
-            로그인 페이지
+            <GithubLoginButton/>
         </div>
     )
 }
