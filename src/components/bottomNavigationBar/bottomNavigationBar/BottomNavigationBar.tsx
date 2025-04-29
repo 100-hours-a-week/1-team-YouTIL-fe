@@ -1,19 +1,26 @@
-import GoCommit from "../bottomNavigationBarButton/GoCommit";
-import GoCommmuniny from "../bottomNavigationBarButton/GoCommunity";
-import GoMainPage from "../bottomNavigationBarButton/GoMainPage";
-import GoProfile from "../bottomNavigationBarButton/GoProfile";
-import GoRepository from "../bottomNavigationBarButton/GoRepository";
+'use client';
 
-const BottomNavigationBar =() =>{
-    return(
-        <div>
-            <GoCommit/>
-            <GoCommmuniny/>
-            <GoMainPage/>
-            <GoProfile/>
-            <GoRepository/>
-        </div>
-    )
-}
+import BottomNavigationBarButton from '../bottomNavigationBarButton/BottomNavigationBarButton';
+import './BottomNavigationBar.scss';
+
+const navItems = [
+    { label: '메인 페이지', href: '/' },
+  { label: 'TIL 생성', href: '/commit' },
+  { label: '커뮤니티', href: '/community' },
+  { label: '레포지토리', href: '/repository/tils' },
+  { label: '프로필', href: '/profile' },
+];
+
+const BottomNavigationBar = () => {
+  return (
+    <div className='bottom-nav-place'>
+      <nav className="bottom-nav">
+        {navItems.map(({ label, href }) => (
+          <BottomNavigationBarButton key={href} label={label} href={href} />
+        ))}
+      </nav>
+    </div>
+  );
+};
 
 export default BottomNavigationBar;
