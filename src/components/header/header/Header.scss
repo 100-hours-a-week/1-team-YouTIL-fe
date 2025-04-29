@@ -1,10 +1,7 @@
-.bottom-nav-place {
-    position: absolute; /* ✅ 절대 위치로 해야 하단 고정이 진짜 된다 */
-    bottom: 0;
-  
+.header-place {
   }
   
-  .bottom-nav {
+  .header-button {
     display: flex; /* ✅ 요소들을 가로로 배열 */
     justify-content: space-around; /* 버튼들 간격 고르게 */
     align-items: center; /* 버튼 수직 가운데 정렬 */
