@@ -6,7 +6,7 @@ const main = () => {
   // redirect('/login');
   return (
     <div>
-      λ©”μΈνμ΄μ§€ μ…λ‹λ‹¤.
+      ΈήΐΞΖδΐΜΑφ ΐΤ΄Ο΄Ω.
     </div>
   )
 };
