@@ -3,7 +3,7 @@
 import { redirect } from 'next/navigation';
 
 const main = () => {
-  redirect('/login');
+  // redirect('/login');
   return (
     <div>
       메인페이지 입니다.

@@ -15,8 +15,8 @@ const GithubLoginButton = () => {
 
   const handleLogin = () => {
     const clientId = process.env.NEXT_PUBLIC_GITHUB_CLIENT_ID;
-    const redirectUri = 'http://localhost:3000/login';
-    const githubAuthUrl = `https://github.com/login/oauth/authorize?client_id=${clientId}&redirect_uri=${redirectUri}`;
+    // const redirectUri = 'http://localhost:3000/login';
+    const githubAuthUrl = `https://github.com/login/oauth/authorize?client_id=${clientId}&scope=read%3Auser%20user%3Aemail`;
 
     window.location.href = githubAuthUrl;
   };

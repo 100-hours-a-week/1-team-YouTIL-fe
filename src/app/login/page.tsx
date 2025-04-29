@@ -1,5 +1,5 @@
-import GithubLoginButton from "@/components/login/githubloginbuttion/GithubLoginButtion";
-import LoginDescription from "@/components/login/logindescription/LoginDescription";
+import GithubLoginButton from "@/components/login/githubLoginButton/GithubLoginButtion";
+import LoginDescription from "@/components/login/loginDescription/LoginDescription";
 
 const login =() =>{
     return(

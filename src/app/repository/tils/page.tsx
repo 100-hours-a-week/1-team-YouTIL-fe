@@ -1,4 +1,4 @@
-const repositorytils =() =>{
+const repositoryTils =() =>{
     return(
         <div>
             저장소 til 페이지지
@@ -6,4 +6,4 @@ const repositorytils =() =>{
     )
 }
 
-export default repositorytils;
+export default repositoryTils;

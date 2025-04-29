@@ -1,7 +1,8 @@
 const LoginDescription =() =>{
     return(
         <div>
-            로그인 디스크립션
+            You-TIL
+            코드 한 줄, 성장 한 걸음
         </div>
     )
 }

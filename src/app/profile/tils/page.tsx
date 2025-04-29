@@ -1,4 +1,4 @@
-const profiletils =() =>{
+const profileTils =() =>{
     return(
         <div>
             프로필 til 목록
@@ -6,4 +6,4 @@ const profiletils =() =>{
     )
 }
 
-export default profiletils;
+export default profileTils;
