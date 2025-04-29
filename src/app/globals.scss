@@ -17,12 +17,11 @@ html, body {
   align-items: center;
   width: 100%;
   height: 100%;
-  position: relative;
 }
 
 .mobile-frame {
-  width: 400px;
-  min-width: 400px;
+  width: 430px;
+  min-width: 430px;
   height: 100%;
   background: white;
   overflow: hidden;
@@ -30,6 +29,7 @@ html, body {
   flex-direction: column;
   margin-left: auto;
   margin-right: 20vw;
+  position: relative
 }
 
 /* 🔥 반응형 대응 */
@@ -39,8 +39,8 @@ html, body {
   }
 
   .mobile-frame {
-    width: 400px;
-    min-width: 400px;
+    width: 430px;
+    min-width: 430px;
     margin: 0;
     height: 100%;
     border-radius: 0;

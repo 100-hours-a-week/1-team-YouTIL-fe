@@ -6,7 +6,7 @@ import BottomNavigationBar from '../bottomNavigationBar/bottomNavigationBar/Bott
 
 export default function LayoutWrapper({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const isLoginPage = pathname === '/login'; // ✅ 경로가 /login이면
+  const isLoginPage = pathname === '/login';
 
   return (
     <div className="layout-container">
