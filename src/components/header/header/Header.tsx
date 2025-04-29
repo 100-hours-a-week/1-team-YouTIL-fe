@@ -1,9 +1,17 @@
+import HeaderBackButton from "../headerBackButton/HeaderBackButton";
+import HeaderLogo from "../headerLogo/HeaderLogo";
+import HeaderLogoutButton from "../headerLogoutButton/HeaderLogoutButton";
 
+import './Header.scss';
 
 const Header =() =>{
     return(
-        <div>
-            헤더가 들어갈 자리 입니다.
+        <div className="header-place">
+            <div className="header-button">
+                <HeaderBackButton/>
+                <HeaderLogo/>
+                <HeaderLogoutButton/>
+            </div>
         </div>
     )
 }
