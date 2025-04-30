@@ -1,6 +1,9 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
+import backicon from 'public/backicon.png';
+import './HeaderBackButton.scss';
 
 const HeaderBackButton = () => {
   const router = useRouter();
@@ -10,18 +13,19 @@ const HeaderBackButton = () => {
   };
 
   return (
-    <button onClick={handleBack} style={buttonStyle}>
-      ← 뒤로가기
-    </button>
+    <div className="back-icon">
+      <button onClick={handleBack}>
+        <Image
+          src={backicon}
+          alt="backicon"
+          width={50}
+          height={50}
+          priority
+          />
+      </button>
+    </div>
   );
 };
 
-const buttonStyle = {
-  background: 'none',
-  border: 'none',
-  fontSize: '16px',
-  cursor: 'pointer',
-  color: '#333',
-};
 
 export default HeaderBackButton;

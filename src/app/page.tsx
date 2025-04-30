@@ -1,12 +1,13 @@
 'use client';
 
 import { redirect } from 'next/navigation';
+import Heatmap from '@/components/main/heatmap/Heatmap';
 
 const main = () => {
   // redirect('/login');
   return (
     <div>
-      메인페이지 입니다.
+      <Heatmap/>
     </div>
   )
 };

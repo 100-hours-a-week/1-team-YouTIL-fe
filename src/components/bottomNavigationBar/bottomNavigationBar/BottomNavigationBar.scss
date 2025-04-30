@@ -1,13 +1,13 @@
 .bottom-nav-place {
-    position: absolute; /* ✅ 절대 위치로 해야 하단 고정이 진짜 된다 */
-    bottom: 0;
-  
-  }
-  
-  .bottom-nav {
-    display: flex; /* ✅ 요소들을 가로로 배열 */
-    justify-content: space-around; /* 버튼들 간격 고르게 */
-    align-items: center; /* 버튼 수직 가운데 정렬 */
-    height: 100%; /* 부모 높이 채우기 */
-  }
-  
+  position: absolute;
+  bottom: 0;
+  margin: 5px;
+  width: 100%; // 🔥 부모 기준 가로 길이 100%
+}
+
+.bottom-nav {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  width: 100%; // 🔥 내부 nav도 100%로 확장
+}
