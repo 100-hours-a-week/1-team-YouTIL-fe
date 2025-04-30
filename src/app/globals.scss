@@ -32,6 +32,14 @@ html, body {
   position: relative
 }
 
+.main-space-1{
+  margin-top: 50px;
+}
+
+.main-space-2{
+  margin-top: 50px;
+}
+
 /* 🔥 반응형 대응 */
 @media (max-width: 700px) {
   .layout-container {
