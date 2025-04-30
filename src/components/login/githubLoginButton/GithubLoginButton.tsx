@@ -3,6 +3,10 @@
 import { useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 
+import gitlogin from "public/gitlogin.png"
+import Image from "next/image";
+import "./GithubLoginButton.scss";
+
 const GithubLoginButton = () => {
   const searchParams = useSearchParams();
   
@@ -22,11 +26,14 @@ const GithubLoginButton = () => {
   };
 
   return (
-    <div>
-      <button onClick={handleLogin}>
-        깃허브 로그인 버튼
-      </button>
-    </div>
+      <Image onClick={handleLogin}
+      src={gitlogin}
+      alt="YouTIL Logo"
+      width={325}
+      height={45}
+      priority
+      className="github-login-button"
+      />
   );
 };
 
