@@ -20,6 +20,7 @@ const GithubLoginButton = () => {
       GithubLogin(code)
         .then((data) => {
           const token = data.accessToken;
+          
           setAccessToken(token);
           window.location.href = '/';
         })
