@@ -6,38 +6,29 @@ import Image from 'next/image';
 import gitlogin from 'public/gitlogin.png';
 import './GithubLoginButton.scss';
 
+import GithubLogin from '@/api/loginAPI';
+import useAuthStore from '@/store/authStore';
+
 const GithubLoginButton = () => {
   const searchParams = useSearchParams();
+  const setAccessToken = useAuthStore((state) => state.setAccessToken);
 
   useEffect(() => {
     const code = searchParams.get('code');
 
     if (code) {
-
-      fetch('http://34.22.84.164:8080/api/v1/users/github', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          authorizationCode: code,
-        }),
-      })
-        .then(async (res) => {
-          if (!res.ok) {
-            throw new Error(`서버 응답 오류: ${res.status}`);
-          }
-          const response = await res.json();
-
-          //예시: 토큰 저장 후 메인 페이지 이동
-          localStorage.setItem('accessToken', response.data.accessToken);
+      GithubLogin(code)
+        .then((data) => {
+          const token = data.accessToken;
+          setAccessToken(token);
+          //localStorage.setItem('accessToken', token);
           window.location.href = '/';
         })
         .catch((error) => {
-          console.error('GitHub 로그인 오류:', error);
+          console.error('로그인 실패:', error);
         });
     }
-  }, [searchParams]);
+  }, [searchParams, setAccessToken]);
 
   const handleLogin = () => {
     const client_id = process.env.NEXT_PUBLIC_GITHUB_CLIENT_ID;
