@@ -13,7 +13,6 @@ const GithubLoginButton = () => {
     const code = searchParams.get('code');
 
     if (code) {
-      console.log('깃허브에서 받은 code:', code);
 
       fetch('http://34.22.84.164:8080/api/v1/users/github', {
         method: 'POST',
