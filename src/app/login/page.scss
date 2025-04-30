@@ -1,0 +1,15 @@
+.login-page {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    
+    .login-space-1{
+        margin: 50px;
+    }
+
+    .login-space-2{
+        margin: 25px;
+    }
+  }

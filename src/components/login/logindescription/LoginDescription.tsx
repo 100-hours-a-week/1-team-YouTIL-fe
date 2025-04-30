@@ -1,9 +1,16 @@
+import logindescription from "public/logindescription.png"
+import Image from "next/image";
 const LoginDescription =() =>{
     return(
         <div>
-            You-TIL
-            코드 한 줄, 성장 한 걸음
-        </div>
+            <Image
+            src={logindescription}
+            alt="YouTIL Login"
+            width={600}
+            height={180}
+            priority
+            />
+      </div>
     )
 }
 
