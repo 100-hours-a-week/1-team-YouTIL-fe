@@ -18,9 +18,9 @@ const GithubLoginButton = () => {
   }, [searchParams]);
 
   const handleLogin = () => {
-    const clientId = process.env.NEXT_PUBLIC_GITHUB_CLIENT_ID;
+    const client_id = process.env.NEXT_PUBLIC_GITHUB_CLIENT_ID;
     // const redirectUri = 'http://localhost:3000/login';
-    const githubAuthUrl = `https://github.com/login/oauth/authorize?client_id=${clientId}&scope=read%3Auser%20user%3Aemail`;
+    const githubAuthUrl = `https://github.com/login/oauth/authorize?${client_id}=Ov23liKd1531Gv0qzNnL&scope=read%3Auser%20user%3Aemail%20read%3Aorg%20repo`;
 
     window.location.href = githubAuthUrl;
   };
