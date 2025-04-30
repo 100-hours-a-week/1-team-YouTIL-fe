@@ -10,18 +10,11 @@ const HeaderBackButton = () => {
   };
 
   return (
-    <button onClick={handleBack} style={buttonStyle}>
+    <button onClick={handleBack}>
       ← 뒤로가기
     </button>
   );
 };
 
-const buttonStyle = {
-  background: 'none',
-  border: 'none',
-  fontSize: '16px',
-  cursor: 'pointer',
-  color: '#333',
-};
 
 export default HeaderBackButton;

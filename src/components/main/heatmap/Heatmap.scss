@@ -1,0 +1,100 @@
+.heatmap-wrapper {
+  display: flex;
+  background: #ffffff;
+  color: #000000;
+  border-radius: 12px;
+  margin-left: 1rem;
+  margin-right: 1rem;
+  padding: 1rem;
+  overflow: hidden;
+  border: 1px solid #ccc;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  
+  
+  .heatmap-container{
+    .heatmap-content{
+      display: flex;
+      align-items: center;
+      margin-bottom: 10px;
+      .heatmap-controls-right {
+        button {
+          font-size: 1.2rem;
+          background: none;
+          border: none;
+        }
+      }
+
+      .heatmap-calendar {
+        margin-left: 10px;
+        margin-right: 10px;
+      }
+
+      .heatmap-controls-left {
+        button {
+          font-size: 1.2rem;
+          background: none;
+          border: none;
+        }
+      }
+  }
+  .heatmap-legend {
+    margin-left: 42px;
+    .heatmap-legend-label {
+      color: #768390;
+      font-size: 12px;
+    }
+
+    .heatmap-legend-bar {
+      display: inline-block;
+      margin: 0 4px;
+    }
+  }
+}
+
+.heatmap-space{
+  width: 20px;
+}
+
+  .heatmap-dropdown {
+    float: right;
+    right: 0;
+    .heatmap-year-button {
+      button {
+        // padding: 0.5rem 1rem;
+        font-size: 0.9rem;
+        background-color: #f5f5f5;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+    }
+
+    .heatmap-dropdown-content {
+      left:0;
+      border: 1px solid #ccc;
+      background-color: white;
+      width: 100%;
+      border-radius: 4px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+      
+      
+      li {
+          list-style: none;
+          a {
+            display: block;
+            padding-top: 0.5rem;
+            text-align: center;
+            cursor: pointer;
+            font-size: 0.875rem;
+            color: #333;
+            text-decoration: none;
+    
+            &:hover {
+              background-color: #f5f5f5;
+            }
+          }
+        }
+      
+    }
+  }
+}
