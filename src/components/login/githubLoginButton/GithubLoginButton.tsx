@@ -21,7 +21,6 @@ const GithubLoginButton = () => {
         .then((data) => {
           const token = data.accessToken;
           setAccessToken(token);
-          //localStorage.setItem('accessToken', token);
           window.location.href = '/';
         })
         .catch((error) => {
