@@ -11,17 +11,20 @@ const GithubLoginButton = () => {
   const setAccessToken = useAuthStore((state) => state.setAccessToken);
 
   useEffect(() => {
-    const code = searchParams.get('code');
-    if (code) {
-      GithubLogin(code)
-        .then((data) => {
-          setAccessToken(data.accessToken);
-          window.location.href = '/';
-        })
-        .catch((error) => {
-          console.error('로그인 실패:', error);
-        });
-    }
+    const fetchToken = async () => {
+      const code = searchParams.get('code');
+      if (!code) return;
+
+      try {
+        const data = await GithubLogin(code);
+        setAccessToken(data.accessToken);
+        window.location.href = '/';
+      } catch (error) {
+        console.error('로그인 실패:', error);
+      }
+    };
+
+    fetchToken();
   }, [searchParams, setAccessToken]);
 
   return <LoginButton />;
