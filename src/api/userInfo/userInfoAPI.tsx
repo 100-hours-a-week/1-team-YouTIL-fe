@@ -1,3 +1,4 @@
+import { BASE_URL } from '../constant/apiConstants';
 import useAuthStore from '@/store/authStore';
 import useUserInfoStore from '@/store/userInfoStore';
 
@@ -6,7 +7,7 @@ const getUserInfo = async () => {
     const accessToken = useAuthStore.getState().accessToken;
     const setUserInfo = useUserInfoStore.getState().setUserInfo;
 
-    const response = await fetch('http://34.22.84.164:8080/api/v1/users?userId=2', {
+    const response = await fetch(`${BASE_URL}/users?userId=2`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',

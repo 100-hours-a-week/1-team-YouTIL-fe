@@ -1,8 +1,6 @@
 'use client';
 
 import { useEffect } from 'react';
-
-import useAuthGuard from '@/hooks/useAuthGuard';
 import getUserInfo from '@/api/userInfo/userInfoAPI';
 
 import Heatmap from '@/components/main/heatmap/Heatmap';
@@ -12,19 +10,14 @@ import TechNews from '@/components/main/techNews/TechNews';
 import NewTILDescription from '@/components/description/newTILDescription/NewTILDescription';
 
 const Main = () => {
-  useAuthGuard();
-
   useEffect(() => {
-    const fetchUser = async () => {
+    (async () => {
       try {
-        const user = await getUserInfo();
-        console.log('유저 정보:', user);
+        await getUserInfo();
       } catch (error) {
         console.error('유저 정보 불러오기 실패:', error);
       }
-    };
-
-    fetchUser();
+    })();
   }, []);
 
   return (
@@ -32,13 +25,11 @@ const Main = () => {
       <div className="main-space-1"></div>
       <WelcomeDescription />
       <TechNews />
-      
       <div className="main-space-1"></div>
       <TILRecordDescription />
       <Heatmap />
-
       <div className="main-space-1"></div>
-      <NewTILDescription/>
+      <NewTILDescription />
     </div>
   );
 };
