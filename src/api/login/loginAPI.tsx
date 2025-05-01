@@ -15,6 +15,7 @@ const GithubLogin = async (authorizationCode: string) => {
       }
   
       const response = await res.json();
+
       return response.data;
     } catch (error) {
       console.error('GitHub 로그인 오류:', error);
