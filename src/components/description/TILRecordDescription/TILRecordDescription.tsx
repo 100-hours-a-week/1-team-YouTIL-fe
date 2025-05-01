@@ -1,11 +1,15 @@
-import "./TILRecordDescription.scss"
+'use client';
 
-const TILRecordDescription =() =>{
-    return(
-        <div className="description">
-            **님의 TIL 기록입니다.
-        </div>
-    )
-}
+import './TILRecordDescription.scss';
+import useUserInfoStore from '@/store/userInfoStore';
+
+const TILRecordDescription = () => {
+  const { userInfo } = useUserInfoStore();
+  return (
+    <div className="description">
+      {userInfo.name}님의 TIL 기록입니다.
+    </div>
+  );
+};
 
 export default TILRecordDescription;

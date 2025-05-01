@@ -6,7 +6,7 @@ import Image from 'next/image';
 import gitlogin from 'public/gitlogin.png';
 import './GithubLoginButton.scss';
 
-import GithubLogin from '@/api/loginAPI';
+import GithubLogin from '@/api/login/loginAPI';
 import useAuthStore from '@/store/authStore';
 
 const GithubLoginButton = () => {
@@ -20,6 +20,7 @@ const GithubLoginButton = () => {
       GithubLogin(code)
         .then((data) => {
           const token = data.accessToken;
+          
           setAccessToken(token);
           window.location.href = '/';
         })
