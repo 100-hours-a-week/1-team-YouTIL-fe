@@ -7,9 +7,9 @@ const WelcomeDescription = () => {
   const { userInfo } = useUserInfoStore();
 
   return (
-    <div className="description">
+    <article className="description">
       {userInfo.name}님 환영합니다
-    </div>
+    </article>
   );
 };
 
