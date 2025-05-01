@@ -8,6 +8,7 @@ import './GithubLoginButton.scss';
 
 import GithubLogin from '@/api/login/loginAPI';
 import useAuthStore from '@/store/authStore';
+import { getGithubAuthUrl } from '@/api/constant/githubLoginConstants';
 
 const GithubLoginButton = () => {
   const searchParams = useSearchParams();
@@ -15,12 +16,10 @@ const GithubLoginButton = () => {
 
   useEffect(() => {
     const code = searchParams.get('code');
-
     if (code) {
       GithubLogin(code)
         .then((data) => {
           const token = data.accessToken;
-          
           setAccessToken(token);
           window.location.href = '/';
         })
@@ -31,9 +30,8 @@ const GithubLoginButton = () => {
   }, [searchParams, setAccessToken]);
 
   const handleLogin = () => {
-    const client_id = process.env.NEXT_PUBLIC_GITHUB_CLIENT_ID;
-    const githubAuthUrl = `https://github.com/login/oauth/authorize?client_id=${client_id}&scope=read%3Auser%20user%3Aemail%20read%3Aorg%20repo`;
-
+    const client_id = process.env.NEXT_PUBLIC_GITHUB_CLIENT_ID!;
+    const githubAuthUrl = getGithubAuthUrl(client_id);
     window.location.href = githubAuthUrl;
   };
 
