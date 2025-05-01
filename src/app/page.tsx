@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect } from 'react';
-import useAuthRedirect from '@/hooks/useAuthRedirect';
 import getUserInfo from '@/api/userInfo/userInfoAPI';
 
 import Heatmap from '@/components/main/heatmap/Heatmap';
@@ -11,11 +10,7 @@ import TechNews from '@/components/main/techNews/TechNews';
 import NewTILDescription from '@/components/description/newTILDescription/NewTILDescription';
 
 const Main = () => {
-  const { isAuthenticated } = useAuthRedirect();
-
   useEffect(() => {
-    if (!isAuthenticated) return;
-
     const fetchUser = async () => {
       try {
         const user = await getUserInfo();
@@ -26,9 +21,8 @@ const Main = () => {
     };
 
     fetchUser();
-  }, [isAuthenticated]);
+  }, []);
 
-  if (isAuthenticated === null) return null; // 초기 로딩 시 아무 것도 렌더 안 함
 
   return (
     <div className="main-page">
