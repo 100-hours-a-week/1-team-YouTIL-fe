@@ -1,5 +1,5 @@
 import GithubLoginButton from "@/components/login/githubLoginButton/GithubLoginButton/GithubLoginButton";
-import LoginPageIntro from "@/components/login/logindescription/LoginPageIntro";
+import LoginPageIntro from "@/components/login/loginPageIntro/LoginPageIntro";
 import "./page.scss";
 
 const login =() =>{

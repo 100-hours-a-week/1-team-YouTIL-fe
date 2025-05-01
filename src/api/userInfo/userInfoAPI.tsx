@@ -1,5 +1,3 @@
-// /api/userInfo/getUserInfo.ts
-
 import { BASE_URL } from '../constant/apiConstants';
 import useAuthStore from '@/store/authStore';
 import useUserInfoStore from '@/store/userInfoStore';

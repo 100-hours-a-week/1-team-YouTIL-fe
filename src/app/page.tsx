@@ -11,18 +11,14 @@ import NewTILDescription from '@/components/description/newTILDescription/NewTIL
 
 const Main = () => {
   useEffect(() => {
-    const fetchUser = async () => {
+    (async () => {
       try {
-        const user = await getUserInfo();
-        console.log('유저 정보:', user);
+        await getUserInfo();
       } catch (error) {
         console.error('유저 정보 불러오기 실패:', error);
       }
-    };
-
-    fetchUser();
+    })();
   }, []);
-
 
   return (
     <div className="main-page">

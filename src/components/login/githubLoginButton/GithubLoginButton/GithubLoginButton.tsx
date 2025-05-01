@@ -2,30 +2,25 @@
 
 import { useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
-import GithubLogin from '@/api/login/loginAPI';
-import useAuthStore from '@/store/authStore';
+import { useGithubLogin } from '@/hooks/useGithubLogin';
 import LoginButton from '../LoginButton/LoginButton';
 
 const GithubLoginButton = () => {
   const searchParams = useSearchParams();
-  const setAccessToken = useAuthStore((state) => state.setAccessToken);
+  const { login } = useGithubLogin();
 
   useEffect(() => {
-    const fetchToken = async () => {
-      const code = searchParams.get('code');
-      if (!code) return;
+    const code = searchParams.get('code');
+    if (!code) return;
 
-      try {
-        const data = await GithubLogin(code);
-        setAccessToken(data.accessToken);
+    login(code)
+      .then(() => {
         window.location.href = '/';
-      } catch (error) {
-        console.error('로그인 실패:', error);
-      }
-    };
-
-    fetchToken();
-  }, [searchParams, setAccessToken]);
+      })
+      .catch((error) => {
+        console.error('GitHub 로그인 실패:', error);
+      });
+  }, [searchParams, login]);
 
   return <LoginButton />;
 };
