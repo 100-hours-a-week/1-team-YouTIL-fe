@@ -8,6 +8,7 @@ import TILRecordDescription from '@/components/description/TILRecordDescription/
 import WelcomeDescription from '@/components/description/welcomeDescription/WelcomeDescription';
 import TechNews from '@/components/main/techNews/TechNews';
 import NewTILDescription from '@/components/description/newTILDescription/NewTILDescription';
+import NewTILList from '@/components/main/newTILList/NewTILList';
 
 const Main = () => {
   useEffect(() => {
@@ -30,6 +31,7 @@ const Main = () => {
       <Heatmap />
       <div className="main-space-1"></div>
       <NewTILDescription />
+      <NewTILList/>
     </div>
   );
 };

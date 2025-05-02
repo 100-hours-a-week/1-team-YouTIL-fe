@@ -9,6 +9,7 @@ html, body {
   background-position: center;
   background-repeat: no-repeat;
   background-attachment: fixed;
+  overflow-y: auto;
 }
 
 .layout-container {
@@ -24,7 +25,6 @@ html, body {
   min-width: 500px;
   height: 100%;
   background: white;
-  overflow: hidden;
   display: flex;
   flex-direction: column;
   margin-left: auto;
