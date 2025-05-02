@@ -107,6 +107,7 @@ const Heatmap = () => {
     };
 
     return (
+
         <div className="heatmap-wrapper">
             <div className="heatmap-container">
                 <div className='heatmap-content'>
@@ -145,7 +146,7 @@ const Heatmap = () => {
                                             handleNextClick(basicYear + offset);
                                             setYear(basicYear + offset);
                                         }}
-                                    >
+                                        >
                                         {basicYear + offset}
                                     </a>
                                 </li>

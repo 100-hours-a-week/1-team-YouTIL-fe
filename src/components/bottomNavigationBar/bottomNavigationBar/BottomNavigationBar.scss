@@ -1,9 +1,9 @@
 .bottom-nav-bar {
   position: fixed;
   bottom: 0;
-  width: 500px; /* ✅ mobile-frame 너비에 맞춤 */
+  width: 500px; 
   background: white;
-  z-index: 1000;
+  z-index: 20;
   box-shadow: 0 -1px 5px rgba(0, 0, 0, 0.05);
 }
 
