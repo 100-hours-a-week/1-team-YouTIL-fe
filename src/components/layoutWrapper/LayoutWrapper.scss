@@ -1,35 +1,37 @@
 .layout {
-    &-container {
-      display: flex;
-      justify-content: flex-start;
-      align-items: center;
-      width: 100%;
-      height: 100%;
-    }
-  
+  &-container {
+    width: 100%;
+    min-height: 100vh;
+    height: auto;
+    display: block;
+  }
+
+  &__frame {
+    display: flex;
+    flex-direction: column;
+    width: 500px;
+    min-width: 500px;
+    height: auto;
+    background: white;
+    margin-left: auto;
+    margin-right: 20vw;
+    position: relative;
+  }
+
+  @media (max-width: 500px) {
+
     &__frame {
       width: 500px;
-      min-width: 500px;
-      height: 100%;
-      background: white;
-      margin-left: auto;
-      margin-right: 20vw;
-      position: relative;
-    }
-  
-    @media (max-width: 500px) {
-      &-container {
-        justify-content: center;
-      }
-  
-      &__frame {
-        width: 500px;
-        margin: 0px;
-        min-width: 500px;
-        height: 100%;
-        border-radius: 0;
-        box-shadow: none;
-      }
+      margin: 0;
+      height: auto;
+      border-radius: 0;
+      box-shadow: none;
     }
   }
-  
+}
+
+main {
+  display: block;
+  min-height: 100%;
+  height: auto;
+}

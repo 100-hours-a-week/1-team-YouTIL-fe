@@ -1,9 +1,10 @@
 .til-list {
-    height: 100vh;
+    height: 100%;
     padding: 1rem;
     box-sizing: border-box;
     color: #000;
-  
+    margin-bottom: 50px;
+    
     &__card {
       background-color: #fff;
       border: 1px solid #e0e0e0;

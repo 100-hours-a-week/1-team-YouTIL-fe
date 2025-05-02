@@ -1,8 +1,8 @@
 .bottom-nav-bar {
   position: fixed;
   bottom: 0;
-  width: 500px; 
   background: white;
+  width: 500px; 
   z-index: 20;
   box-shadow: 0 -1px 5px rgba(0, 0, 0, 0.05);
 }
@@ -12,4 +12,5 @@
   justify-content: space-around;
   align-items: center;
   padding: 0.75rem 1rem;
+  height: 30px;
 }

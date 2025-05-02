@@ -3,12 +3,14 @@
 import { useEffect } from 'react';
 import getUserInfo from '@/api/userInfo/userInfoAPI';
 
+import './page.scss';
 import Heatmap from '@/components/main/heatmap/Heatmap';
 import TILRecordDescription from '@/components/description/TILRecordDescription/TILRecordDescription';
 import WelcomeDescription from '@/components/description/welcomeDescription/WelcomeDescription';
 import TechNews from '@/components/main/techNews/TechNews';
 import NewTILDescription from '@/components/description/newTILDescription/NewTILDescription';
 import NewTILList from '@/components/main/newTILList/NewTILList';
+
 
 const Main = () => {
   useEffect(() => {
