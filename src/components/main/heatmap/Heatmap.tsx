@@ -44,8 +44,8 @@ const Heatmap = () => {
                     scale: {
                         color: {
                             type: 'linear',
-                            range: ['#8dfc98', '#4dfa5d', '#00ff18', '#00c713', '#00870d'],
-                            domain: [1, 3, 5, 7, 9],
+                            range: ['#B3E7FC', '#5FC9F8', '#00B6F9', '#0075A8', '#004B70'],
+                            domain: [1, 2, 3, 4, 5],
                         },
                     },
                     domain: {

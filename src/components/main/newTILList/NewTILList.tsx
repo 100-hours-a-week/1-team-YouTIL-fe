@@ -104,7 +104,7 @@ const NewTILList = () => {
               </div>
               <div className="til-list__tags">
                 {til.tags.map((tag, i) => (
-                    <span key={i} className="til-list__tag">{tag}</span>
+                    <span key={i} className="til-list__tag">#{tag}</span>
                 ))}
             </div>
 
