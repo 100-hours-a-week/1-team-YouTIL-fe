@@ -1,7 +1,16 @@
+import Image from "next/image";
+import nocommit from "public/nocommit.png"
+
 const NoCommitDescription =() =>{
     return(
         <div>
-            커밋 내역이 존재하지 않습니다 ㅠㅠ
+            <Image
+            src={nocommit}
+            alt="NoCommit"
+            width={300}
+            height={165}
+            priority
+            />
         </div>
     )    
 }
