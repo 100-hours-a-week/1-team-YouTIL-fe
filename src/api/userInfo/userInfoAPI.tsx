@@ -7,7 +7,7 @@ const getUserInfo = async () => {
     const accessToken = useAuthStore.getState().accessToken;
     const setUserInfo = useUserInfoStore.getState().setUserInfo;
 
-    const response = await fetch(`${BASE_URL}/users?userId=2`, {
+    const response = await fetch(`${BASE_URL}/users?userId=`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',

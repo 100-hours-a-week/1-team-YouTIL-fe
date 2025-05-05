@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useUserOrganizationStore } from '@/store/userOrganizationStore';
 import { useUserRepositoryStore } from '@/store/userRepositoryStore';
+import { useUserBranchStore } from '@/store/userBranchStore';
 import { useSelectedDateStore } from '@/store/userDateStore';
 import { useCommitListStore } from '@/store/userCommitListStore';
 import { useFetch } from '@/hooks/useFetch';
@@ -13,19 +14,14 @@ interface Branch {
   name: string;
 }
 
-interface Patch {
+interface Commit {
   commit_message: string;
-}
-
-interface File {
-  filepath: string;
-  latest_code: string;
-  patches: Patch[];
+  sha: string;
 }
 
 interface CommitDetailResponse {
   data: {
-    files: File[];
+    commits: Commit[];
   };
 }
 
@@ -44,6 +40,7 @@ const SelectBranchModal = ({ onClose }: Props) => {
   const selectedRepo = useUserRepositoryStore((state) => state.selectedRepository);
   const selectedDate = useSelectedDateStore((state) => state.selectedDate);
   const setCommitMessages = useCommitListStore((state) => state.setCommitMessages);
+  const setSelectedBranch = useUserBranchStore((state) => state.setSelectedBranch); // ✅ 브랜치 상태 저장
 
   const { callApi } = useFetch();
   const accessToken = useGetAccessToken();
@@ -59,13 +56,14 @@ const SelectBranchModal = ({ onClose }: Props) => {
         setIsLoading(false);
         return;
       }
+
       try {
         const response = await callApi<BranchResponse>({
           method: 'GET',
-          endpoint: `/github/branches?organizationId=${selectedOrg ? selectedOrg.organization_id : ''}&repositoryId=${selectedRepo.repositoryId}`,
+          endpoint: `/github/branches?organizationId=${selectedOrg?.organization_id ?? ''}&repositoryId=${selectedRepo.repositoryId}`,
           headers: {
             Authorization: `Bearer ${accessToken}`,
-          },  
+          },
         });
 
         setBranches(response.data.branches);
@@ -89,17 +87,16 @@ const SelectBranchModal = ({ onClose }: Props) => {
     try {
       const response = await callApi<CommitDetailResponse>({
         method: 'GET',
-        endpoint: `/github/commits?&organizationId=${selectedOrg ? selectedOrg.organization_id : ''}&repositoryId=${selectedRepo.repositoryId}&branchId=${selectedBranchName}&date=${selectedDate}`,
+        endpoint: `/github/commits?organizationId=${selectedOrg?.organization_id ?? ''}&repositoryId=${selectedRepo.repositoryId}&branchId=${selectedBranchName}&date=${selectedDate}`,
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
       });
-      console.log(response);
-      const messages = response.data.files.flatMap((file) =>
-        file.patches.map((p) => p.commit_message)
-      );
 
+      const commits = response?.data?.commits ?? [];
+      const messages = commits.map((commit) => commit.commit_message);
       setCommitMessages(messages);
+      setSelectedBranch({ branchName: selectedBranchName });
     } catch (err) {
       console.error('커밋 가져오기 실패:', err);
     } finally {
