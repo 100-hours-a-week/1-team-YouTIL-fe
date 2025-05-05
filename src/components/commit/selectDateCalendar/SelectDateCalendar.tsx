@@ -1,7 +1,6 @@
-'use client'
+'use client';
 
-import { useState } from 'react';
-
+import { useState, useEffect } from 'react';
 import {
   format,
   addMonths,
@@ -17,22 +16,29 @@ import {
   addDays
 } from 'date-fns';
 import './SelectDateCalendar.scss';
+import { useSelectedDateStore } from '@/store/userDateStore';
+
 
 const SelectDateCalendar = () => {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState(new Date());
 
-  const renderHeader = () => {
-    return (
-      <div className="calendar__header">
-        <button onClick={() => setCurrentDate(subYears(currentDate, 1))}>{'<<'}</button>
-        <button onClick={() => setCurrentDate(subMonths(currentDate, 1))}>{'<'}</button>
-        <span>{format(selectedDate, 'yyyy년 M월 d일')}</span>
-        <button onClick={() => setCurrentDate(addMonths(currentDate, 1))}>{'>'}</button>
-        <button onClick={() => setCurrentDate(addYears(currentDate, 1))}>{'>>'}</button>
-      </div>
-    );
-  };
+  const setSelectedDateGlobal = useSelectedDateStore((state) => state.setSelectedDate);
+
+  useEffect(() => {
+    const formatted = format(selectedDate, 'yyyy-MM-dd');
+    setSelectedDateGlobal(formatted);
+  }, [selectedDate, setSelectedDateGlobal]);
+
+  const renderHeader = () => (
+    <div className="calendar__header">
+      <button onClick={() => setCurrentDate(subYears(currentDate, 1))}>{'<<'}</button>
+      <button onClick={() => setCurrentDate(subMonths(currentDate, 1))}>{'<'}</button>
+      <span>{format(selectedDate, 'yyyy년 M월 d일')}</span>
+      <button onClick={() => setCurrentDate(addMonths(currentDate, 1))}>{'>'}</button>
+      <button onClick={() => setCurrentDate(addYears(currentDate, 1))}>{'>>'}</button>
+    </div>
+  );
 
   const renderDays = () => {
     const days = [];
@@ -61,24 +67,24 @@ const SelectDateCalendar = () => {
     while (day <= endDate) {
       for (let i = 0; i < 7; i++) {
         const cloneDay = day;
-        const formattedDate = format(day, 'd');
         const isSelected = isSameDay(day, selectedDate);
         const isCurrentMonth = isSameMonth(day, monthStart);
 
         days.push(
           <div
             className={`calendar__cell ${isSelected ? 'calendar__cell--selected' : ''} ${!isCurrentMonth ? 'calendar__cell--disabled' : ''}`}
-            key={day.toString()}
+            key={day.toISOString()}
             onClick={() => setSelectedDate(cloneDay)}
           >
-            {formattedDate}
+            {format(day, 'd')}
           </div>
         );
         day = addDays(day, 1);
       }
-      rows.push(<div className="calendar__row" key={day.toString()}>{days}</div>);
+      rows.push(<div className="calendar__row" key={day.toISOString()}>{days}</div>);
       days = [];
     }
+
     return <div className="calendar__body">{rows}</div>;
   };
 

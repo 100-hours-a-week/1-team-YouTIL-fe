@@ -3,12 +3,30 @@
 import { useEffect, useState } from 'react';
 import { useUserOrganizationStore } from '@/store/userOrganizationStore';
 import { useUserRepositoryStore } from '@/store/userRepositoryStore';
+import { useSelectedDateStore } from '@/store/userDateStore';
+import { useCommitListStore } from '@/store/userCommitListStore';
 import { useFetch } from '@/hooks/useFetch';
 import useGetAccessToken from '@/hooks/useGetAccessToken';
 import './SelectBranchModal.scss';
 
 interface Branch {
   name: string;
+}
+
+interface Patch {
+  commit_message: string;
+}
+
+interface File {
+  filepath: string;
+  latest_code: string;
+  patches: Patch[];
+}
+
+interface CommitDetailResponse {
+  data: {
+    files: File[];
+  };
 }
 
 interface BranchResponse {
@@ -24,6 +42,9 @@ interface Props {
 const SelectBranchModal = ({ onClose }: Props) => {
   const selectedOrg = useUserOrganizationStore((state) => state.selectedOrganization);
   const selectedRepo = useUserRepositoryStore((state) => state.selectedRepository);
+  const selectedDate = useSelectedDateStore((state) => state.selectedDate);
+  const setCommitMessages = useCommitListStore((state) => state.setCommitMessages);
+
   const { callApi } = useFetch();
   const accessToken = useGetAccessToken();
 
@@ -38,16 +59,15 @@ const SelectBranchModal = ({ onClose }: Props) => {
         setIsLoading(false);
         return;
       }
-
       try {
         const response = await callApi<BranchResponse>({
           method: 'GET',
           endpoint: `/github/branches?organizationId=${selectedOrg ? selectedOrg.organization_id : ''}&repositoryId=${selectedRepo.repositoryId}`,
           headers: {
             Authorization: `Bearer ${accessToken}`,
-          },
+          },  
         });
-        console.log(response);
+
         setBranches(response.data.branches);
       } catch (err) {
         console.error('브랜치 불러오기 실패:', err);
@@ -60,13 +80,33 @@ const SelectBranchModal = ({ onClose }: Props) => {
   }, [selectedOrg, selectedRepo, accessToken, callApi]);
 
   const handleSelect = (branch: Branch) => {
-    if (selectedBranchName === branch.name) {
-      setSelectedBranchName(null);
-    } else {
-      setSelectedBranchName(branch.name);
+    setSelectedBranchName((prev) => (prev === branch.name ? null : branch.name));
+  };
+
+  const handleComplete = async () => {
+    if (!selectedBranchName || !selectedRepo || !selectedDate) return;
+
+    try {
+      const response = await callApi<CommitDetailResponse>({
+        method: 'GET',
+        endpoint: `/github/commits?&organizationId=${selectedOrg ? selectedOrg.organization_id : ''}&repositoryId=${selectedRepo.repositoryId}&branchId=${selectedBranchName}&date=${selectedDate}`,
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+      console.log(response);
+      const messages = response.data.files.flatMap((file) =>
+        file.patches.map((p) => p.commit_message)
+      );
+
+      setCommitMessages(messages);
+    } catch (err) {
+      console.error('커밋 가져오기 실패:', err);
+    } finally {
+      onClose();
     }
   };
-  
+
   const isCompleteEnabled = selectedBranchName !== null;
 
   return (
@@ -93,7 +133,7 @@ const SelectBranchModal = ({ onClose }: Props) => {
 
             <button
               className="branch-modal__close"
-              onClick={onClose}
+              onClick={handleComplete}
               disabled={!isCompleteEnabled}
             >
               선택 완료

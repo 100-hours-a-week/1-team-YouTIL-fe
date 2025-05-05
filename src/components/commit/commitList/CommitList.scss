@@ -1,0 +1,36 @@
+.commit-list {
+    &__ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+  
+    &__item {
+      width: 300px;
+      max-width: 600px;
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      border: 1px solid #dcdcdc;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+      margin-bottom: 0.75rem;
+      cursor: pointer;
+      transition: background 0.2s ease, box-shadow 0.2s ease;
+  
+      &:hover {
+        background-color: #f0f8ff;
+      }
+  
+      &--selected {
+        background-color: #00b6fa;
+        color: white;
+        font-weight: bold;
+        border-color: #00b6fa; // ✅ 테두리도 강조
+        box-shadow: 0 3px 6px rgba(0, 182, 250, 0.4); // ✅ 푸른 그림자 강조
+  
+        &:hover {
+          background-color: #00b6fa;
+        }
+      }
+    }
+  }
+  
