@@ -1,0 +1,11 @@
+.commit-page {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    
+  &__space-1{
+    margin-top: 20px;
+  }
+  }

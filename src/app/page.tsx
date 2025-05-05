@@ -25,7 +25,7 @@ const Main = () => {
 
   return (
     <div className="main-page">
-      <div className="main-space-1"></div>
+      {/* <div className="main-space-1"></div> */}
       <WelcomeDescription />
       <TechNews />
       <div className="main-space-1"></div>
