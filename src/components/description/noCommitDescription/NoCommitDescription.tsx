@@ -7,8 +7,8 @@ const NoCommitDescription =() =>{
             <Image
             src={nocommit}
             alt="NoCommit"
-            width={300}
-            height={165}
+            width={275}
+            height={150}
             priority
             />
         </div>

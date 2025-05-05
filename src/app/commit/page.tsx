@@ -11,7 +11,9 @@ const commit =() =>{
     return(
         <div className="commit-page">
             <SelectDateCalendar/>
+            <div className="commit-page__space-1"></div>
             <LinkGithubButton/>
+            <div className="commit-page__space-1"></div>
             <NoCommitDescription/>
         </div>
     )
