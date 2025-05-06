@@ -1,7 +1,9 @@
+import GenerateTILForm from "@/components/generate/generateTILForm/GenerateTILForm";
+
 const generate =() =>{
     return (
         <div>
-            TIL 생성 페이지
+            <GenerateTILForm/>
         </div>
     )
 
