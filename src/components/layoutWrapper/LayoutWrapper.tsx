@@ -20,8 +20,9 @@ export default function LayoutWrapper({ children }: { children: React.ReactNode 
           {!isLoginPage && <Header />}
 
           <main>
-            {/* {isLoginPage ? children : <AuthGuard>{children}</AuthGuard>} */}
-            {children}
+            {isLoginPage ? children : <AuthGuard>{children}</AuthGuard>}
+            {/* {<AuthGuard>{children}</AuthGuard>} */}
+            {/* {children} */}
           </main>
 
           {!isLoginPage && <BottomNavigationBar />}
