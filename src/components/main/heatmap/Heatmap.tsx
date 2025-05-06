@@ -15,8 +15,10 @@ import { useFetch } from '@/hooks/useFetch';
 import useGetAccessToken from '@/hooks/useGetAccessToken';
 
 const weekdays = ["Sun", "Mon", "Tues", "Wed", "Thur", "Fri", "Sat"];
-const currentYear = new Date();
-const basicYear = currentYear.getFullYear();
+const currentDate = new Date();
+const basicYear = currentDate.getFullYear();
+const rawCurrentMonth = currentDate.getMonth(); // 0-based
+const adjustedCurrentMonth = rawCurrentMonth >= 9 ? 8 : rawCurrentMonth;
 
 interface TilApiResponse {
   data: {
@@ -34,6 +36,7 @@ const monthMap: Record<string, string> = {
 const Heatmap = () => {
   const [cal, setCal] = useState<any>(null);
   const [year, setYear] = useState(basicYear);
+  const [currentMonth, setCurrentMonth] = useState(adjustedCurrentMonth); // 0-based
   const heatmapRef = useRef<any>(null);
   const [isOpen, setIsOpen] = useState(false);
   const [tilData, setTilData] = useState<{ date: string; count: number }[]>([]);
@@ -74,6 +77,8 @@ const Heatmap = () => {
 
   useEffect(() => {
     if (!heatmapRef.current && tilData.length > 0) {
+      const startMonthDate = new Date(`${year}-${String(currentMonth + 1).padStart(2, '0')}-01`);
+
       heatmapRef.current = new CalHeatmap();
       heatmapRef.current.paint(
         {
@@ -84,7 +89,7 @@ const Heatmap = () => {
             y: 'count',
             groupY: 'max',
           },
-          date: { start: new Date(`${year}-01-01`) },
+          date: { start: startMonthDate },
           range: 4,
           scale: {
             color: {
@@ -144,14 +149,14 @@ const Heatmap = () => {
   };
 
   const handlePrevDomain = () => {
-    const month = heatmapRef.current?.getCurrentDomain?.()?.[0]?.date?.getMonth?.();
-    if (month === 12) return;
+    if (currentMonth - 4 < 0) return;
+    setCurrentMonth(prev => prev - 4);
     cal?.previous(4);
   };
 
   const handleNextDomain = () => {
-    const month = heatmapRef.current?.getCurrentDomain?.()?.[0]?.date?.getMonth?.();
-    if (month === 1) return;
+    if (currentMonth + 4 > 11) return;
+    setCurrentMonth(prev => prev + 4);
     cal?.next(4);
   };
 
@@ -192,6 +197,7 @@ const Heatmap = () => {
                     setIsOpen(false);
                     handleNextClick(basicYear + offset);
                     setYear(basicYear + offset);
+                    setCurrentMonth(0);
                   }}
                 >
                   {basicYear + offset}
