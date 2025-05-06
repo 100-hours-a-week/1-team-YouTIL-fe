@@ -8,7 +8,6 @@ export const metadata: Metadata = {
   description: "YouTIL",
 };
 
-
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
