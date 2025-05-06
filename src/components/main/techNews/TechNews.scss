@@ -42,7 +42,7 @@
   }
 
   &__item {
-    scroll-snap-align: center; 
+    scroll-snap-align: center;
     position: relative;
     flex: 0 0 auto;
     width: 300px;
@@ -52,9 +52,14 @@
     text-decoration: none;
     color: white;
     transition: transform 0.2s;
+    z-index: 10;
 
     &:hover {
       transform: scale(1.03);
+    }
+
+    &.no-hover:hover {
+      transform: none;
     }
   }
 
