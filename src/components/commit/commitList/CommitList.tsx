@@ -39,6 +39,7 @@ const CommitList = () => {
   const [userSelectedCommits, setUserSelectedCommits] = useState<Commit[]>([]);
   const [shake, setShake] = useState(false);
   const [shakeIndex, setShakeIndex] = useState<number | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   const toggleSelection = (index: number) => {
     const selectedCommit = commits[index];
@@ -66,6 +67,7 @@ const CommitList = () => {
 
   const refreshCommitList = async () => {
     if (!selectedRepository || !selectedBranchName || !selectedDate) return;
+    setIsLoading(true);
     try {
       const response = await callApi<CommitDetailResponse>({
         method: 'GET',
@@ -75,12 +77,14 @@ const CommitList = () => {
         },
       });
 
-      const commits = response?.data?.commits ?? [];
+      const commits = response?.data?.commits ?? [];  
       setCommits(commits);
       setSelectedIndexes([]);
       setUserSelectedCommits([]);
     } catch (err) {
       console.error('커밋 새로고침 실패:', err);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -112,8 +116,12 @@ const CommitList = () => {
         </div>
       )}
 
-      {(!commits || commits.length === 0) ? (
-        <NoCommitDescription />
+      {isLoading ? (
+        <p className="commit-list__loading">로딩 중...</p>
+      ) : !commits || commits.length === 0 ? (
+        <div className='commit-list__desc'>
+          <NoCommitDescription />
+        </div>
       ) : (
         <ul className="commit-list__ul">
           {commits.map((commit, idx) => (
