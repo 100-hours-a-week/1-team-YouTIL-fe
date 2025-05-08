@@ -1,32 +1,30 @@
 'use client'
 
 import './GenerateTILForm.scss';
-import { useCommitListStore } from '@/store/userCommitListStore';
 import { useSelectedCommitListStore } from '@/store/selectedCommitListStore';
 import { useState } from 'react';
 
 const GenerateTILForm = () => {
-  const { commitMessages } = useCommitListStore();
-  const {selectedCommitMessages} = useSelectedCommitListStore();
+  const { selectedCommits } = useSelectedCommitListStore();
   const [title, setTitle] = useState('');
   const [category, setCategory] = useState('풀스택');
   const [visibility, setVisibility] = useState<'public' | 'private'>('public');
 
   return (
     <div className="generate">
-        <form className="generate__form">
-            <label className='generate__label'>
-                선택된 커밋 목록
-            <section className="generate__commits">
-                <ul className="generate__commits-list">
-                {selectedCommitMessages.map((msg, index) => (
-                    <li key={index} className="generate__commit-item">
-                    {msg}
-                    </li>
-                ))}
-                </ul>
-            </section>
-            </label>
+      <form className="generate__form">
+        <label className="generate__label">
+          선택된 커밋 목록
+          <section className="generate__commits">
+            <ul className="generate__commits-list">
+              {selectedCommits.map((commit, index) => (
+                <li key={index} className="generate__commit-item">
+                  {commit.commit_message}
+                </li>
+              ))}
+            </ul>
+          </section>
+        </label>
 
         <label className="generate__label">
           TIL 제목

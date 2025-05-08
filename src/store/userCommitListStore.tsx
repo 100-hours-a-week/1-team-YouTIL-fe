@@ -1,13 +1,18 @@
 import { create } from 'zustand';
 
+interface Commit {
+  sha: string;
+  commit_message: string;
+}
+
 interface CommitListState {
-  commitMessages: string[];
-  setCommitMessages: (messages: string[]) => void;
-  resetCommitMessages: () => void;
+  commits: Commit[];
+  setCommits: (commits: Commit[]) => void;
+  resetCommits: () => void;
 }
 
 export const useCommitListStore = create<CommitListState>((set) => ({
-  commitMessages: [],
-  setCommitMessages: (messages) => set({ commitMessages: messages }),
-  resetCommitMessages: () => set({ commitMessages: [] }),
+  commits: [],
+  setCommits: (commits) => set({ commits }),
+  resetCommits: () => set({ commits: [] }),
 }));
