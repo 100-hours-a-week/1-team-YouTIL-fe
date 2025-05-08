@@ -2,16 +2,30 @@
 
 import './GenerateTILForm.scss';
 import { useSelectedCommitListStore } from '@/store/selectedCommitListStore';
+import { useUserOrganizationStore } from '@/store/userOrganizationStore';
+import { useUserRepositoryStore } from '@/store/userRepositoryStore';
+import { useUserBranchStore } from '@/store/userBranchStore';
+import useGetAccessToken from '@/hooks/useGetAccessToken';
+import { useFetch } from '@/hooks/useFetch';
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 const GenerateTILForm = () => {
+  const router = useRouter();
   const { selectedCommits } = useSelectedCommitListStore();
-  const [title, setTitle] = useState('');
+  const { callApi } = useFetch();
+
+  const selectedOrganization = useUserOrganizationStore((state) => state.selectedOrganization);
+  const selectedRepository = useUserRepositoryStore((state) => state.selectedRepository);
+  const selectedBranch = useUserBranchStore((state) => state.selectedBranch);
+  const accessToken = useGetAccessToken();
+
+  const [title, setTitle] = useState(''); 
   const [category, setCategory] = useState('풀스택');
   const [visibility, setVisibility] = useState<'public' | 'private'>('public');
   const [shake, setShake] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (title.trim() === '') {
@@ -19,12 +33,35 @@ const GenerateTILForm = () => {
       setTimeout(() => setShake(false), 500);
       return;
     }
-    console.log({
-      title,
-      category,
-      visibility,
+
+    const payload = {
+      organizationId: selectedOrganization?.organization_id ?? null,
+      repositoryId: selectedRepository?.repositoryId ?? 0,
+      branch: selectedBranch?.branchName ?? '',
       commits: selectedCommits,
-    });
+      title,
+      category: category.toUpperCase(),
+      is_shared: visibility === 'public',
+    };
+
+    try {
+      // console.log(payload);
+      const response = await callApi({
+        method: 'POST',
+        endpoint: '/tils',
+        // body: JSON.stringify(payload),
+        body:payload,
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${accessToken}`,
+        }
+      });
+
+      console.log('TIL 생성 응답:', response);
+      // router.push('/repository/til');
+    } catch (error) {
+      console.error('TIL 생성 실패:', error);
+    }
   };
 
   return (
@@ -76,10 +113,10 @@ const GenerateTILForm = () => {
               value="public"
               checked={visibility === 'public'}
               onChange={() => setVisibility('public')}
-            />{' '}
+            />
             <span className="generate__visibility-radio">
-            <p className="generate__visibility-radio-label">public</p>
-            <p className="generate__visibility-radio-desc">다른 사용자에게 공유됩니다.</p>
+              <p className="generate__visibility-radio-label">public</p>
+              <p className="generate__visibility-radio-desc">다른 사용자에게 공유됩니다.</p>
             </span>
           </label>
           <label>
@@ -89,10 +126,10 @@ const GenerateTILForm = () => {
               value="private"
               checked={visibility === 'private'}
               onChange={() => setVisibility('private')}
-            />{' '}
+            />
             <span className="generate__visibility-radio">
-            <p className="generate__visibility-radio-label">private</p>
-            <p className="generate__visibility-radio-desc">다른 사용자에게 공유되지 않습니다.</p>
+              <p className="generate__visibility-radio-label">private</p>
+              <p className="generate__visibility-radio-desc">다른 사용자에게 공유되지 않습니다.</p>
             </span>
           </label>
         </div>

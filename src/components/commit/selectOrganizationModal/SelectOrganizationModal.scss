@@ -74,5 +74,10 @@
         cursor: not-allowed;
       }
     }
+
+    &__loading {
+      text-align: center;
+      color: #555;
+    }
   }
   
