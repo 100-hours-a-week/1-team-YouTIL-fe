@@ -1,39 +1,74 @@
 'use client';
 
-import { useTILInfoStore } from '@/store/TILInfoStore';
-import { useSelectedCommitListStore } from '@/store/selectedCommitListStore';
-import { useUserOrganizationStore } from '@/store/userOrganizationStore';
-import { useUserRepositoryStore } from '@/store/userRepositoryStore';
-import { useUserBranchStore } from '@/store/userBranchStore';
+import './RepositoryTILList.scss';
+import { useEffect, useState } from 'react';
+import { useFetch } from '@/hooks/useFetch';
+import useGetAccessToken from '@/hooks/useGetAccessToken';
+import { useRepositoryDateStore } from '@/store/useRepositoryDateStore';
+
+interface TILItem {
+  tilId: number;
+  title: string;
+  createdAt: string;
+}
+
+interface TILResponse {
+  data: {
+    tils: TILItem[];
+  };
+}
 
 const RepositoryTILList = () => {
-  const { title, category, visibility } = useTILInfoStore();
-  const { selectedCommits } = useSelectedCommitListStore();
+  const { callApi } = useFetch();
+  const accessToken = useGetAccessToken();
+  const tilDate = useRepositoryDateStore((state) => state.tilDate);
 
-  const selectedOrganization = useUserOrganizationStore((state) => state.selectedOrganization);
-  const selectedRepository = useUserRepositoryStore((state) => state.selectedRepository);
-  const selectedBranch = useUserBranchStore((state) => state.selectedBranch);
+  const [data, setData] = useState<TILItem[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isError, setIsError] = useState<boolean>(false);
+
+  useEffect(() => {
+    const fetchTILs = async () => {
+      if (!tilDate) return;
+
+      setIsLoading(true);
+      setIsError(false);
+
+      try {
+        const response = await callApi<TILResponse>({
+          method: 'GET',
+          endpoint: `/tils?page=0&size=10`,
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        });
+
+        setData(response.data.tils);
+      } catch (error) {
+        console.error('TIL 데이터를 가져오는 중 오류 발생:', error);
+        setIsError(true);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchTILs();
+  }, [tilDate, callApi, accessToken]);
+
+  if (isLoading) return <p className="til-list__loading">로딩 중...</p>;
+  if (isError) return <p className="til-list__loading">TIL 데이터를 불러오지 못했습니다.</p>;
 
   return (
-    <div>
-      {/* <h2>TIL 정보</h2>
-      <p>제목: {title}</p>
-      <p>카테고리: {category}</p>
-      <p>공개 여부: {visibility}</p>
-
-      <h2>선택된 GitHub 정보</h2>
-      <p>조직: {selectedOrganization?.organization_name ?? '없음'}</p>
-      <p>저장소: {selectedRepository?.repositoryName ?? '없음'}</p>
-      <p>브랜치: {selectedBranch?.branchName ?? '없음'}</p>
-
-      <h2>선택된 커밋 목록</h2>
-      <ul>
-        {selectedCommits.map((commit, idx) => (
-          <li key={idx}>
-            {commit.commit_message} ({commit.sha})
+    <div className="til-list">
+      <h2 className="til-list__title">TIL 목록</h2>
+      <ul className="til-list__items">
+        {data.map((til) => (
+          <li key={til.tilId} className="til-list__item">
+            <h3 className="til-list__item-title">{til.title}</h3>
+            <p className="til-list__item-date">{til.createdAt}</p>
           </li>
         ))}
-      </ul> */}
+      </ul>
     </div>
   );
 };

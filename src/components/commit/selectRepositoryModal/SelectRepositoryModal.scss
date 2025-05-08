@@ -14,8 +14,10 @@
     }
   
     &__content {
-      position: relative;
-      margin: 10% auto;
+      position: absolute;
+      top: 150px;
+      left: 50%;
+      transform: translateX(-50%);
       padding: 1rem;
       width: 320px;
       background: #fff;

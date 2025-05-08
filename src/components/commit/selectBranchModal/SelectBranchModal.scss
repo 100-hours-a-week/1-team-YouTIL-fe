@@ -15,8 +15,10 @@
 
 
   &__content {
-    position: relative;
-    margin: 10% auto;
+    position: absolute;
+    top: 150px;
+    left: 50%;
+    transform: translateX(-50%);
     padding: 1rem;
     width: 320px;
     background: #fff;
@@ -24,6 +26,7 @@
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
     z-index: 1000;
   }
+
 
   &__title {
     font-size: 1.2rem;
