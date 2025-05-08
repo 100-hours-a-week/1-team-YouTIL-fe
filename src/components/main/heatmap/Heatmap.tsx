@@ -17,7 +17,7 @@ import useGetAccessToken from '@/hooks/useGetAccessToken';
 const weekdays = ["Sun", "Mon", "Tues", "Wed", "Thur", "Fri", "Sat"];
 const currentDate = new Date();
 const basicYear = currentDate.getFullYear();
-const rawCurrentMonth = currentDate.getMonth(); // 0-based
+const rawCurrentMonth = currentDate.getMonth();
 const adjustedCurrentMonth = rawCurrentMonth >= 9 ? 8 : rawCurrentMonth;
 
 interface TilApiResponse {
