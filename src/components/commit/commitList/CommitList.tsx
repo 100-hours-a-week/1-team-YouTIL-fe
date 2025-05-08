@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useCommitListStore } from '@/store/userCommitListStore';
+import { useSelectedCommitListStore } from '@/store/selectedCommitListStore';
 import { useUserOrganizationStore } from '@/store/userOrganizationStore';
 import { useUserRepositoryStore } from '@/store/userRepositoryStore';
 import { useUserBranchStore } from '@/store/userBranchStore';
@@ -26,12 +27,13 @@ interface CommitDetailResponse {
 const CommitList = () => {
   const router = useRouter();
   const { commitMessages, setCommitMessages } = useCommitListStore();
+  const {selectedCommitMessages, setSelectedCommitMessages} = useSelectedCommitListStore();
+  const { callApi } = useFetch();
+  const accessToken = useGetAccessToken();
   const selectedOrganizaion = useUserOrganizationStore((state) => state.selectedOrganization);
   const selectedRepository = useUserRepositoryStore((state) => state.selectedRepository);
   const selectedDate = useSelectedDateStore((state) => state.selectedDate);
   const selectedBranchName = useUserBranchStore((state) => state.selectedBranch);
-  const { callApi } = useFetch();
-  const accessToken = useGetAccessToken();
 
   const [selectedIndexes, setSelectedIndexes] = useState<number[]>([]);
   const [selectedCommits, setSelectedCommits] = useState<string[]>([]);
@@ -86,7 +88,7 @@ const CommitList = () => {
       setTimeout(() => setShake(false), 500);
       return;
     }
-    setCommitMessages(selectedCommits);
+    setSelectedCommitMessages(selectedCommits);
     router.push('/generate');
   };
 

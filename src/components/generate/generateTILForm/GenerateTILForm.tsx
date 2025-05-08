@@ -2,10 +2,12 @@
 
 import './GenerateTILForm.scss';
 import { useCommitListStore } from '@/store/userCommitListStore';
+import { useSelectedCommitListStore } from '@/store/selectedCommitListStore';
 import { useState } from 'react';
 
 const GenerateTILForm = () => {
   const { commitMessages } = useCommitListStore();
+  const {selectedCommitMessages} = useSelectedCommitListStore();
   const [title, setTitle] = useState('');
   const [category, setCategory] = useState('풀스택');
   const [visibility, setVisibility] = useState<'public' | 'private'>('public');
@@ -17,7 +19,7 @@ const GenerateTILForm = () => {
                 선택된 커밋 목록
             <section className="generate__commits">
                 <ul className="generate__commits-list">
-                {commitMessages.map((msg, index) => (
+                {selectedCommitMessages.map((msg, index) => (
                     <li key={index} className="generate__commit-item">
                     {msg}
                     </li>
