@@ -6,12 +6,30 @@
     gap: 2rem;
     margin-bottom: 4rem;
   
+    &__form {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.5rem;
+      width: 85%;
+      margin: 0 auto;
+    }
+  
+    &__label {
+      width: 100%;
+      max-width: 600px; // ✅ label 너비 고정
+      margin: 0 auto;   // ✅ 중앙 정렬
+      font-weight: bold;
+      color: #333;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+  
     &__commits {
       border-radius: 8px;
       padding: 1rem;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-      max-width: 400px;
-      width: 100%;
     }
   
     &__commits-list {
@@ -30,25 +48,6 @@
       overflow: hidden;
       text-overflow: ellipsis;
       font-weight: normal;
-    }
-  
-    &__form {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 1.5rem;
-      width: 100%;
-      align-self: center;
-    }
-  
-    &__label {
-      width: 100%;
-      align-self: flex-start;
-      font-weight: bold;
-      color: #333;
-      display: flex;
-      flex-direction: column;
-      gap: 0.5rem;
     }
   
     &__input,

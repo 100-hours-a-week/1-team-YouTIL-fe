@@ -12,19 +12,19 @@ const GenerateTILForm = () => {
 
   return (
     <div className="generate">
-    <form className="generate__form">
-    <label className='generate__label'>
-        선택된 커밋 목록
-      <section className="generate__commits">
-        <ul className="generate__commits-list">
-          {commitMessages.map((msg, index) => (
-              <li key={index} className="generate__commit-item">
-              {msg}
-            </li>
-          ))}
-        </ul>
-      </section>
-      </label>
+        <form className="generate__form">
+            <label className='generate__label'>
+                선택된 커밋 목록
+            <section className="generate__commits">
+                <ul className="generate__commits-list">
+                {commitMessages.map((msg, index) => (
+                    <li key={index} className="generate__commit-item">
+                    {msg}
+                    </li>
+                ))}
+                </ul>
+            </section>
+            </label>
 
         <label className="generate__label">
           TIL 제목
