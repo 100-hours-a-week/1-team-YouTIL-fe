@@ -1,8 +1,10 @@
 .commit-list {
+  width: 336px;
+
   &__actions {
     display: flex;
     justify-content: flex-end;
-    margin-bottom: 1rem;
+    margin-bottom: 1.2rem;
     gap: 0.5rem;
   }
 
@@ -49,8 +51,6 @@
   }
 
   &__item {
-    width: 300px;
-    max-width: 300px;
     padding: 0.5rem 1rem;
     border-radius: 6px;
     border: 1px solid #dcdcdc;
@@ -77,8 +77,6 @@
       &:hover {
         background-color: #00b6fa;
       }
-
-      
     }
     &.error {
       background-color: #ff4d4f;
@@ -94,5 +92,15 @@
       75%  { transform: translateX(-4px); }
       100% { transform: translateX(0); }
     }
+  }
+  &__desc {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  &__loading {
+    text-align: center;
+    color: #555;
   }
 }

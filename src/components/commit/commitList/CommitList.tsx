@@ -26,8 +26,8 @@ interface CommitDetailResponse {
 
 const CommitList = () => {
   const router = useRouter();
-  const { commitMessages, setCommitMessages } = useCommitListStore();
-  const {selectedCommitMessages, setSelectedCommitMessages} = useSelectedCommitListStore();
+  const { commits, setCommits } = useCommitListStore();
+  const { setSelectedCommits } = useSelectedCommitListStore();
   const { callApi } = useFetch();
   const accessToken = useGetAccessToken();
   const selectedOrganizaion = useUserOrganizationStore((state) => state.selectedOrganization);
@@ -36,26 +36,30 @@ const CommitList = () => {
   const selectedBranchName = useUserBranchStore((state) => state.selectedBranch);
 
   const [selectedIndexes, setSelectedIndexes] = useState<number[]>([]);
-  const [selectedCommits, setSelectedCommits] = useState<string[]>([]);
+  const [userSelectedCommits, setUserSelectedCommits] = useState<Commit[]>([]);
   const [shake, setShake] = useState(false);
   const [shakeIndex, setShakeIndex] = useState<number | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   const toggleSelection = (index: number) => {
+    const selectedCommit = commits[index];
+    if (!selectedCommit) return;
+
     setSelectedIndexes((prev) => {
       if (prev.includes(index)) {
         const next = prev.filter((i) => i !== index);
-        setSelectedCommits(next.map((i) => commitMessages[i]));
+        const selected = next.map((i) => commits[i]);
+        setUserSelectedCommits(selected);
         return next;
-      } 
-      else {
+      } else {
         if (prev.length >= 5) {
-          console.log("asdf")
           setShakeIndex(index);
           setTimeout(() => setShakeIndex(null), 500);
           return prev;
         }
         const next = [...prev, index];
-        setSelectedCommits(next.map((i) => commitMessages[i]));
+        const selected = next.map((i) => commits[i]);
+        setUserSelectedCommits(selected);
         return next;
       }
     });
@@ -63,6 +67,7 @@ const CommitList = () => {
 
   const refreshCommitList = async () => {
     if (!selectedRepository || !selectedBranchName || !selectedDate) return;
+    setIsLoading(true);
     try {
       const response = await callApi<CommitDetailResponse>({
         method: 'GET',
@@ -72,23 +77,24 @@ const CommitList = () => {
         },
       });
 
-      const commits = response?.data?.commits ?? [];
-      const messages = commits.map((commit) => commit.commit_message);
-      setCommitMessages(messages);
+      const commits = response?.data?.commits ?? [];  
+      setCommits(commits);
       setSelectedIndexes([]);
-      setSelectedCommits([]);
+      setUserSelectedCommits([]);
     } catch (err) {
       console.error('커밋 새로고침 실패:', err);
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const handleGenerateClick = () => {
-    if (selectedCommits.length === 0) {
+    if (userSelectedCommits.length === 0) {
       setShake(true);
       setTimeout(() => setShake(false), 500);
       return;
     }
-    setSelectedCommitMessages(selectedCommits);
+    setSelectedCommits(userSelectedCommits);
     router.push('/generate');
   };
 
@@ -110,11 +116,15 @@ const CommitList = () => {
         </div>
       )}
 
-      {(!commitMessages || commitMessages.length === 0) ? (
-        <NoCommitDescription />
+      {isLoading ? (
+        <p className="commit-list__loading">로딩 중...</p>
+      ) : !commits || commits.length === 0 ? (
+        <div className='commit-list__desc'>
+          <NoCommitDescription />
+        </div>
       ) : (
         <ul className="commit-list__ul">
-          {commitMessages.map((message, idx) => (
+          {commits.map((commit, idx) => (
             <li
               key={idx}
               className={`commit-list__item
@@ -123,7 +133,7 @@ const CommitList = () => {
               `}
               onClick={() => toggleSelection(idx)}
             >
-              {message}
+              {commit.commit_message}
             </li>
           ))}
         </ul>

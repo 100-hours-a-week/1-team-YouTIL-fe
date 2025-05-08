@@ -39,8 +39,8 @@ const SelectBranchModal = ({ onClose }: Props) => {
   const selectedOrg = useUserOrganizationStore((state) => state.selectedOrganization);
   const selectedRepo = useUserRepositoryStore((state) => state.selectedRepository);
   const selectedDate = useSelectedDateStore((state) => state.selectedDate);
-  const setCommitMessages = useCommitListStore((state) => state.setCommitMessages);
-  const setSelectedBranch = useUserBranchStore((state) => state.setSelectedBranch); // ✅ 브랜치 상태 저장
+  const setCommits = useCommitListStore((state) => state.setCommits);
+  const setSelectedBranch = useUserBranchStore((state) => state.setSelectedBranch);
 
   const { callApi } = useFetch();
   const accessToken = useGetAccessToken();
@@ -84,6 +84,8 @@ const SelectBranchModal = ({ onClose }: Props) => {
   const handleComplete = async () => {
     if (!selectedBranchName || !selectedRepo || !selectedDate) return;
 
+    setIsLoading(true);
+
     try {
       const response = await callApi<CommitDetailResponse>({
         method: 'GET',
@@ -94,13 +96,14 @@ const SelectBranchModal = ({ onClose }: Props) => {
       });
 
       const commits = response?.data?.commits ?? [];
-      const messages = commits.map((commit) => commit.commit_message);
-      setCommitMessages(messages);
+      setCommits(commits);
       setSelectedBranch({ branchName: selectedBranchName });
+
+      setIsLoading(false);
+      onClose();
     } catch (err) {
       console.error('커밋 가져오기 실패:', err);
-    } finally {
-      onClose();
+      setIsLoading(false);
     }
   };
 

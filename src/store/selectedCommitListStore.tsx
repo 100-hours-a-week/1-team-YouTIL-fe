@@ -1,13 +1,18 @@
 import { create } from 'zustand';
 
+interface CommitItem {
+  commit_message: string;
+  sha: string;
+}
+
 interface SelectedCommitListState {
-  selectedCommitMessages: string[];
-  setSelectedCommitMessages: (messages: string[]) => void;
-  resetSelectedCommitMessages: () => void;
+  selectedCommits: CommitItem[];
+  setSelectedCommits: (commits: CommitItem[]) => void;
+  resetSelectedCommits: () => void;
 }
 
 export const useSelectedCommitListStore = create<SelectedCommitListState>((set) => ({
-  selectedCommitMessages: [],
-  setSelectedCommitMessages: (messages) => set({ selectedCommitMessages: messages }),
-  resetSelectedCommitMessages: () => set({ selectedCommitMessages: [] }),
+  selectedCommits: [],
+  setSelectedCommits: (commits) => set({ selectedCommits: commits }),
+  resetSelectedCommits: () => set({ selectedCommits: [] }),
 }));
