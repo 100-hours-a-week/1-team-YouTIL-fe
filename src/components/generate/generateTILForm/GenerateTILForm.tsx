@@ -9,6 +9,23 @@ const GenerateTILForm = () => {
   const [title, setTitle] = useState('');
   const [category, setCategory] = useState('풀스택');
   const [visibility, setVisibility] = useState<'public' | 'private'>('public');
+  const [shake, setShake] = useState(false);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (title.trim() === '') {
+      setShake(true);
+      setTimeout(() => setShake(false), 500);
+      return;
+    }
+    console.log({
+      title,
+      category,
+      visibility,
+      commits: selectedCommits,
+    });
+  };
 
   return (
     <div className="generate">
@@ -80,7 +97,11 @@ const GenerateTILForm = () => {
           </label>
         </div>
 
-        <button type="submit" className="generate__button">
+        <button
+          type="submit"
+          onClick={handleSubmit}
+          className={`generate__button ${shake ? 'error shake' : ''}`}
+        >
           생성하기
         </button>
       </form>
