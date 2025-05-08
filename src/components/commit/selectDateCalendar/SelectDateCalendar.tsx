@@ -34,7 +34,7 @@ const SelectDateCalendar = () => {
     <div className="calendar__header">
       <button onClick={() => setCurrentDate(subYears(currentDate, 1))}>{'<<'}</button>
       <button onClick={() => setCurrentDate(subMonths(currentDate, 1))}>{'<'}</button>
-      <span>{format(selectedDate, 'yyyy년 M월 d일')}</span>
+      <span>{format(currentDate, 'yyyy년 M월')}</span>
       <button onClick={() => setCurrentDate(addMonths(currentDate, 1))}>{'>'}</button>
       <button onClick={() => setCurrentDate(addYears(currentDate, 1))}>{'>>'}</button>
     </div>
