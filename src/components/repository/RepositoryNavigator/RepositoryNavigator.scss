@@ -1,40 +1,60 @@
 .repository-navigator {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+
+  &__tabs {
     display: flex;
     justify-content: center;
-    margin-bottom: 1.5rem;
-    margin-top:10px;
-    &__tabs {
-      display: flex;
-      position: relative;
-      border-bottom: 1px solid #ddd;
-      width: 220px; // 너비 조절 가능
-    }
-  
-    &__tab {
-      flex: 1;
-      text-align: center;
-      padding: 0.5rem 0;
-      font-weight: 600;
-      font-size: 0.95rem;
-      color: #aaa;
-      text-decoration: none;
-      position: relative;
-      z-index: 1;
-      transition: color 0.3s ease;
-  
-      &.active {
-        color: #00b6fa;
-      }
-    }
-  
-    &__underline {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      width: 50%;
-      height: 2px;
-      background-color: #00b6fa;
-      transition: transform 0.3s ease;
+    position: relative;
+    width: 100%;
+    max-width: 400px;
+    margin-bottom: 1rem;
+    border-bottom: 2px solid #ddd;
+  }
+
+  &__tab {
+    flex: 1;
+    padding: 0.75rem 1rem;
+    background: transparent;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 1rem;
+    color: #777;
+    position: relative;
+    transition: color 0.3s ease;
+
+    &.active {
+      color: #00b6fa;
     }
   }
-  
+
+  &__underline {
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 50%;
+    height: 2px;
+    background-color: #00b6fa;
+    transition: transform 0.3s ease;
+  }
+
+  &.til-active &__underline {
+    transform: translateX(0%);
+  }
+
+  &.interview-active &__underline {
+    transform: translateX(100%);
+  }
+
+  &__content {
+    width: 100%;
+    max-width: 700px;
+    padding: 0 1rem;
+    min-height: 710px;
+    transition: min-height 0.3s ease;
+  }
+}

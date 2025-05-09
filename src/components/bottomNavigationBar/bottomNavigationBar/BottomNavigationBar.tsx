@@ -7,7 +7,7 @@ const navItems = [
   { label: '메인 페이지', href: '/' },
   { label: 'TIL 생성', href: '/commit' },
   { label: '커뮤니티', href: '/community' },
-  { label: '레포지토리', href: '/repository/til' },
+  { label: '레포지토리', href: '/repository' },
   { label: '프로필', href: '/profile' },
 ];
 

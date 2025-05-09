@@ -10,33 +10,42 @@ import {
   startOfMonth,
   endOfMonth,
   startOfWeek,
-  endOfWeek,
+  endOfWeek,  
   isSameMonth,
   isSameDay,
-  addDays
+  addDays,
+  parseISO
 } from 'date-fns';
 import './RepositoryDateCalendar.scss';
-import { usePathname } from 'next/navigation';
 import { useRepositoryDateStore } from '@/store/useRepositoryDateStore';
 
 const RepositoryDateCalendar = () => {
-  const pathname = usePathname();
-  const setTilDate = useRepositoryDateStore((state) => state.setTilDate);
-  const setInterviewDate = useRepositoryDateStore((state) => state.setInterviewDate);
+  const {
+    activeTab,
+    tilDate,
+    interviewDate,
+    setTilDate,
+    setInterviewDate,
+  } = useRepositoryDateStore();
 
-  const [currentDate, setCurrentDate] = useState(new Date());
-  const [selectedDate, setSelectedDate] = useState(new Date());
+  const rawDate = activeTab === 'interview' ? interviewDate : tilDate;
+  const initialSelected = rawDate && !isNaN(Date.parse(rawDate))
+    ? parseISO(rawDate)
+    : new Date();
+
+  const [currentDate, setCurrentDate] = useState(initialSelected);
+  const [selectedDate, setSelectedDate] = useState(initialSelected);
 
   useEffect(() => {
     const formatted = format(selectedDate, 'yyyy-MM-dd');
+    activeTab === 'interview' ? setInterviewDate(formatted) : setTilDate(formatted);
+  }, [selectedDate]);
 
-    if (pathname.includes('/repository/interview')) {
-      setInterviewDate(formatted);
-    } else {
-      // 기본은 til로 간주
-      setTilDate(formatted);
-    }
-  }, [selectedDate, pathname, setTilDate, setInterviewDate]);
+  useEffect(() => {
+    const newSelectedDate = rawDate && !isNaN(Date.parse(rawDate)) ? parseISO(rawDate) : new Date();
+    setSelectedDate(newSelectedDate);
+    setCurrentDate(newSelectedDate);
+  }, [activeTab]);
 
   const renderHeader = () => (
     <div className="calendar__header">
@@ -49,18 +58,16 @@ const RepositoryDateCalendar = () => {
   );
 
   const renderDays = () => {
-    const days = [];
-    const date = startOfWeek(currentDate);
-
-    for (let i = 0; i < 7; i++) {
-      days.push(
-        <div className="calendar__day" key={i}>
-          {format(addDays(date, i), 'EEE')}
-        </div>
-      );
-    }
-
-    return <div className="calendar__days-row">{days}</div>;
+    const start = startOfWeek(currentDate);
+    return (
+      <div className="calendar__days-row">
+        {Array.from({ length: 7 }, (_, i) => (
+          <div className="calendar__day" key={i}>
+            {format(addDays(start, i), 'EEE')}
+          </div>
+        ))}
+      </div>
+    );
   };
 
   const renderCells = () => {
@@ -81,8 +88,10 @@ const RepositoryDateCalendar = () => {
 
         days.push(
           <div
-            className={`calendar__cell ${isSelected ? 'calendar__cell--selected' : ''} ${!isCurrentMonth ? 'calendar__cell--disabled' : ''}`}
             key={day.toISOString()}
+            className={`calendar__cell ${
+              isSelected ? 'calendar__cell--selected' : ''
+            } ${!isCurrentMonth ? 'calendar__cell--disabled' : ''}`}
             onClick={() => setSelectedDate(cloneDay)}
           >
             {format(day, 'd')}
@@ -90,7 +99,6 @@ const RepositoryDateCalendar = () => {
         );
         day = addDays(day, 1);
       }
-
       rows.push(<div className="calendar__row" key={day.toISOString()}>{days}</div>);
       days = [];
     }

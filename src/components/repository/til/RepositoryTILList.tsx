@@ -21,15 +21,13 @@ interface TILResponse {
 const RepositoryTILList = () => {
   const { callApi } = useFetch();
   const accessToken = useGetAccessToken();
-  const tilDate = useRepositoryDateStore((state) => state.tilDate);
-
+  const {tilDate} = useRepositoryDateStore();
   const [data, setData] = useState<TILItem[]>([]);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [isError, setIsError] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isError, setIsError] = useState(false);
 
   useEffect(() => {
     const fetchTILs = async () => {
-      if (!tilDate) return;
 
       setIsLoading(true);
       setIsError(false);
@@ -37,12 +35,11 @@ const RepositoryTILList = () => {
       try {
         const response = await callApi<TILResponse>({
           method: 'GET',
-          endpoint: `/tils?page=0&size=10`,
+          endpoint: `/tils?page=0&size=10&date=${tilDate}`,
           headers: {
             Authorization: `Bearer ${accessToken}`,
           },
         });
-
         setData(response.data.tils);
       } catch (error) {
         console.error('TIL 데이터를 가져오는 중 오류 발생:', error);
@@ -53,10 +50,10 @@ const RepositoryTILList = () => {
     };
 
     fetchTILs();
-  }, [tilDate, callApi, accessToken]);
+  }, [callApi, accessToken]);
 
-  if (isLoading) return <p className="repository-til-list__loading">로딩 중...</p>;
-  if (isError) return <p className="repository-til-list__loading">TIL 데이터를 불러오지 못했습니다.</p>;
+  // if (isLoading) return <p className="repository-til-list__loading">로딩 중...</p>;
+  // if (isError) return <p className="repository-til-list__loading">TIL 데이터를 불러오지 못했습니다.</p>;
 
   return (
     <div className="repository-til-list">

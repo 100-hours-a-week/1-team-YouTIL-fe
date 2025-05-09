@@ -1,35 +1,34 @@
 'use client';
 
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { useRepositoryDateStore } from '@/store/useRepositoryDateStore';
+import RepositoryTILList from '../til/RepositoryTILList';
+import RepositoryInterviewList from '../interview/RepositoryInterviewList';
 import './RepositoryNavigator.scss';
 
 const RepositoryNavigator = () => {
-  const pathname = usePathname();
-  const isTIL = pathname === '/repository/til';
-  const isInterview = pathname === '/repository/interview';
+  const { activeTab, setActiveTab } = useRepositoryDateStore();
 
   return (
-    <div className="repository-navigator">
+    <div className={`repository-navigator ${activeTab}-active`}>
       <div className="repository-navigator__tabs">
-        <Link
-          href="/repository/til"
-          className={`repository-navigator__tab ${isTIL ? 'active' : ''}`}
+        <button
+          className={`repository-navigator__tab ${activeTab === 'til' ? 'active' : ''}`}
+          onClick={() => setActiveTab('til')}
         >
           TIL
-        </Link>
-        <Link
-          href="/repository/interview"
-          className={`repository-navigator__tab ${isInterview ? 'active' : ''}`}
+        </button>
+        <button
+          className={`repository-navigator__tab ${activeTab === 'interview' ? 'active' : ''}`}
+          onClick={() => setActiveTab('interview')}
         >
           면접질문
-        </Link>
-        <div
-          className="repository-navigator__underline"
-          style={{
-            transform: isTIL ? 'translateX(0%)' : 'translateX(100%)',
-          }}
-        />
+        </button>
+        <div className="repository-navigator__underline" />
+      </div>
+
+      <div className="repository-navigator__content">
+        {activeTab === 'til' && <RepositoryTILList />}
+        {activeTab === 'interview' && <RepositoryInterviewList />}
       </div>
     </div>
   );

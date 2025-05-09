@@ -1,7 +1,14 @@
-import { redirect } from 'next/navigation';
+import RepositoryDateCalendar from '@/components/repository/repositoryDateCalendar/RepositoryDateCalendar';
+import RepositoryNavigator from '@/components/repository/RepositoryNavigator/RepositoryNavigator';
 
-const RepositoryRedirectPage = () => {
-  redirect('/repository/til');
+const repository = () => {
+
+  return (
+    <div>
+      <RepositoryDateCalendar/>
+      <RepositoryNavigator />
+    </div>
+  );
 };
 
-export default RepositoryRedirectPage;
+export default repository;
