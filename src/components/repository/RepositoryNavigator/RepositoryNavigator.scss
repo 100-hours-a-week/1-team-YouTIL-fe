@@ -1,0 +1,40 @@
+.repository-navigator {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 1.5rem;
+    margin-top:10px;
+    &__tabs {
+      display: flex;
+      position: relative;
+      border-bottom: 1px solid #ddd;
+      width: 220px; // 너비 조절 가능
+    }
+  
+    &__tab {
+      flex: 1;
+      text-align: center;
+      padding: 0.5rem 0;
+      font-weight: 600;
+      font-size: 0.95rem;
+      color: #aaa;
+      text-decoration: none;
+      position: relative;
+      z-index: 1;
+      transition: color 0.3s ease;
+  
+      &.active {
+        color: #00b6fa;
+      }
+    }
+  
+    &__underline {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 50%;
+      height: 2px;
+      background-color: #00b6fa;
+      transition: transform 0.3s ease;
+    }
+  }
+  

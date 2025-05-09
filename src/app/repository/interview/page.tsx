@@ -1,9 +1,9 @@
-import SelectDateCalendar from "@/components/commit/selectDateCalendar/SelectDateCalendar";
+import RepositoryInterviewList from "@/components/repository/interview/RepositoryInterviewList";
 
 const repositoryInterview =() =>{
     return(
         <div>
-            인터뷰
+            <RepositoryInterviewList/>
         </div>
     )
 }

@@ -16,19 +16,27 @@ import {
   addDays
 } from 'date-fns';
 import './RepositoryDateCalendar.scss';
+import { usePathname } from 'next/navigation';
+import { useRepositoryDateStore } from '@/store/useRepositoryDateStore';
 
-interface Props {
-  setDate: (date: string) => void;
-}
+const RepositoryDateCalendar = () => {
+  const pathname = usePathname();
+  const setTilDate = useRepositoryDateStore((state) => state.setTilDate);
+  const setInterviewDate = useRepositoryDateStore((state) => state.setInterviewDate);
 
-const RepositoryDateCalendar = ({ setDate }: Props) => {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState(new Date());
 
   useEffect(() => {
     const formatted = format(selectedDate, 'yyyy-MM-dd');
-    setDate(formatted);
-  }, [selectedDate, setDate]);
+
+    if (pathname.includes('/repository/interview')) {
+      setInterviewDate(formatted);
+    } else {
+      // 기본은 til로 간주
+      setTilDate(formatted);
+    }
+  }, [selectedDate, pathname, setTilDate, setInterviewDate]);
 
   const renderHeader = () => (
     <div className="calendar__header">
@@ -51,6 +59,7 @@ const RepositoryDateCalendar = ({ setDate }: Props) => {
         </div>
       );
     }
+
     return <div className="calendar__days-row">{days}</div>;
   };
 
@@ -81,6 +90,7 @@ const RepositoryDateCalendar = ({ setDate }: Props) => {
         );
         day = addDays(day, 1);
       }
+
       rows.push(<div className="calendar__row" key={day.toISOString()}>{days}</div>);
       days = [];
     }

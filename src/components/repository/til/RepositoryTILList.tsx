@@ -55,17 +55,17 @@ const RepositoryTILList = () => {
     fetchTILs();
   }, [tilDate, callApi, accessToken]);
 
-  if (isLoading) return <p className="til-list__loading">로딩 중...</p>;
-  if (isError) return <p className="til-list__loading">TIL 데이터를 불러오지 못했습니다.</p>;
+  if (isLoading) return <p className="repository-til-list__loading">로딩 중...</p>;
+  if (isError) return <p className="repository-til-list__loading">TIL 데이터를 불러오지 못했습니다.</p>;
 
   return (
-    <div className="til-list">
-      <h2 className="til-list__title">TIL 목록</h2>
-      <ul className="til-list__items">
+    <div className="repository-til-list">
+      <h2 className="repository-til-list__title">TIL 목록</h2>
+      <ul className="repository-til-list__items">
         {data.map((til) => (
-          <li key={til.tilId} className="til-list__item">
-            <h3 className="til-list__item-title">{til.title}</h3>
-            <p className="til-list__item-date">{til.createdAt}</p>
+          <li key={til.tilId} className="repository-til-list__item">
+            <h3 className="repository-til-list__item-title">{til.title}</h3>
+            <p className="repository-til-list__item-date">{til.createdAt}</p>
           </li>
         ))}
       </ul>

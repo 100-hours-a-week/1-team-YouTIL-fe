@@ -8,10 +8,19 @@ interface RepositoryDateState {
   resetDates: () => void;
 }
 
-export const useRepositoryDateStore = create<RepositoryDateState>((set) => ({
+export const useRepositoryDateStore = create<RepositoryDateState>((set, get) => ({
   tilDate: '',
   interviewDate: '',
-  setTilDate: (date) => set({ tilDate: date }),
-  setInterviewDate: (date) => set({ interviewDate: date }),
-  resetDates: () => set({ tilDate: '', interviewDate: '' }),
+
+  setTilDate: (date: string) => {
+    set({ tilDate: date });
+  },
+
+  setInterviewDate: (date: string) => {
+    set({ interviewDate: date });
+  },
+
+  resetDates: () => {
+    set({ tilDate: '', interviewDate: '' });
+  },
 }));
