@@ -18,54 +18,108 @@ interface TILResponse {
   };
 }
 
+interface TILDetailItem {
+  title: string;
+  content: string;
+  tag: string[];
+  category: string;
+  nickname: string;
+  profileImageUrl: string;
+  createdAt: string;
+  visitedCount: number;
+  recommendCount: number;
+  commentsCount: number;
+}
+
 const RepositoryTILList = () => {
   const { callApi } = useFetch();
   const accessToken = useGetAccessToken();
-  const tilDate = useRepositoryDateStore((state) => state.tilDate);
+  const { tilDate } = useRepositoryDateStore();
 
-  const [data, setData] = useState<TILItem[]>([]);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [isError, setIsError] = useState<boolean>(false);
+  const [tilData, setTilData] = useState<TILItem[]>([]);
+  const [expandedTilId, setExpandedTilId] = useState<number | null>(null);
+  const [tilDetailData, setTilDetailData] = useState<TILDetailItem | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isError, setIsError] = useState(false);
 
   useEffect(() => {
     const fetchTILs = async () => {
-      if (!tilDate) return;
-
       setIsLoading(true);
       setIsError(false);
-
       try {
+        console.log(tilDate);
         const response = await callApi<TILResponse>({
           method: 'GET',
-          endpoint: `/tils?page=0&size=10`,
+          endpoint: `/tils?page=0&size=10&date=${tilDate}`,
           headers: {
             Authorization: `Bearer ${accessToken}`,
           },
         });
-
-        setData(response.data.tils);
+        setTilData(response.data.tils);
       } catch (error) {
-        console.error('TIL 데이터를 가져오는 중 오류 발생:', error);
+        console.error('TIL 목록 요청 실패:', error);
         setIsError(true);
       } finally {
         setIsLoading(false);
-      }
+      } 
     };
 
     fetchTILs();
   }, [tilDate, callApi, accessToken]);
 
-  if (isLoading) return <p className="til-list__loading">로딩 중...</p>;
-  if (isError) return <p className="til-list__loading">TIL 데이터를 불러오지 못했습니다.</p>;
+  const handleClickTIL = async (tilId: number) => {
+    if (expandedTilId === tilId) {
+      setExpandedTilId(null);
+      setTilDetailData(null);
+      return;
+    }
+
+    try {
+      const response = await callApi<{ data: TILDetailItem }>({
+        method: 'GET',
+        endpoint: `/tils/${tilId}`,
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+      setExpandedTilId(tilId);
+      setTilDetailData(response.data);
+    } catch (error) {
+      console.error('TIL 상세 요청 실패:', error);
+    }
+  };
+
+  // if (isLoading) return <p className="repository-til-list__loading">로딩 중...</p>;
+  // if (isError) return <p className="repository-til-list__loading">불러오기 실패</p>;
 
   return (
-    <div className="til-list">
-      <h2 className="til-list__title">TIL 목록</h2>
-      <ul className="til-list__items">
-        {data.map((til) => (
-          <li key={til.tilId} className="til-list__item">
-            <h3 className="til-list__item-title">{til.title}</h3>
-            <p className="til-list__item-date">{til.createdAt}</p>
+    <div className="repository-til-list">
+      <h2 className="repository-til-list__title">TIL 목록</h2>
+      <ul className="repository-til-list__items">
+        {tilData.map((til) => (
+          <li
+            key={til.tilId}
+            className="repository-til-list__item"
+            onClick={() => handleClickTIL(til.tilId)}
+          >
+            <div className="repository-til-list__item-header">
+              <h3 className="repository-til-list__item-title">{til.title}</h3>
+              <p className="repository-til-list__item-date">{til.createdAt}</p>
+            </div>
+
+            {expandedTilId === til.tilId && tilDetailData && (
+              <div className="repository-til-list__item-detail">
+                <p className="repository-til-list__item-content">{tilDetailData.content}</p>
+                <p className="repository-til-list__item-tags">
+                  {tilDetailData.tag.map((tag, i) => (
+                    <span key={i} className="repository-til-list__item-tag">#{tag}</span>
+                  ))}
+                </p>
+                <p className="repository-til-list__item-meta">
+                  조회수 {tilDetailData.visitedCount} · 추천 {tilDetailData.recommendCount} · 댓글 {tilDetailData.commentsCount}
+                </p>
+              </div>
+            )}
           </li>
         ))}
       </ul>

@@ -10,25 +10,42 @@ import {
   startOfMonth,
   endOfMonth,
   startOfWeek,
-  endOfWeek,
+  endOfWeek,  
   isSameMonth,
   isSameDay,
-  addDays
+  addDays,
+  parseISO
 } from 'date-fns';
 import './RepositoryDateCalendar.scss';
+import { useRepositoryDateStore } from '@/store/useRepositoryDateStore';
 
-interface Props {
-  setDate: (date: string) => void;
-}
+const RepositoryDateCalendar = () => {
+  const {
+    activeTab,
+    tilDate,
+    interviewDate,
+    setTilDate,
+    setInterviewDate,
+  } = useRepositoryDateStore();
 
-const RepositoryDateCalendar = ({ setDate }: Props) => {
-  const [currentDate, setCurrentDate] = useState(new Date());
-  const [selectedDate, setSelectedDate] = useState(new Date());
+  const rawDate = activeTab === 'interview' ? interviewDate : tilDate;
+  const initialSelected = rawDate && !isNaN(Date.parse(rawDate))
+    ? parseISO(rawDate)
+    : new Date();
+
+  const [currentDate, setCurrentDate] = useState(initialSelected);
+  const [selectedDate, setSelectedDate] = useState(initialSelected);
 
   useEffect(() => {
     const formatted = format(selectedDate, 'yyyy-MM-dd');
-    setDate(formatted);
-  }, [selectedDate, setDate]);
+    activeTab === 'interview' ? setInterviewDate(formatted) : setTilDate(formatted);
+  }, [selectedDate]);
+
+  useEffect(() => {
+    const newSelectedDate = rawDate && !isNaN(Date.parse(rawDate)) ? parseISO(rawDate) : new Date();
+    setSelectedDate(newSelectedDate);
+    setCurrentDate(newSelectedDate);
+  }, [activeTab]);
 
   const renderHeader = () => (
     <div className="calendar__header">
@@ -41,17 +58,16 @@ const RepositoryDateCalendar = ({ setDate }: Props) => {
   );
 
   const renderDays = () => {
-    const days = [];
-    const date = startOfWeek(currentDate);
-
-    for (let i = 0; i < 7; i++) {
-      days.push(
-        <div className="calendar__day" key={i}>
-          {format(addDays(date, i), 'EEE')}
-        </div>
-      );
-    }
-    return <div className="calendar__days-row">{days}</div>;
+    const start = startOfWeek(currentDate);
+    return (
+      <div className="calendar__days-row">
+        {Array.from({ length: 7 }, (_, i) => (
+          <div className="calendar__day" key={i}>
+            {format(addDays(start, i), 'EEE')}
+          </div>
+        ))}
+      </div>
+    );
   };
 
   const renderCells = () => {
@@ -72,8 +88,10 @@ const RepositoryDateCalendar = ({ setDate }: Props) => {
 
         days.push(
           <div
-            className={`calendar__cell ${isSelected ? 'calendar__cell--selected' : ''} ${!isCurrentMonth ? 'calendar__cell--disabled' : ''}`}
             key={day.toISOString()}
+            className={`calendar__cell ${
+              isSelected ? 'calendar__cell--selected' : ''
+            } ${!isCurrentMonth ? 'calendar__cell--disabled' : ''}`}
             onClick={() => setSelectedDate(cloneDay)}
           >
             {format(day, 'd')}

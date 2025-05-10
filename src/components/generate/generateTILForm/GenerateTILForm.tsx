@@ -62,7 +62,7 @@ const GenerateTILForm = () => {
       console.log('TIL 생성 응답:', response);
   
       setIsLoading(false);
-      router.push('/repository/til');
+      router.push('/repository');
     } catch (error) {
       console.error('TIL 생성 실패:', error);
       setIsLoading(false);
