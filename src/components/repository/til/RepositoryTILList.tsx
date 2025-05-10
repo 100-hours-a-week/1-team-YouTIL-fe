@@ -47,6 +47,7 @@ const RepositoryTILList = () => {
       setIsLoading(true);
       setIsError(false);
       try {
+        console.log(tilDate);
         const response = await callApi<TILResponse>({
           method: 'GET',
           endpoint: `/tils?page=0&size=10&date=${tilDate}`,
@@ -60,7 +61,7 @@ const RepositoryTILList = () => {
         setIsError(true);
       } finally {
         setIsLoading(false);
-      }
+      } 
     };
 
     fetchTILs();
