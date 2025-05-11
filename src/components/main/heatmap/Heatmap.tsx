@@ -36,7 +36,7 @@ const monthMap: Record<string, string> = {
 const Heatmap = () => {
   const [cal, setCal] = useState<any>(null);
   const [year, setYear] = useState(basicYear);
-  const [currentMonth, setCurrentMonth] = useState(adjustedCurrentMonth); // 0-based
+  const [currentMonth, setCurrentMonth] = useState(adjustedCurrentMonth);
   const heatmapRef = useRef<any>(null);
   const [isOpen, setIsOpen] = useState(false);
   const [tilData, setTilData] = useState<{ date: string; count: number }[]>([]);
