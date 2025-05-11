@@ -4,7 +4,7 @@ import './NewTILList.scss';
 import { useEffect, useState } from 'react';
 import { useFetch } from '@/hooks/useFetch';
 import useGetAccessToken from '@/hooks/useGetAccessToken';
-import { parseISO, format } from 'date-fns'; // ✅ 추가
+import { parseISO, format } from 'date-fns';
 
 interface TILItem {
   id: number;

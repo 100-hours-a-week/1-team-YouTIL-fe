@@ -43,7 +43,7 @@ const TechNews = () => {
     container.scrollTo({ left: index * itemWidth, behavior: 'smooth' });
 
     setIsSliding(true);
-    setTimeout(() => setIsSliding(false), 500); // hover 제한 시간 (슬라이드 애니메이션 시간과 맞춤)
+    setTimeout(() => setIsSliding(false), 500);
   };
 
   const scrollByItem = (direction: 'left' | 'right', userTriggered = false) => {

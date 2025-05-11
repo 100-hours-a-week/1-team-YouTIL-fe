@@ -25,7 +25,7 @@ const GenerateTILForm = () => {
   const [category, setCategory] = useState('풀스택');
   const [visibility, setVisibility] = useState<'public' | 'private'>('public');
   const [shake, setShake] = useState(false);
-  const [isLoading, setIsLoading] = useState(false); // ✅ 로딩 상태
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

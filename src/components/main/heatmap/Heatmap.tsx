@@ -36,7 +36,7 @@ const monthMap: Record<string, string> = {
 const Heatmap = () => {
   const [cal, setCal] = useState<any>(null);
   const [year, setYear] = useState(basicYear);
-  const [currentMonth, setCurrentMonth] = useState(adjustedCurrentMonth); // 0-based
+  const [currentMonth, setCurrentMonth] = useState(adjustedCurrentMonth);
   const heatmapRef = useRef<any>(null);
   const [isOpen, setIsOpen] = useState(false);
   const [tilData, setTilData] = useState<{ date: string; count: number }[]>([]);
@@ -162,50 +162,51 @@ const Heatmap = () => {
 
   return (
     <div className="heatmap-wrapper">
-      <div className="heatmap-container">
-        <div className='heatmap-content'>
-          <div className="heatmap-controls-left">
-            <button onClick={handlePrevDomain}>←</button>
+      <div className="heatmap-wrapper__container">
+        <div className="heatmap-wrapper__content">
+          <div className="heatmap-wrapper__controls-left">
+            <button onClick={handlePrevDomain}>&lt;</button>
           </div>
 
-          <div id="ex-ghDay" className="heatmap-calendar"></div>
+          <div id="ex-ghDay" className="heatmap-wrapper__calendar"></div>
 
-          <div className='heatmap-controls-right'>
-            <button onClick={handleNextDomain}>→</button>
+          <div className="heatmap-wrapper__controls-right">
+            <button onClick={handleNextDomain}>&gt;</button>
           </div>
         </div>
-        <div className="heatmap-legend">
-          <span className="heatmap-legend-label">Less</span>
-          <div id="ex-ghDay-legend" className="heatmap-legend-bar"></div>
-          <span className="heatmap-legend-label">More</span>
+
+        <div className="heatmap-wrapper__legend">
+          <span className="heatmap-wrapper__legend-label">Less</span>
+          <div id="ex-ghDay-legend" className="heatmap-wrapper__legend-bar"></div>
+          <span className="heatmap-wrapper__legend-label">More</span>
         </div>
       </div>
-      <div className='heatmap-space'></div>
 
-      <div className="heatmap-dropdown">
-        <div className="heatmap-year-button">
+      <div className="heatmap-wrapper__space"></div>
+
+      <div className="heatmap-wrapper__dropdown">
+        <div className="heatmap-wrapper__dropdown-year-button">
           <button onClick={() => setIsOpen(prev => !prev)} type="button">
             {year}
           </button>
         </div>
-        {isOpen && (
-          <div className="heatmap-dropdown-content">
-            {[0, 1, 2, 3, 4].map(offset => (
-              <li key={offset}>
-                <a
-                  onClick={() => {
-                    setIsOpen(false);
-                    handleNextClick(basicYear + offset);
-                    setYear(basicYear + offset);
-                    setCurrentMonth(0);
-                  }}
-                >
-                  {basicYear + offset}
-                </a>
-              </li>
-            ))}
-          </div>
-        )}
+
+        <div className={`heatmap-wrapper__dropdown-content ${isOpen ? 'show' : ''}`}>
+          {[0, 1, 2, 3, 4].map(offset => (
+            <li key={offset}>
+              <a
+                onClick={() => {
+                  setIsOpen(false);
+                  handleNextClick(basicYear + offset);
+                  setYear(basicYear + offset);
+                  setCurrentMonth(0);
+                }}
+              >
+                {basicYear + offset}
+              </a>
+            </li>
+          ))}
+        </div>
       </div>
     </div>
   );
