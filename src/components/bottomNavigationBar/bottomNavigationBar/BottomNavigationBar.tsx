@@ -13,8 +13,8 @@ const navItems = [
 
 const BottomNavigationBar = () => {
   return (
-    <div className='bottom-nav-bar'>
-      <nav className="bottom-nav">
+    <div className="bottom-navigation-bar">
+      <nav className="bottom-navigation-bar__nav">
         {navItems.map(({ label, href }) => (
           <BottomNavigationBarButton key={href} label={label} href={href} />
         ))}
