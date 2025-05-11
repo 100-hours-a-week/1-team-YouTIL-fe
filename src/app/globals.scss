@@ -11,11 +11,59 @@ body {
   padding: 0;
   width: 100%;
   height: 100%;
-  font-family: var(--font-geist-sans);
+  font-family: 'YoonGothic', sans-serif;
   background-image: url('/background.png');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
   background-attachment: fixed;
   overflow-y: scroll;
+}
+
+@font-face {
+  font-family: 'YoonGothic';
+  src: url('/fonts/윤고딕310.ttf') format('truetype');
+  font-weight: 100;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'YoonGothic';
+  src: url('/fonts/윤고딕320.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'YoonGothic';
+  src: url('/fonts/윤고딕330.ttf') format('truetype');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'YoonGothic';
+  src: url('/fonts/윤고딕340.ttf') format('truetype');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'YoonGothic';
+  src: url('/fonts/윤고딕350.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'YoonGothic';
+  src: url('/fonts/윤고딕360.ttf') format('truetype');
+  font-weight: 800;
+  font-style: normal;
+  font-display: swap;
 }
