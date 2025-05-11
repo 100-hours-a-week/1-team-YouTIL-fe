@@ -25,15 +25,14 @@ const Main = () => {
 
   return (
     <div className="main-page">
-      {/* <div className="main-space-1"></div> */}
       <WelcomeDescription />
       <TechNews />
-      <div className="main-space-1"></div>
+      <div className="main-page__space--top" />
       <TILRecordDescription />
       <Heatmap />
-      <div className="main-space-1"></div>
+      <div className="main-page__space--top" />
       <NewTILDescription />
-      <NewTILList/>
+      <NewTILList />
     </div>
   );
 };
