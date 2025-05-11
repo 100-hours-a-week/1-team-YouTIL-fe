@@ -46,11 +46,19 @@ const RepositoryTILList = () => {
     const fetchTILs = async () => {
       setIsLoading(true);
       setIsError(false);
+
+      const today = new Date();
+      const yyyy = today.getFullYear();
+      const mm = String(today.getMonth() + 1).padStart(2, '0');
+      const dd = String(today.getDate()).padStart(2, '0');
+      const formattedToday = `${yyyy}-${mm}-${dd}`;
+
+      const targetDate = tilDate || formattedToday;
+
       try {
-        console.log(tilDate);
         const response = await callApi<TILResponse>({
           method: 'GET',
-          endpoint: `/tils?page=0&size=10&date=${tilDate}`,
+          endpoint: `/tils?page=0&size=10&date=${targetDate}`,
           headers: {
             Authorization: `Bearer ${accessToken}`,
           },
@@ -61,7 +69,7 @@ const RepositoryTILList = () => {
         setIsError(true);
       } finally {
         setIsLoading(false);
-      } 
+      }
     };
 
     fetchTILs();
@@ -88,9 +96,6 @@ const RepositoryTILList = () => {
       console.error('TIL 상세 요청 실패:', error);
     }
   };
-
-  // if (isLoading) return <p className="repository-til-list__loading">로딩 중...</p>;
-  // if (isError) return <p className="repository-til-list__loading">불러오기 실패</p>;
 
   return (
     <div className="repository-til-list">

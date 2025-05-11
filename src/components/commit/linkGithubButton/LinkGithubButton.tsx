@@ -6,10 +6,17 @@ import SelectRepositoryModal from '../selectRepositoryModal/SelectRepositoryModa
 import SelectBranchModal from '../selectBranchModal/SelectBranchModal';
 import './LinkGithubButton.scss';
 
+import { useUserRepositoryStore } from '@/store/userRepositoryStore';
+import { useSelectedDateStore } from '@/store/userDateStore';
+import { useUserBranchStore } from '@/store/userBranchStore';
+
 const LinkGithubButton = () => {
   const [organizationModalOpen, setOrganizationModalOpen] = useState(false);
   const [repositoryModalOpen, setRepositoryModalOpen] = useState(false);
   const [branchModalOpen, setBranchModalOpen] = useState(false);
+
+  const selectedRepo = useUserRepositoryStore((state) => state.selectedRepository);
+  const selectedBranchName = useUserBranchStore((state) => state.selectedBranch);
 
   const handleOpenOrganizationModal = () => {
     setOrganizationModalOpen(true);
@@ -39,9 +46,21 @@ const LinkGithubButton = () => {
 
   return (
     <>
-      <div className="link-github-button" onClick={handleOpenOrganizationModal}>
-        깃허브 연동하기
-      </div>
+      {selectedRepo && selectedBranchName ? (
+        <div className="link-github-button__info">
+          <span className="link-github-button__repo-name">{selectedRepo.repositoryName}</span>
+          <button
+            className="link-github-button__change"
+            onClick={handleOpenOrganizationModal}
+          >
+            변경
+          </button>
+        </div>
+      ) : (
+        <div className="link-github-button" onClick={handleOpenOrganizationModal}>
+          깃허브 연동하기
+        </div>
+      )}
 
       {organizationModalOpen && (
         <SelectOrganizationModal

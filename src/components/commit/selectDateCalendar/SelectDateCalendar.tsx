@@ -13,22 +13,25 @@ import {
   endOfWeek,
   isSameMonth,
   isSameDay,
-  addDays
+  addDays,
+  parseISO,
 } from 'date-fns';
 import './SelectDateCalendar.scss';
 import { useSelectedDateStore } from '@/store/userDateStore';
 
-
 const SelectDateCalendar = () => {
-  const [currentDate, setCurrentDate] = useState(new Date());
-  const [selectedDate, setSelectedDate] = useState(new Date());
+  const { selectedDate: storedDate, setSelectedDate } = useSelectedDateStore();
 
-  const setSelectedDateGlobal = useSelectedDateStore((state) => state.setSelectedDate);
+  const parsedStoredDate = storedDate ? parseISO(storedDate) : null;
+  const today = new Date();
+
+  const [currentDate, setCurrentDate] = useState(parsedStoredDate ?? today);
+  const [selectedDate, setSelectedDateLocal] = useState(parsedStoredDate ?? today);
 
   useEffect(() => {
     const formatted = format(selectedDate, 'yyyy-MM-dd');
-    setSelectedDateGlobal(formatted);
-  }, [selectedDate, setSelectedDateGlobal]);
+    setSelectedDate(formatted);
+  }, [selectedDate, setSelectedDate]);
 
   const renderHeader = () => (
     <div className="calendar__header">
@@ -74,7 +77,7 @@ const SelectDateCalendar = () => {
           <div
             className={`calendar__cell ${isSelected ? 'calendar__cell--selected' : ''} ${!isCurrentMonth ? 'calendar__cell--disabled' : ''}`}
             key={day.toISOString()}
-            onClick={() => setSelectedDate(cloneDay)}
+            onClick={() => setSelectedDateLocal(cloneDay)}
           >
             {format(day, 'd')}
           </div>
