@@ -167,48 +167,46 @@ const Heatmap = () => {
           <div className="heatmap-wrapper__controls-left">
             <button onClick={handlePrevDomain}>←</button>
           </div>
-  
+
           <div id="ex-ghDay" className="heatmap-wrapper__calendar"></div>
-  
+
           <div className="heatmap-wrapper__controls-right">
             <button onClick={handleNextDomain}>→</button>
           </div>
         </div>
-  
+
         <div className="heatmap-wrapper__legend">
           <span className="heatmap-wrapper__legend-label">Less</span>
           <div id="ex-ghDay-legend" className="heatmap-wrapper__legend-bar"></div>
           <span className="heatmap-wrapper__legend-label">More</span>
         </div>
       </div>
-  
+
       <div className="heatmap-wrapper__space"></div>
-  
+
       <div className="heatmap-wrapper__dropdown">
         <div className="heatmap-wrapper__dropdown-year-button">
           <button onClick={() => setIsOpen(prev => !prev)} type="button">
             {year}
           </button>
         </div>
-  
-        {isOpen && (
-          <div className="heatmap-wrapper__dropdown-content">
-            {[0, 1, 2, 3, 4].map(offset => (
-              <li key={offset}>
-                <a
-                  onClick={() => {
-                    setIsOpen(false);
-                    handleNextClick(basicYear + offset);
-                    setYear(basicYear + offset);
-                    setCurrentMonth(0);
-                  }}
-                >
-                  {basicYear + offset}
-                </a>
-              </li>
-            ))}
-          </div>
-        )}
+
+        <div className={`heatmap-wrapper__dropdown-content ${isOpen ? 'show' : ''}`}>
+          {[0, 1, 2, 3, 4].map(offset => (
+            <li key={offset}>
+              <a
+                onClick={() => {
+                  setIsOpen(false);
+                  handleNextClick(basicYear + offset);
+                  setYear(basicYear + offset);
+                  setCurrentMonth(0);
+                }}
+              >
+                {basicYear + offset}
+              </a>
+            </li>
+          ))}
+        </div>
       </div>
     </div>
   );
