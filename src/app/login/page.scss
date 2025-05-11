@@ -4,12 +4,15 @@
     justify-content: center;
     align-items: center;
     height: 100%;
-    
-    .login-space-1{
+  
+    &__space {
+      &--top {
         margin: 50px;
-    }
-
-    .login-space-2{
+      }
+  
+      &--bottom {
         margin: 25px;
+      }
     }
   }
+  
