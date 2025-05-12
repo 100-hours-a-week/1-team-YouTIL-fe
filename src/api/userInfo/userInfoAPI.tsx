@@ -1,4 +1,3 @@
-import { BASE_URL } from '../constant/apiConstants';
 import useAuthStore from '@/store/authStore';
 import useUserInfoStore from '@/store/userInfoStore';
 
@@ -7,7 +6,12 @@ const getUserInfo = async () => {
     const accessToken = useAuthStore.getState().accessToken;
     const setUserInfo = useUserInfoStore.getState().setUserInfo;
 
-    const response = await fetch(`${BASE_URL}/users?userId=`, {
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
+    if (!baseUrl) {
+      throw new Error('환경변수 NEXT_PUBLIC_BASE_URL이 설정되지 않았습니다.');
+    }
+
+    const response = await fetch(`${baseUrl}/users?userId=`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',

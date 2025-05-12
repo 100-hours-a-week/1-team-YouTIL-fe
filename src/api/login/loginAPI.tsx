@@ -1,9 +1,13 @@
-import { BASE_URL } from '../constant/apiConstants';
 import useAuthStore from '@/store/authStore';
 
 const GithubLogin = async (authorizationCode: string) => {
   try {
-    const res = await fetch(`${BASE_URL}/users/github`, {
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
+    if (!baseUrl) {
+      throw new Error('환경변수 NEXT_PUBLIC_BASE_URL이 설정되지 않았습니다.');
+    }
+
+    const res = await fetch(`${baseUrl}/users/github`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
