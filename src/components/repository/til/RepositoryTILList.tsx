@@ -40,14 +40,9 @@ const RepositoryTILList = () => {
   const [tilData, setTilData] = useState<TILItem[]>([]);
   const [expandedTilId, setExpandedTilId] = useState<number | null>(null);
   const [tilDetailData, setTilDetailData] = useState<TILDetailItem | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isError, setIsError] = useState(false);
 
   useEffect(() => {
     const fetchTILs = async () => {
-      setIsLoading(true);
-      setIsError(false);
-
       const today = new Date();
       const yyyy = today.getFullYear();
       const mm = String(today.getMonth() + 1).padStart(2, '0');
@@ -67,9 +62,6 @@ const RepositoryTILList = () => {
         setTilData(response.data.tils);
       } catch (error) {
         console.error('TIL 목록 요청 실패:', error);
-        setIsError(true);
-      } finally {
-        setIsLoading(false);
       }
     };
 
