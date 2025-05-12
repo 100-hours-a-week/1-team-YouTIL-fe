@@ -10,7 +10,7 @@ type AuthGuardProps = {
 
 const AuthGuard = ({ children }: AuthGuardProps) => {
   const router = useRouter();
-  const [checked, setChecked] = useState(false); // accessToken 체크 완료 여부
+  const [checked, setChecked] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {

@@ -54,14 +54,24 @@ const SelectOrganizationModal = ({ onClose, onComplete }: Props) => {
     fetchOrganizations();
   }, [accessToken, callApi]);
 
+  useEffect(() => {
+    if (noSelection) {
+      setSelectedOrganization(null);
+    } 
+    else if (selectedOrgId !== null) {
+      const selected = organizations.find((org) => org.organization_id === selectedOrgId);
+      if (selected) {
+        setSelectedOrganization(selected);
+      }
+    }
+  }, [noSelection, selectedOrgId, organizations]);
+
   const handleSelect = (org: Organization) => {
     if (selectedOrgId === org.organization_id) {
       setSelectedOrgId(null);
-      setSelectedOrganization(null);
     } else {
       setSelectedOrgId(org.organization_id);
       setNoSelection(false);
-      setSelectedOrganization(org);
     }
   };
 
@@ -70,7 +80,6 @@ const SelectOrganizationModal = ({ onClose, onComplete }: Props) => {
       const next = !prev;
       if (next) {
         setSelectedOrgId(null);
-        setSelectedOrganization(null);
       }
       return next;
     });
