@@ -19,13 +19,13 @@
   }
 
   &__info {
-    font-size: 15px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
   }
-
+  
   &__repo-name {
+    font-size: 15px;
     color: #00B6FA;
     font-weight: 400;
     text-align: center;
@@ -37,6 +37,7 @@
   }
 
   &__change {
+    margin-top: 2px;
     margin-left: 12px;
     padding: 2px 8px;
     font-size: 13px;
