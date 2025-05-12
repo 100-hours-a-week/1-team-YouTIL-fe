@@ -10,7 +10,7 @@ import {
   startOfMonth,
   endOfMonth,
   startOfWeek,
-  endOfWeek,
+  endOfWeek,  
   isSameMonth,
   isSameDay,
   addDays,
@@ -29,29 +29,23 @@ const RepositoryDateCalendar = () => {
   } = useRepositoryDateStore();
 
   const rawDate = activeTab === 'interview' ? interviewDate : tilDate;
-  const initialSelected =
-    rawDate && !isNaN(Date.parse(rawDate))
-      ? parseISO(rawDate)
-      : new Date();
+  const initialSelected = rawDate && !isNaN(Date.parse(rawDate))
+    ? parseISO(rawDate)
+    : new Date();
 
   const [currentDate, setCurrentDate] = useState(initialSelected);
   const [selectedDate, setSelectedDate] = useState(initialSelected);
 
   useEffect(() => {
     const formatted = format(selectedDate, 'yyyy-MM-dd');
-    if (activeTab === 'interview') {
-      setInterviewDate(formatted);
-    } else {
-      setTilDate(formatted);
-    }
-  }, [selectedDate, activeTab, setInterviewDate, setTilDate]);
+    activeTab === 'interview' ? setInterviewDate(formatted) : setTilDate(formatted);
+  }, [selectedDate]);
 
   useEffect(() => {
-    const newSelectedDate =
-      rawDate && !isNaN(Date.parse(rawDate)) ? parseISO(rawDate) : new Date();
+    const newSelectedDate = rawDate && !isNaN(Date.parse(rawDate)) ? parseISO(rawDate) : new Date();
     setSelectedDate(newSelectedDate);
     setCurrentDate(newSelectedDate);
-  }, [activeTab, rawDate]);
+  }, [activeTab]);
 
   const renderHeader = () => (
     <div className="calendar__header">
@@ -105,11 +99,7 @@ const RepositoryDateCalendar = () => {
         );
         day = addDays(day, 1);
       }
-      rows.push(
-        <div className="calendar__row" key={day.toISOString()}>
-          {days}
-        </div>
-      );
+      rows.push(<div className="calendar__row" key={day.toISOString()}>{days}</div>);
       days = [];
     }
 
