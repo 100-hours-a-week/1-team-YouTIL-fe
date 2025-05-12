@@ -25,14 +25,15 @@ const TechNews = () => {
   const { data } = useQuery({
     queryKey: ['tech-news'],
     queryFn: async () => {
-      const res = await callApi<{ data: { news: NewsItem[] } }>({
+      const response = await callApi<{ data: { news: NewsItem[] } }>({
         method: 'GET',
         endpoint: '/news',
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
       });
-      return res.data.news;
+      console.log(response);
+      return response.data.news;
     },
   });
 
