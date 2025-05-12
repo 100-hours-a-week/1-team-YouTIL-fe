@@ -32,7 +32,6 @@ const TechNews = () => {
           Authorization: `Bearer ${accessToken}`,
         },
       });
-      console.log(response);
       return response.data.news;
     },
   });
