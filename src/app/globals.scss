@@ -1,57 +1,69 @@
-html, body {
+html {
   margin: 0;
   padding: 0;
   width: 100%;
   height: 100%;
-  font-family: var(--font-geist-sans);
+  overflow-y: hidden;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  font-family: 'YoonGothic', sans-serif;
   background-image: url('/background.png');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
   background-attachment: fixed;
+  overflow-y: scroll;
 }
 
-.layout-container {
-  display: flex;
-  justify-content: flex-start;
-  align-items: center;
-  width: 100%;
-  height: 100%;
+@font-face {
+  font-family: 'YoonGothic';
+  src: url('/fonts/윤고딕310.ttf') format('truetype');
+  font-weight: 100;
+  font-style: normal;
+  font-display: swap;
 }
 
-.mobile-frame {
-  width: 500px;
-  min-width: 500px;
-  height: 100%;
-  background: white;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  margin-left: auto;
-  margin-right: 20vw;
-  position: relative
+@font-face {
+  font-family: 'YoonGothic';
+  src: url('/fonts/윤고딕320.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
 }
 
-.main-space-1{
-  margin-top: 50px;
+@font-face {
+  font-family: 'YoonGothic';
+  src: url('/fonts/윤고딕330.ttf') format('truetype');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
 }
 
-.main-space-2{
-  margin-top: 50px;
+@font-face {
+  font-family: 'YoonGothic';
+  src: url('/fonts/윤고딕340.ttf') format('truetype');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
 }
 
-/* 🔥 반응형 대응 */
-@media (max-width: 700px) {
-  .layout-container {
-    justify-content: center;
-  }
+@font-face {
+  font-family: 'YoonGothic';
+  src: url('/fonts/윤고딕350.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
 
-  .mobile-frame {
-    width: 500px;
-    min-width: 500px;
-    margin: 0;
-    height: 100%;
-    border-radius: 0;
-    box-shadow: none;
-  }
+@font-face {
+  font-family: 'YoonGothic';
+  src: url('/fonts/윤고딕360.ttf') format('truetype');
+  font-weight: 800;
+  font-style: normal;
+  font-display: swap;
 }

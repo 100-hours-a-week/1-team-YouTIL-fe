@@ -1,0 +1,121 @@
+.repository-til-list {
+  padding: 0.5rem;
+  margin-bottom: 45px;
+  background-color: #fff;
+  margin: 0 auto;
+  width: 80%;
+  margin-bottom: 45px;
+  &__title {
+    font-size: 1.25rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+    text-align: center;
+  }
+
+  &__items {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  &__item {
+    padding: 0.5rem 0.75rem;
+    margin-bottom: 0.75rem;
+    border: 1px solid #ddd;
+    border-radius: 12px;
+    background-color: #fff;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+
+    &-header {
+      cursor: pointer;
+    }
+
+    &-detail {
+      margin-top: 0.5rem;
+      background: #f9f9f9;
+      border-left: 3px solid #00b6fa;
+      padding: 0.75rem;
+      border-radius: 8px;
+    }
+
+    &-content {
+      font-size: 0.9rem;
+      margin-bottom: 0.5rem;
+      color: #333;
+    }
+
+    &-tags {
+      font-size: 0.8rem;
+      margin-bottom: 0.5rem;
+    }
+
+    &-tag {
+      display: inline-block;
+      margin-right: 4px;
+      background: #e0f7ff;
+      color: #007b9e;
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+
+    &-views {
+      font-size: 0.8rem;
+      color: #888;
+    }
+  
+
+    &-title {
+      margin: 0 0 0.4rem 0;
+      font-size: 1rem;
+    }
+
+    &-date {
+      margin: 0.2rem 0;
+      font-size: 0.85rem;
+      color: #555;
+    }
+    .repository-til-list__item-header {
+  cursor: pointer;
+}
+
+.repository-til-list__item-detail {
+  margin-top: 0.5rem;
+  background: #f9f9f9;
+  padding: 0.75rem;
+  border-left: 3px solid #00b6fa;
+  border-radius: 8px;
+}
+
+.repository-til-list__item-content {
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
+  color: #333;
+  white-space: pre-wrap;
+}
+
+.repository-til-list__item-tags {
+  margin-bottom: 0.5rem;
+}
+
+.repository-til-list__item-tag {
+  display: inline-block;
+  margin-right: 6px;
+  background: #e0f7ff;
+  color: #007b9e;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+}
+
+.repository-til-list__item-meta {
+  font-size: 0.75rem;
+  color: #888;
+}
+  }
+
+  &__loading {
+    text-align: center;
+    font-size: 0.95rem;
+    color: #777;
+  }
+}

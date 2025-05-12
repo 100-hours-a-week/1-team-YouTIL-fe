@@ -1,16 +1,16 @@
-import GithubLoginButton from "@/components/login/githubLoginButton/GithubLoginButton";
-import LoginDescription from "@/components/login/loginDescription/LoginDescription";
+import GithubLoginButton from "@/components/login/githubLoginButton/GithubLoginButton/GithubLoginButton";
+import LoginPageIntro from "@/components/login/loginPageIntro/LoginPageIntro";
 import "./page.scss";
 
 const login =() =>{
-    return(
+    return (
         <div className="login-page">
-            <div className="login-space-1"></div>
-            <LoginDescription/>
-            <div className="login-space-2"></div>
-            <GithubLoginButton/>
+          <div className="login-page__space--top" />
+          <LoginPageIntro />
+          <div className="login-page__space--bottom" />
+          <GithubLoginButton />
         </div>
-    )
+      );
 }
 
 export default login;

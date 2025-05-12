@@ -1,12 +1,16 @@
-import "./WelcomeDescription.scss"
+'use client';
 
-const WelcomeDescription =() =>{
-    return(
-        <div className="description">
-            **님 환영합니다
-        </div>
-    )
+import './WelcomeDescription.scss';
+import useUserInfoStore from '@/store/userInfoStore';
 
-}
+const WelcomeDescription = () => {
+  const { userInfo } = useUserInfoStore();
+
+  return (
+    <article className="description">
+      {userInfo.name}님 환영합니다
+    </article>
+  );
+};
 
 export default WelcomeDescription;

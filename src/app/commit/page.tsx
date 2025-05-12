@@ -1,7 +1,17 @@
+import LinkGithubButton from "@/components/commit/linkGithubButton/LinkGithubButton";
+import SelectDateCalendar from "@/components/commit/selectDateCalendar/SelectDateCalendar";
+import CommitList from "@/components/commit/commitList/CommitList";
+
+import './page.scss';
+
 const commit =() =>{
     return(
-        <div>
-            커밋 리스트 페이지
+        <div className="commit-page">
+            <SelectDateCalendar/>
+            <div className="commit-page__space-1"></div>
+            <LinkGithubButton/>
+            <div className="commit-page__space-1"></div>
+            <CommitList/>
         </div>
     )
 }

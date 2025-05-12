@@ -4,10 +4,10 @@ import BottomNavigationBarButton from '../bottomNavigationBarButton/BottomNaviga
 import './BottomNavigationBar.scss';
 
 const navItems = [
-    { label: '메인 페이지', href: '/' },
-  { label: 'TIL 생성', href: '/commit' },
+  { label: '메인 페이지', href: '/' },
   { label: '커뮤니티', href: '/community' },
-  { label: '레포지토리', href: '/repository/tils' },
+  { label: 'TIL 생성', href: '/commit' },
+  { label: '레포지토리', href: '/repository' },
   { label: '프로필', href: '/profile' },
 ];
 

@@ -1,11 +1,12 @@
 'use client';
 
 import Image from 'next/image';
+import Link from 'next/link';
 import logo from 'public/logo.png';
 
 const HeaderLogo = () => {
   return (
-    <div>
+    <Link href="/" className="header-logo">
       <Image
         src={logo}
         alt="YouTIL Logo"
@@ -13,7 +14,7 @@ const HeaderLogo = () => {
         height={50}
         priority
       />
-    </div>
+    </Link>
   );
 };
 
