@@ -1,14 +1,14 @@
-declare module 'cal-heatmap/plugins/Tooltip' {
-    const Tooltip: any;
-    export default Tooltip;
+declare module 'cal-heatmap' {
+  class CalHeatmap {
+    paint: (config: any, plugins: any[]) => void;
+    jumpTo: (date: string, animate: boolean) => void;
+    previous: (range: number) => void;
+    next: (range: number) => void;
   }
-  
-  declare module 'cal-heatmap/plugins/LegendLite' {
-    const LegendLite: any;
-    export default LegendLite;
-  }
-  
-  declare module 'cal-heatmap/plugins/CalendarLabel' {
-    const CalendarLabel: any;
-    export default CalendarLabel;
-  }
+
+  export default CalHeatmap;
+}
+
+declare module 'cal-heatmap/plugins/Tooltip';
+declare module 'cal-heatmap/plugins/LegendLite';
+declare module 'cal-heatmap/plugins/CalendarLabel';
