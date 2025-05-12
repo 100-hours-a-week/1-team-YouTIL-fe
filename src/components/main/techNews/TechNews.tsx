@@ -4,6 +4,7 @@ import { useRef, useEffect, useState, useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useFetch } from '@/hooks/useFetch';
 import useGetAccessToken from '@/hooks/useGetAccessToken';
+import Image from 'next/image';
 import './TechNews.scss';
 
 interface NewsItem {
@@ -77,7 +78,7 @@ const TechNews = () => {
     return () => {
       if (intervalRef.current) clearInterval(intervalRef.current);
     };
-  }, [data, autoSlideEnabled, scrollByItem]); // ✅ scrollByItem을 의존성 배열에 추가
+  }, [data, autoSlideEnabled, scrollByItem]);
 
   return (
     <div className="technews">
@@ -95,7 +96,14 @@ const TechNews = () => {
             rel="noopener noreferrer"
             className={`technews__item ${isSliding ? 'no-hover' : ''}`}
           >
-            <img src={news.thumbnail} alt={news.title} className="technews__thumbnail" />
+            <Image
+              src={news.thumbnail}
+              alt={news.title}
+              width={300}
+              height={180}
+              className="technews__thumbnail"
+              unoptimized
+            />
             <div className="technews__gradient" />
             <div className="technews__headline">{news.title}</div>
           </a>

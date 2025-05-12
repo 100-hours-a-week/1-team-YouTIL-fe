@@ -1,10 +1,10 @@
 'use client';
 
-import CalHeatmap from 'cal-heatmap';  // 타입 선언을 통해 오류가 발생하지 않음
+import CalHeatmap from 'cal-heatmap';
 import { useState, useEffect, useRef } from 'react';
 import 'cal-heatmap/cal-heatmap.css';
 import './Heatmap.scss';
-import Tooltip from 'cal-heatmap/plugins/Tooltip';  // 이제 타입 오류가 없음
+import Tooltip from 'cal-heatmap/plugins/Tooltip';
 import LegendLite from 'cal-heatmap/plugins/LegendLite';
 import CalendarLabel from 'cal-heatmap/plugins/CalendarLabel';
 import { useFetch } from '@/hooks/useFetch';
