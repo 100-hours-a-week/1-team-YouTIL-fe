@@ -2,6 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import useAuthStore from '@/store/authStore';
+import './HeaderLogoutButton.scss';
 
 const HeaderLogoutButton = () => {
   const router = useRouter();
@@ -13,7 +14,7 @@ const HeaderLogoutButton = () => {
   };
 
   return (
-    <div onClick={handleLogout} style={{ cursor: 'pointer' }}>
+    <div className="header-logout-button" onClick={handleLogout}>
       로그아웃
     </div>
   );
