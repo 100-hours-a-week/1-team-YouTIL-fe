@@ -68,29 +68,35 @@ const CommitList = () => {
     };
 
     fetchCommits();
-  }, [selectedRepository, selectedBranchName, selectedDate, callApi, accessToken]);
+  }, [
+    selectedOrganizaion?.organization_id,
+    selectedRepository,
+    selectedBranchName,
+    selectedDate,
+    callApi,
+    accessToken,
+    setCommits,
+  ]);
 
   const toggleSelection = (index: number) => {
     const selectedCommit = commits[index];
     if (!selectedCommit) return;
 
     setSelectedIndexes((prev) => {
+      let next;
       if (prev.includes(index)) {
-        const next = prev.filter((i) => i !== index);
-        const selected = next.map((i) => commits[i]);
-        setUserSelectedCommits(selected);
-        return next;
+        next = prev.filter((i) => i !== index);
       } else {
         if (prev.length >= 5) {
           setShakeIndex(index);
           setTimeout(() => setShakeIndex(null), 500);
           return prev;
         }
-        const next = [...prev, index];
-        const selected = next.map((i) => commits[i]);
-        setUserSelectedCommits(selected);
-        return next;
+        next = [...prev, index];
       }
+      const selected = next.map((i) => commits[i]);
+      setUserSelectedCommits(selected);
+      return next;
     });
   };
 

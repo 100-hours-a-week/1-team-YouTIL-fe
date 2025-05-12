@@ -1,4 +1,4 @@
-'use client'
+'use client';
 
 import './GenerateTILForm.scss';
 import { useSelectedCommitListStore } from '@/store/selectedCommitListStore';
@@ -10,6 +10,7 @@ import { useFetch } from '@/hooks/useFetch';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import GenerateTILModal from '../generateTILModal/GenerateTILModal';
+import DeadLineModal from '../deadLineModal/DeadLineModal';
 
 const GenerateTILForm = () => {
   const router = useRouter();
@@ -26,16 +27,17 @@ const GenerateTILForm = () => {
   const [visibility, setVisibility] = useState<'public' | 'private'>('public');
   const [shake, setShake] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isDeadlineError, setIsDeadlineError] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-  
+
     if (title.trim() === '') {
       setShake(true);
       setTimeout(() => setShake(false), 500);
       return;
     }
-  
+
     const payload = {
       organizationId: selectedOrganization?.organization_id ?? null,
       repositoryId: selectedRepository?.repositoryId ?? 0,
@@ -45,9 +47,9 @@ const GenerateTILForm = () => {
       category: category.toUpperCase(),
       is_shared: visibility === 'public',
     };
-  
+
     setIsLoading(true);
-  
+
     try {
       const response = await callApi({
         method: 'POST',
@@ -58,21 +60,31 @@ const GenerateTILForm = () => {
           Authorization: `Bearer ${accessToken}`,
         },
       });
-  
+    
       console.log('TIL 생성 응답:', response);
-  
+    
       setIsLoading(false);
       router.push('/repository');
     } catch (error) {
-      console.error('TIL 생성 실패:', error);
       setIsLoading(false);
+    
+      if (error instanceof Error) {
+        if (error.message.includes('503')) {
+          setIsDeadlineError(true);
+          return;
+        }
+        console.error('TIL 생성 실패:', error.message);
+      } else {
+        console.error('예상치 못한 에러:', error);
+      }
     }
-  };
-  
+  };    
 
   return (
     <>
       {isLoading && <GenerateTILModal />}
+      {isDeadlineError && <DeadLineModal onClose={() => setIsDeadlineError(false)} />}
+
       <div className="generate">
         <form className="generate__form">
           <label className="generate__label">

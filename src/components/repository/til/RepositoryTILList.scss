@@ -91,6 +91,9 @@
   margin-bottom: 0.5rem;
   color: #333;
   white-space: pre-wrap;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  max-width: 100%;
 }
 
 .repository-til-list__item-tags {
