@@ -7,7 +7,6 @@ import SelectBranchModal from '../selectBranchModal/SelectBranchModal';
 import './LinkGithubButton.scss';
 
 import { useUserRepositoryStore } from '@/store/userRepositoryStore';
-import { useSelectedDateStore } from '@/store/userDateStore';
 import { useUserBranchStore } from '@/store/userBranchStore';
 
 const LinkGithubButton = () => {
