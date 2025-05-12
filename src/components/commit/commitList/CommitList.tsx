@@ -68,7 +68,7 @@ const CommitList = () => {
     };
 
     fetchCommits();
-  }, [selectedRepository, selectedBranchName, selectedDate, callApi, accessToken, selectedOrganizaion]);
+  }, [selectedRepository, selectedBranchName, selectedDate, callApi, accessToken]);
 
   const toggleSelection = (index: number) => {
     const selectedCommit = commits[index];

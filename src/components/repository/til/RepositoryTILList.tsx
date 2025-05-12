@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 import { useFetch } from '@/hooks/useFetch';
 import useGetAccessToken from '@/hooks/useGetAccessToken';
 import { useRepositoryDateStore } from '@/store/useRepositoryDateStore';
+import { parseISO, format } from 'date-fns';
 
 interface TILItem {
   tilId: number;
@@ -101,32 +102,37 @@ const RepositoryTILList = () => {
     <div className="repository-til-list">
       <h2 className="repository-til-list__title">TIL 목록</h2>
       <ul className="repository-til-list__items">
-        {tilData.map((til) => (
-          <li
-            key={til.tilId}
-            className="repository-til-list__item"
-            onClick={() => handleClickTIL(til.tilId)}
-          >
-            <div className="repository-til-list__item-header">
-              <h3 className="repository-til-list__item-title">{til.title}</h3>
-              <p className="repository-til-list__item-date">{til.createdAt}</p>
-            </div>
+        {tilData.map((til) => {
+          const parsedDate = parseISO(til.createdAt);
+          const formattedDate = format(parsedDate, 'yyyy-MM-dd : HH:mm:ss');
 
-            {expandedTilId === til.tilId && tilDetailData && (
-              <div className="repository-til-list__item-detail">
-                <p className="repository-til-list__item-content">{tilDetailData.content}</p>
-                <p className="repository-til-list__item-tags">
-                  {tilDetailData.tag.map((tag, i) => (
-                    <span key={i} className="repository-til-list__item-tag">#{tag}</span>
-                  ))}
-                </p>
-                <p className="repository-til-list__item-meta">
-                  조회수 {tilDetailData.visitedCount} · 추천 {tilDetailData.recommendCount} · 댓글 {tilDetailData.commentsCount}
-                </p>
+          return (
+            <li
+              key={til.tilId}
+              className="repository-til-list__item"
+              onClick={() => handleClickTIL(til.tilId)}
+            >
+              <div className="repository-til-list__item-header">
+                <h3 className="repository-til-list__item-title">{til.title}</h3>
+                <p className="repository-til-list__item-date">{formattedDate}</p>
               </div>
-            )}
-          </li>
-        ))}
+
+              {expandedTilId === til.tilId && tilDetailData && (
+                <div className="repository-til-list__item-detail">
+                  <p className="repository-til-list__item-content">{tilDetailData.content}</p>
+                  <p className="repository-til-list__item-tags">
+                    {tilDetailData.tag.map((tag, i) => (
+                      <span key={i} className="repository-til-list__item-tag">#{tag}</span>
+                    ))}
+                  </p>
+                  <p className="repository-til-list__item-meta">
+                    조회수 {tilDetailData.visitedCount} · 추천 {tilDetailData.recommendCount} · 댓글 {tilDetailData.commentsCount}
+                  </p>
+                </div>
+              )}
+            </li>
+          );
+        })}
       </ul>
     </div>
   );

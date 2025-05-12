@@ -1,7 +1,7 @@
 const profile =() =>{
     return(
         <div>
-            프로필 페이지
+            곧 출시 예정인 서비스입니다!
         </div>
     )
 }
