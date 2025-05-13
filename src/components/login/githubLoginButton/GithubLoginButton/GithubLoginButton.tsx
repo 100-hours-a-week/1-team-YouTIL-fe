@@ -15,7 +15,7 @@ const GithubLoginButton = () => {
 
     login(code)
       .then(() => {
-        // window.location.href = '/';
+        window.location.href = '/';
       })
       .catch((error) => {
         console.error('GitHub 로그인 실패:', error);

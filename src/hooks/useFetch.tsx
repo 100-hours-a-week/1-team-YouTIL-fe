@@ -7,12 +7,13 @@ interface UseFetchParams {
   endpoint: string;
   body?: unknown | null;
   headers?: Record<string, string> | null;
+  credentials?: RequestCredentials; // ✅ 'include' | 'same-origin' | 'omit'
 }
 
 export const useFetch = () => {
   const callApi = useCallback(
     <T,>(params: UseFetchParams): Promise<T> => {
-      const { method, endpoint, body = null, headers = null } = params;
+      const { method, endpoint, body = null, headers = null, credentials } = params;
 
       const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
       if (!baseUrl) {
@@ -20,14 +21,17 @@ export const useFetch = () => {
       }
 
       return (async () => {
-        const response = await fetch(`${baseUrl}${endpoint}`, {
+        const fetchOptions: RequestInit = {
           method,
           headers: {
             'Content-Type': 'application/json',
             ...(headers || {}),
           },
           body: body ? JSON.stringify(body) : undefined,
-        });
+          ...(credentials ? { credentials } : {}),
+        };
+
+        const response = await fetch(`${baseUrl}${endpoint}`, fetchOptions);
 
         if (!response.ok) {
           const errorText = await response.text();
