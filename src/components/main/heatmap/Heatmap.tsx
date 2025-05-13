@@ -7,8 +7,13 @@ import './Heatmap.scss';
 import Tooltip from 'cal-heatmap/plugins/Tooltip';
 import LegendLite from 'cal-heatmap/plugins/LegendLite';
 import CalendarLabel from 'cal-heatmap/plugins/CalendarLabel';
+import type { PluginDefinition } from 'cal-heatmap';
+// import { TooltipOptions } from 'cal-heatmap/plugins/Tooltip';
+// import { LegendOptions } from 'cal-heatmap/plugins/LegendLite';
+// import { CalendarLabelOptions } from 'cal-heatmap/plugins/CalendarLabel';
 import { useFetch } from '@/hooks/useFetch';
 import useGetAccessToken from '@/hooks/useGetAccessToken';
+import { format } from 'date-fns';
 
 const weekdays = ['Sun', 'Mon', 'Tues', 'Wed', 'Thur', 'Fri', 'Sat'];
 const currentDate = new Date();
@@ -81,6 +86,37 @@ const Heatmap = () => {
       const startMonthDate = new Date(`${year}-${String(currentMonth + 1).padStart(2, '0')}-01`);
 
       heatmapRef.current = new CalHeatmap();
+
+      const plugins: PluginDefinition[] = [
+        [
+          Tooltip,
+          {
+            text: (date, value) =>
+              `${value ?? 'No'} contributions on </br>${format(date, 'EEEE, MMMM d, yyyy')}`,
+          },
+        ],
+        [
+          LegendLite,
+          {
+            includeBlank: true,
+            itemSelector: '#ex-ghDay-legend',
+            radius: 2,
+            width: 11,
+            height: 11,
+            gutter: 4,
+          },
+        ],
+        [
+          CalendarLabel,
+          {
+            width: 30,
+            textAlign: 'start',
+            text: () => weekdays.map((d, i) => (i % 2 === 0 ? '' : d)),
+            padding: [25, 0, 0, 0],
+          },
+        ],
+      ];
+
       heatmapRef.current.paint(
         {
           data: {
@@ -106,41 +142,9 @@ const Heatmap = () => {
           subDomain: { type: 'ghDay', radius: 2, width: 11, height: 11, gutter: 4 },
           itemSelector: '#ex-ghDay',
         },
-        [
-          [
-            Tooltip,
-            {
-              text: function (date: Date, value: number, dayjsDate: { format: (s: string) => string }) {
-                return (
-                  (value ? value : 'No') +
-                  ' contributions on </br>' +
-                  dayjsDate.format('dddd, MMMM D, YYYY')
-                );
-              },
-            },
-          ],
-          [
-            LegendLite,
-            {
-              includeBlank: true,
-              itemSelector: '#ex-ghDay-legend',
-              radius: 2,
-              width: 11,
-              height: 11,
-              gutter: 4,
-            },
-          ],
-          [
-            CalendarLabel,
-            {
-              width: 30,
-              textAlign: 'start',
-              text: () => weekdays.map((d, i) => (i % 2 === 0 ? '' : d)),
-              padding: [25, 0, 0, 0],
-            },
-          ],
-        ]
+        plugins,
       );
+
       setCal(heatmapRef.current);
     }
   }, [cal, year, currentMonth, tilData]);
