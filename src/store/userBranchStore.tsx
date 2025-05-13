@@ -7,11 +7,11 @@ interface Branch {
 interface UserBranchState {
   selectedBranch: Branch | null;
   setSelectedBranch: (branch: Branch) => void;
-  resetBranch: () => void;
+  clearBranch: () => void;
 }
 
 export const useUserBranchStore = create<UserBranchState>((set) => ({
   selectedBranch: null,
   setSelectedBranch: (branch) => set({ selectedBranch: branch }),
-  resetBranch: () => set({ selectedBranch: null }),
+  clearBranch: () => set({ selectedBranch: null }),
 }));

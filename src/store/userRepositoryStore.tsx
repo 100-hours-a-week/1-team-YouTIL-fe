@@ -8,9 +8,11 @@ interface Repository {
 interface UserRepositoryState {
   selectedRepository: Repository | null;
   setRepository: (repo: Repository) => void;
+  clearRepository: () => void;
 }
 
 export const useUserRepositoryStore = create<UserRepositoryState>((set) => ({
   selectedRepository: null,
   setRepository: (repo) => set({ selectedRepository: repo }),
+  clearRepository: () => set({ selectedRepository: null }),
 }));

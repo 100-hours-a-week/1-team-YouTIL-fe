@@ -78,13 +78,15 @@
         background-color: #00b6fa;
       }
     }
+
     &.error {
       background-color: #ff4d4f;
     }
-    
+
     &.shake {
       animation: shake 0.3s;
     }
+
     @keyframes shake {
       0%   { transform: translateX(0); }
       25%  { transform: translateX(-4px); }
@@ -93,6 +95,7 @@
       100% { transform: translateX(0); }
     }
   }
+
   &__desc {
     display: flex;
     justify-content: center;
@@ -102,5 +105,28 @@
   &__loading {
     text-align: center;
     color: #555;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+
+    &::before {
+      content: '';
+    }
+  }
+
+  &__spinner {
+    width: 16px;
+    height: 16px;
+    border: 2px solid #ccc;
+    border-top: 2px solid #00b6fa;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+
+  @keyframes spin {
+    0%   { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
   }
 }
