@@ -1,35 +1,52 @@
 .generate-modal {
-    position: fixed;
-    top: 0;
-    left: 0;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 999;
+
+  &__overlay {
+    position: absolute;
     width: 100%;
     height: 100%;
-    z-index: 999;
-  
-    &__overlay {
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.3);
-    }
-  
-    &__content {
-        position: absolute;
-        top: 150px;
-        left: 50%;
-        transform: translateX(-50%);
-        padding: 1rem;
-        width: 320px;
-        background: #fff;
-        border-radius: 8px;
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-        z-index: 1000;
-      }
-    
-  
-    &__text {
-        text-align: center;
-        color: #555;
-    }
+    background: rgba(0, 0, 0, 0.3);
   }
-  
+
+  &__content {
+    position: absolute;
+    top: 150px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 1rem;
+    width: 320px;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+  }
+
+  &__text {
+    text-align: center;
+    color: #555;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+  }
+
+  &__spinner {
+    width: 16px;
+    height: 16px;
+    border: 2px solid #ccc;
+    border-top: 2px solid #00b6fa;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+
+  @keyframes spin {
+    0%   { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+}

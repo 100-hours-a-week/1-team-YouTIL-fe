@@ -4,7 +4,6 @@ import { Suspense } from "react";
 import GithubLoginButton from "@/components/login/githubLoginButton/GithubLoginButton/GithubLoginButton";
 import LoginPageIntro from "@/components/login/loginPageIntro/LoginPageIntro";
 import "./page.scss";
-import Image from "next/image";
 
 const login = () => {
   return (

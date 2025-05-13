@@ -99,12 +99,11 @@ const RepositoryTILList = () => {
           const formattedDate = format(parsedDate, 'yyyy-MM-dd : HH:mm:ss');
 
           return (
-            <li
-              key={til.tilId}
-              className="repository-til-list__item"
-              onClick={() => handleClickTIL(til.tilId)}
-            >
-              <div className="repository-til-list__item-header">
+            <li key={til.tilId} className="repository-til-list__item">
+              <div
+                className="repository-til-list__item-header"
+                onClick={() => handleClickTIL(til.tilId)}
+              >
                 <h3 className="repository-til-list__item-title">{til.title}</h3>
                 <p className="repository-til-list__item-date">{formattedDate}</p>
               </div>
@@ -114,7 +113,9 @@ const RepositoryTILList = () => {
                   <p className="repository-til-list__item-content">{tilDetailData.content}</p>
                   <p className="repository-til-list__item-tags">
                     {tilDetailData.tag.map((tag, i) => (
-                      <span key={i} className="repository-til-list__item-tag">#{tag}</span>
+                      <span key={i} className="repository-til-list__item-tag">
+                        #{tag}
+                      </span>
                     ))}
                   </p>
                   <p className="repository-til-list__item-meta">

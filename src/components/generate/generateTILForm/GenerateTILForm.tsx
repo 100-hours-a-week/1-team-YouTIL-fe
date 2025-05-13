@@ -51,7 +51,7 @@ const GenerateTILForm = () => {
     setIsLoading(true);
 
     try {
-      const response = await callApi({
+      /*const response = */await callApi({
         method: 'POST',
         endpoint: '/tils',
         body: payload,
@@ -60,9 +60,7 @@ const GenerateTILForm = () => {
           Authorization: `Bearer ${accessToken}`,
         },
       });
-    
-      console.log('TIL 생성 응답:', response);
-    
+      
       setIsLoading(false);
       router.push('/repository');
     } catch (error) {
