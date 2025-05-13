@@ -5,6 +5,9 @@ import LayoutWrapper from "@/components/layoutWrapper/LayoutWrapper";
 export const metadata: Metadata = {
   title: "YouTIL",
   description: "YouTIL",
+  icons:{
+    icon: '/favicon.png'
+  }
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

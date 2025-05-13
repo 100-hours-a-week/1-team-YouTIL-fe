@@ -15,6 +15,7 @@ const GithubLogin = async (authorizationCode: string) => {
       body: JSON.stringify({
         authorizationCode,
       }),
+      credentials: 'include',
     });
 
     if (!res.ok) {
