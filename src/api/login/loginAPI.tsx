@@ -23,9 +23,10 @@ const GithubLogin = async (authorizationCode: string) => {
     }
 
     const response = await res.json();
-    const accessToken = response.data.accessToken;
+    
+    // const accessToken = response.data.accessToken;
 
-    useAuthStore.getState().setAccessToken(accessToken);
+    // useAuthStore.getState().setAccessToken(accessToken);
 
     return response.data;
   } catch (error) {
