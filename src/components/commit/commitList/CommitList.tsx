@@ -69,9 +69,6 @@ const CommitList = () => {
 
     fetchCommits();
   }, [
-    selectedOrganizaion?.organization_id,
-    selectedRepository,
-    selectedBranchName,
     selectedDate,
     callApi,
     accessToken,

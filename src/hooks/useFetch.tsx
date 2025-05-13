@@ -8,6 +8,7 @@ interface UseFetchParams {
   endpoint: string;
   body?: unknown | null;
   headers?: Record<string, string> | null;
+  credentials?: RequestCredentials;
 }
 
 export const useFetch = () => {
