@@ -1,18 +1,17 @@
 .login-page {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    height: 100%;
-  
-    &__space {
-      &--top {
-        margin: 50px;
-      }
-  
-      &--bottom {
-        margin: 25px;
-      }
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+
+  &__space {
+    &--top {
+      margin: 50px;
+    }
+
+    &--bottom {
+      margin: 0px;
     }
   }
-  
+}
