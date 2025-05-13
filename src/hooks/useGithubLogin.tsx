@@ -16,6 +16,7 @@ export const useGithubLogin = () => {
       method: 'POST',
       endpoint: '/users/github',
       body: { authorizationCode },
+      credentials: 'include',
     });
 
     setAccessToken(response.data.accessToken);
