@@ -64,7 +64,7 @@ const SelectOrganizationModal = ({ onClose, onComplete }: Props) => {
         setSelectedOrganization(selected);
       }
     }
-  }, [noSelection, selectedOrgId, organizations]);
+  }, [noSelection, selectedOrgId, organizations, setSelectedOrganization]);
 
   const handleSelect = (org: Organization) => {
     if (selectedOrgId === org.organization_id) {

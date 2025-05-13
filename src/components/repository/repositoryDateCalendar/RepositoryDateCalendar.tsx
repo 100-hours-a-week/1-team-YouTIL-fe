@@ -38,8 +38,12 @@ const RepositoryDateCalendar = () => {
 
   useEffect(() => {
     const formatted = format(selectedDate, 'yyyy-MM-dd');
-    activeTab === 'interview' ? setInterviewDate(formatted) : setTilDate(formatted);
-  }, [selectedDate]);
+    if (activeTab === 'interview') {
+      setInterviewDate(formatted);
+    } else {
+      setTilDate(formatted);
+    }
+  }, [selectedDate, activeTab, setInterviewDate, setTilDate]);
 
   useEffect(() => {
     const newSelectedDate = rawDate && !isNaN(Date.parse(rawDate)) ? parseISO(rawDate) : new Date();

@@ -1,9 +1,10 @@
 'use client';
 
-import { useRef, useEffect, useState } from 'react';
+import { useRef, useEffect, useState, useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useFetch } from '@/hooks/useFetch';
 import useGetAccessToken from '@/hooks/useGetAccessToken';
+import Image from 'next/image';
 import './TechNews.scss';
 
 interface NewsItem {
@@ -32,12 +33,11 @@ const TechNews = () => {
           Authorization: `Bearer ${accessToken}`,
         },
       });
-      console.log(response);
       return response.data.news;
     },
   });
 
-  const scrollToIndex = (index: number) => {
+  const scrollToIndex = useCallback((index: number) => {
     if (!scrollRef.current || !data) return;
     const container = scrollRef.current;
     const itemWidth = 300 + 96;
@@ -45,25 +45,28 @@ const TechNews = () => {
 
     setIsSliding(true);
     setTimeout(() => setIsSliding(false), 500);
-  };
+  }, [data]);
 
-  const scrollByItem = (direction: 'left' | 'right', userTriggered = false) => {
-    if (!scrollRef.current || !data) return;
+  const scrollByItem = useCallback(
+    (direction: 'left' | 'right', userTriggered = false) => {
+      if (!scrollRef.current || !data) return;
 
-    if (userTriggered) setAutoSlideEnabled(false);
+      if (userTriggered) setAutoSlideEnabled(false);
 
-    const container = scrollRef.current;
-    const itemWidth = 300 + 96;
-    const currentScroll = container.scrollLeft;
-    const index = Math.round(currentScroll / itemWidth);
+      const container = scrollRef.current;
+      const itemWidth = 300 + 96;
+      const currentScroll = container.scrollLeft;
+      const index = Math.round(currentScroll / itemWidth);
 
-    const nextIndex =
-      direction === 'right'
-        ? (index + 1) % data.length
-        : (index - 1 + data.length) % data.length;
+      const nextIndex =
+        direction === 'right'
+          ? (index + 1) % data.length
+          : (index - 1 + data.length) % data.length;
 
-    scrollToIndex(nextIndex);
-  };
+      scrollToIndex(nextIndex);
+    },
+    [data, scrollToIndex]
+  );
 
   useEffect(() => {
     if (!data || !autoSlideEnabled) return;
@@ -75,7 +78,7 @@ const TechNews = () => {
     return () => {
       if (intervalRef.current) clearInterval(intervalRef.current);
     };
-  }, [data, autoSlideEnabled]);
+  }, [data, autoSlideEnabled, scrollByItem]);
 
   return (
     <div className="technews">
@@ -93,7 +96,14 @@ const TechNews = () => {
             rel="noopener noreferrer"
             className={`technews__item ${isSliding ? 'no-hover' : ''}`}
           >
-            <img src={news.thumbnail} alt={news.title} className="technews__thumbnail" />
+            <Image
+              src={news.thumbnail}
+              alt={news.title}
+              width={300}
+              height={180}
+              className="technews__thumbnail"
+              unoptimized
+            />
             <div className="technews__gradient" />
             <div className="technews__headline">{news.title}</div>
           </a>
