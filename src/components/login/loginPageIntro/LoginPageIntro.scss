@@ -1,0 +1,31 @@
+.login-intro {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    margin-top: 0;
+    padding-top: 0;
+    transform: translateY(-40px);
+  
+    &__image {
+      margin-bottom: 16px;
+    }
+  
+    &__notice {
+      line-height: 1.6;
+    }
+  
+    &__notice--title {
+      display: block;
+      color: #007bff;
+      font-weight: bold;
+      margin-bottom: 8px;
+    }
+  
+    &__notice--content {
+      display: block;
+      color: #00B6F9;
+      margin-top: 0;
+    }
+  }
+  
