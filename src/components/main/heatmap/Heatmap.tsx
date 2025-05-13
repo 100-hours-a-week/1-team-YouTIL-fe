@@ -1,20 +1,16 @@
 'use client';
 
-// @ts-ignore
 import CalHeatmap from 'cal-heatmap';
 import { useState, useEffect, useRef } from 'react';
 import 'cal-heatmap/cal-heatmap.css';
 import './Heatmap.scss';
-// @ts-ignore
 import Tooltip from 'cal-heatmap/plugins/Tooltip';
-// @ts-ignore
 import LegendLite from 'cal-heatmap/plugins/LegendLite';
-// @ts-ignore
 import CalendarLabel from 'cal-heatmap/plugins/CalendarLabel';
 import { useFetch } from '@/hooks/useFetch';
 import useGetAccessToken from '@/hooks/useGetAccessToken';
 
-const weekdays = ["Sun", "Mon", "Tues", "Wed", "Thur", "Fri", "Sat"];
+const weekdays = ['Sun', 'Mon', 'Tues', 'Wed', 'Thur', 'Fri', 'Sat'];
 const currentDate = new Date();
 const basicYear = currentDate.getFullYear();
 const rawCurrentMonth = currentDate.getMonth();
@@ -33,13 +29,18 @@ const monthMap: Record<string, string> = {
   sep: '09', oct: '10', nov: '11', dec: '12',
 };
 
+interface TilData {
+  date: string;
+  count: number;
+}
+
 const Heatmap = () => {
-  const [cal, setCal] = useState<any>(null);
+  const [cal, setCal] = useState<CalHeatmap | null>(null);
   const [year, setYear] = useState(basicYear);
   const [currentMonth, setCurrentMonth] = useState(adjustedCurrentMonth);
-  const heatmapRef = useRef<any>(null);
+  const heatmapRef = useRef<CalHeatmap | null>(null);
   const [isOpen, setIsOpen] = useState(false);
-  const [tilData, setTilData] = useState<{ date: string; count: number }[]>([]);
+  const [tilData, setTilData] = useState<TilData[]>([]);
 
   const { callApi } = useFetch();
   const accessToken = useGetAccessToken();
@@ -73,7 +74,7 @@ const Heatmap = () => {
     };
 
     fetchTILData();
-  }, [year]);
+  }, [year, accessToken, callApi]);
 
   useEffect(() => {
     if (!heatmapRef.current && tilData.length > 0) {
@@ -109,7 +110,7 @@ const Heatmap = () => {
           [
             Tooltip,
             {
-              text: function (date: Date, value: number, dayjsDate: any) {
+              text: function (date: Date, value: number, dayjsDate: { format: (s: string) => string }) {
                 return (
                   (value ? value : 'No') +
                   ' contributions on </br>' +
@@ -142,10 +143,10 @@ const Heatmap = () => {
       );
       setCal(heatmapRef.current);
     }
-  }, [cal, year, tilData]);
+  }, [cal, year, currentMonth, tilData]);
 
   const handleNextClick = (year: number) => {
-    cal.jumpTo(`${year}-01-30`, true);
+    cal?.jumpTo(`${year}-01-30`, true);
   };
 
   const handlePrevDomain = () => {
