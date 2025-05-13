@@ -126,7 +126,10 @@ const CommitList = () => {
       )}
 
       {isLoading ? (
-        <p className="commit-list__loading">로딩 중...</p>
+         <p className="commit-list__loading">
+         <span className="commit-list__spinner" />
+         로딩 중...
+       </p>
       ) : !commits || commits.length === 0 ? (
         <div className="commit-list__desc">
           <NoCommitDescription />

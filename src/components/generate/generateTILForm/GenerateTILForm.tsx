@@ -61,8 +61,6 @@ const GenerateTILForm = () => {
         },
       });
     
-      console.log('TIL 생성 응답:', response);
-    
       setIsLoading(false);
       router.push('/repository');
     } catch (error) {
