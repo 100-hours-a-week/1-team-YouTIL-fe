@@ -1,6 +1,5 @@
 'use client';
 
-import { useEffect } from 'react';
 import { usePathname } from 'next/navigation';
 import Header from '../header/header/Header';
 import BottomNavigationBar from '../bottomNavigationBar/bottomNavigationBar/BottomNavigationBar';

@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { refreshAccess } from '@/lib/refreshAccess';
+import useAuthStore from '@/store/authStore';
 
 type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE';
 
@@ -12,35 +12,38 @@ interface UseFetchParams {
 }
 
 export const useFetch = () => {
+  const setAccessToken = useAuthStore((state) => state.setAccessToken);
+
   const callApi = useCallback(
     async <T,>(params: UseFetchParams): Promise<T> => {
-      const { method, endpoint, body = null, headers = null } = params;
+      const {
+        method,
+        endpoint,
+        body = null,
+        headers = null,
+        credentials = 'same-origin',
+      } = params;
 
       const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
       if (!baseUrl) {
         throw new Error('환경변수 NEXT_PUBLIC_BASE_URL이 설정되지 않았습니다.');
       }
 
-      // await refreshAccess();
-
       const response = await fetch(`${baseUrl}${endpoint}`, {
         method,
+        credentials,
         headers: {
           'Content-Type': 'application/json',
           ...(headers || {}),
         },
         body: body ? JSON.stringify(body) : undefined,
       });
-      // response.headers.forEach((value, key) => {
-      //   console.log(`${key}: ${value}`);
-      //   if (key.toLowerCase() === 'authorization' && value.startsWith('Bearer ')) {
-      //     const newAccessToken = value.replace('Bearer ', '').trim();
-      //     console.log('새 accessToken:', newAccessToken);
-      //   }
-      //       // await new Promise((resolve) => setTimeout(resolve, 10000));
-      // });
 
-      
+      const newAccessToken = response.headers.get('authorization')?.replace('Bearer ', '');
+      if (newAccessToken) {
+        setAccessToken(newAccessToken);
+      }
+
       if (!response.ok) {
         const errorText = await response.text();
         throw new Error(`HTTP ${response.status}: ${errorText}`);
@@ -48,7 +51,7 @@ export const useFetch = () => {
 
       return response.json();
     },
-    []
+    [setAccessToken]
   );
 
   return { callApi };
