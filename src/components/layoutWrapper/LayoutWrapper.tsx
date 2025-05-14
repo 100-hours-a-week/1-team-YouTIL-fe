@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect } from 'react';
 import { usePathname } from 'next/navigation';
 import Header from '../header/header/Header';
 import BottomNavigationBar from '../bottomNavigationBar/bottomNavigationBar/BottomNavigationBar';
@@ -21,8 +22,6 @@ export default function LayoutWrapper({ children }: { children: React.ReactNode 
 
           <main>
             {isLoginPage ? children : <AuthGuard>{children}</AuthGuard>}
-            {/* {<AuthGuard>{children}</AuthGuard>} */}
-            {/* {children} */}
           </main>
 
           {!isLoginPage && <BottomNavigationBar />}

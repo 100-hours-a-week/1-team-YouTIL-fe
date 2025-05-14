@@ -1,4 +1,5 @@
-import { useFetch } from '@/hooks/useFetch';
+'use client';
+
 import useAuthStore from '@/store/authStore';
 
 interface GithubLoginResponse {
@@ -8,19 +9,35 @@ interface GithubLoginResponse {
 }
 
 export const useGithubLogin = () => {
-  const { callApi } = useFetch();
   const setAccessToken = useAuthStore((state) => state.setAccessToken);
 
   const login = async (authorizationCode: string) => {
-    const response = await callApi<GithubLoginResponse>({
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
+    if (!baseUrl) {
+      throw new Error('환경변수 NEXT_PUBLIC_BASE_URL이 설정되지 않았습니다.');
+    }
+
+    const response = await fetch(`${baseUrl}/users/github`, {
       method: 'POST',
-      endpoint: '/users/github',
-      body: { authorizationCode },
+      headers: {
+        'Content-Type': 'application/json',
+      },
       credentials: 'include',
+      body: JSON.stringify({ authorizationCode }),
     });
 
-    setAccessToken(response.data.accessToken);
-    return response.data;
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`HTTP ${response.status}: ${errorText}`);
+    }
+
+    const result: GithubLoginResponse = await response.json();
+    const accessToken = result.data.accessToken;
+
+    setAccessToken(accessToken);
+    localStorage.setItem('accessToken', accessToken);
+
+    return result.data;
   };
 
   return { login };

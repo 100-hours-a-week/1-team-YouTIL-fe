@@ -21,9 +21,7 @@ interface TILItem {
 }
 
 interface TILResponse {
-  data: {
-    tils: TILItem[];
-  };
+  data: TILItem[];
 }
 
 const NewTILList = () => {
@@ -42,7 +40,8 @@ const NewTILList = () => {
             Authorization: `Bearer ${accessToken}`,
           },
         });
-        setTils(response.data.tils);
+        console.log(response);
+        setTils(response.data);
       } catch (error) {
         console.error('최근 TIL 데이터를 불러오는 중 오류 발생:', error);
         setIsError(true);
@@ -61,7 +60,6 @@ const NewTILList = () => {
       {tils.map((til) => (
         <div key={til.id} className="til-list__card">
           <div className="til-list__header">
-            {/* <p className="til-list__image">{til.profileImageUrl}</p> */}
             <p className="til-list__title">{til.title}</p>
           </div>
           <div className="til-list__tags">
