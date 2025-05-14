@@ -11,13 +11,13 @@ export const refreshAccess = async () => {
     const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/news`, {
       method: 'GET',
       headers: {
-        Authorization: `Bearer ${accessToken}`,
+            Authorization: `Bearer ${accessToken}`,
         },
-        credentials: 'include'
+      credentials:'include',
     });
 
+    const authHeader = response.headers.get('authorization');
     console.log(response);
-    const authHeader = response.headers.get('Authorization');
 
     if (authHeader?.startsWith('Bearer ')) {
       const newAccessToken = authHeader.replace('Bearer ', '').trim();

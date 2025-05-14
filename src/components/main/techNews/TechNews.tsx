@@ -1,11 +1,10 @@
 'use client';
 
 import { useRef, useEffect, useState, useCallback } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { useFetch } from '@/hooks/useFetch';
-import useGetAccessToken from '@/hooks/useGetAccessToken';
 import Image from 'next/image';
 import './TechNews.scss';
+import useAuthStore from '@/store/authStore';
+import useGetAccessToken from '@/hooks/useGetAccessToken';
 
 interface NewsItem {
   title: string;
@@ -16,27 +15,37 @@ interface NewsItem {
 }
 
 const TechNews = () => {
-  const { callApi } = useFetch();
-  const accessToken = useGetAccessToken();
   const scrollRef = useRef<HTMLDivElement>(null);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const [autoSlideEnabled, setAutoSlideEnabled] = useState(true);
   const [isSliding, setIsSliding] = useState(false);
+  const [data, setData] = useState<NewsItem[] | null>(null);
 
-  const { data } = useQuery({
-    queryKey: ['tech-news'],
-    queryFn: async () => {
-      const response = await callApi<{ data: { news: NewsItem[] } }>({
+  const fetchNews = useCallback(async () => {
+    const accessToken = useGetAccessToken();
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/news`, {
         method: 'GET',
-        endpoint: '/news',
-        headers: {
+        credentials: 'include',
+	      headers: {
           Authorization: `Bearer ${accessToken}`,
         },
-        credentials:'include',
       });
-      return response.data.news;
-    },
-  });
+
+      if (!res.ok) {
+        throw new Error('Failed to fetch tech news');
+      }
+
+      const json = await res.json();
+      setData(json.data.news);
+    } catch (err) {
+      console.error(err);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchNews();
+  }, [fetchNews]);
 
   const scrollToIndex = useCallback((index: number) => {
     if (!scrollRef.current || !data) return;

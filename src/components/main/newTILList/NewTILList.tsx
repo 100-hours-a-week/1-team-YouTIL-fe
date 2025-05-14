@@ -40,7 +40,6 @@ const NewTILList = () => {
             Authorization: `Bearer ${accessToken}`,
           },
         });
-        console.log(response);
         setTils(response.data);
       } catch (error) {
         console.error('최근 TIL 데이터를 불러오는 중 오류 발생:', error);
