@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import useAuthStore from '@/store/authStore';
+import { refreshAccess } from '@/lib/refreshAccess';
 
 type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE';
 
@@ -12,8 +12,6 @@ interface UseFetchParams {
 }
 
 export const useFetch = () => {
-  const setAccessToken = useAuthStore((state) => state.setAccessToken);
-
   const callApi = useCallback(
     async <T,>(params: UseFetchParams): Promise<T> => {
       const { method, endpoint, body = null, headers = null } = params;
@@ -23,6 +21,8 @@ export const useFetch = () => {
         throw new Error('환경변수 NEXT_PUBLIC_BASE_URL이 설정되지 않았습니다.');
       }
 
+      // await refreshAccess();
+
       const response = await fetch(`${baseUrl}${endpoint}`, {
         method,
         headers: {
@@ -31,13 +31,16 @@ export const useFetch = () => {
         },
         body: body ? JSON.stringify(body) : undefined,
       });
+      // response.headers.forEach((value, key) => {
+      //   console.log(`${key}: ${value}`);
+      //   if (key.toLowerCase() === 'authorization' && value.startsWith('Bearer ')) {
+      //     const newAccessToken = value.replace('Bearer ', '').trim();
+      //     console.log('새 accessToken:', newAccessToken);
+      //   }
+      //       // await new Promise((resolve) => setTimeout(resolve, 10000));
+      // });
 
-      const authHeader = response.headers.get('Authorization');
-      if (authHeader?.startsWith('Bearer ')) {
-        const newAccessToken = authHeader.replace('Bearer ', '').trim();
-        setAccessToken(newAccessToken);
-      }
-
+      
       if (!response.ok) {
         const errorText = await response.text();
         throw new Error(`HTTP ${response.status}: ${errorText}`);
@@ -45,7 +48,7 @@ export const useFetch = () => {
 
       return response.json();
     },
-    [setAccessToken]
+    []
   );
 
   return { callApi };

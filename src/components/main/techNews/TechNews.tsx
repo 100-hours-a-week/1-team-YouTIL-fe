@@ -32,6 +32,7 @@ const TechNews = () => {
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
+        credentials:'include',
       });
       return response.data.news;
     },
