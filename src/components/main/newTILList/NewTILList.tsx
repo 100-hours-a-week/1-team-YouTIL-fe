@@ -31,12 +31,12 @@ const NewTILList = () => {
   const accessToken = useGetAccessToken();
   const [tils, setTils] = useState<TILItem[]>([]);
   const [isError, setIsError] = useState(false);
-  const accessExist = useCheckAccess(accessToken);
+  const existAccess = useCheckAccess(accessToken);
 
   useEffect(() => {
     const fetchRecentTILs = async () => {
 
-      if (!accessExist) return;
+      if (!existAccess) return;
 
       try {
         const response = await callApi<TILResponse>({

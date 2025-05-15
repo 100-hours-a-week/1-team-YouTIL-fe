@@ -13,7 +13,6 @@ import TechNews from '@/components/main/techNews/TechNews';
 import NewTILDescription from '@/components/description/newTILDescription/NewTILDescription';
 import NewTILList from '@/components/main/newTILList/NewTILList';
 import useCheckAccess from '@/hooks/useCheckExistAccess';
-import { access } from 'fs';
 
 interface UserInfoResponse {
   data: {
