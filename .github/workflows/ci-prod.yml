@@ -30,11 +30,11 @@ jobs:
       - name: Install Dependencies
         run: pnpm install
 
-      - name: Build
-        run: pnpm build
-
       - name: Generate .env
         run: echo "${{ secrets.ENV_PROD }}" > .env
+
+      - name: Build
+        run: pnpm build
 
       - name: Prepare SSH Key
         run: |
