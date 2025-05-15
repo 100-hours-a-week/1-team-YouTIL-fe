@@ -16,7 +16,13 @@ export const useFetch = () => {
 
   const callApi = useCallback(
     async <T,>(params: UseFetchParams): Promise<T> => {
-      const { method, endpoint, body = null, headers = null } = params;
+      const {
+        method,
+        endpoint,
+        body = null,
+        headers = null,
+        credentials = 'same-origin',
+      } = params;
 
       const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
       if (!baseUrl) {
@@ -25,6 +31,7 @@ export const useFetch = () => {
 
       const response = await fetch(`${baseUrl}${endpoint}`, {
         method,
+        credentials,
         headers: {
           'Content-Type': 'application/json',
           ...(headers || {}),
@@ -32,9 +39,8 @@ export const useFetch = () => {
         body: body ? JSON.stringify(body) : undefined,
       });
 
-      const authHeader = response.headers.get('Authorization');
-      if (authHeader?.startsWith('Bearer ')) {
-        const newAccessToken = authHeader.replace('Bearer ', '').trim();
+      const newAccessToken = response.headers.get('authorization')?.replace('Bearer ', '');
+      if (newAccessToken) {
         setAccessToken(newAccessToken);
       }
 

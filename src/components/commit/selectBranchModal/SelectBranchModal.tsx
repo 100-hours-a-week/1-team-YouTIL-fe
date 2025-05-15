@@ -64,6 +64,7 @@ const SelectBranchModal = ({ onClose }: Props) => {
           headers: {
             Authorization: `Bearer ${accessToken}`,
           },
+          credentials:'include',
         });
 
         setBranches(response.data.branches);

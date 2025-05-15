@@ -59,6 +59,7 @@ const Heatmap = () => {
           headers: {
             Authorization: `Bearer ${accessToken}`,
           },
+          credentials: 'include',
         });
 
         const raw = res.data?.tils ?? {};
