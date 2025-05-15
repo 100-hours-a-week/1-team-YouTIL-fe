@@ -6,68 +6,26 @@ on:
       - dev
 
 jobs:
-  build:
-    name: Build Frontend
+  deploy:
+    name: Upload Code & Trigger Remote Build
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Setup Node & PNPM
-        uses: pnpm/action-setup@v2
-        with:
-          version: 8
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: 'pnpm'
-
-      - name: Install Dependencies
-        run: pnpm install
-
-      - name: Generate .env
-        run: echo "${{ secrets.ENV_DEV }}" > .env
-
-      - name: Build
-        run: pnpm build
-
-      - name: Upload Build Artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: frontend-build
-          path: |
-            .output
-            .env
-
-  deploy:
-    name: Deploy to GCP Server
-    runs-on: ubuntu-latest
-    needs: build
-
-    steps:
-      - name: Set Version Name (timestamp)
-        id: version
-        run: echo "VERSION=$(date +'%Y%m%d-%H%M')" >> $GITHUB_ENV
-
       - name: Prepare SSH Key
         run: |
           echo "${{ secrets.YOUTIL_DEV_SSH_KEY }}" > key.pem
           chmod 600 key.pem
 
-      - name: Download Build Artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: frontend-build
-          path: deploy-files
+      - name: Generate .env file
+        run: echo "${{ secrets.ENV_DEV }}" > .env
 
-      - name: Copy to GCP Server in Timestamp Folder
+      - name: Upload .env separately
         run: |
-          ssh -i key.pem -o StrictHostKeyChecking=no ubuntu@${{ secrets.YOUTIL_DEV_HOST }} "mkdir -p /home/ubuntu/deploy/fe/${{ env.VERSION }}"
-          scp -i key.pem -o StrictHostKeyChecking=no -r deploy-files/.output ubuntu@${{ secrets.YOUTIL_DEV_HOST }}:/home/ubuntu/deploy/fe/${{ env.VERSION }}/.output
-          scp -i key.pem -o StrictHostKeyChecking=no deploy-files/.env.production ubuntu@${{ secrets.YOUTIL_DEV_HOST }}:/home/ubuntu/deploy/fe/${{ env.VERSION }}/.env
+          scp -i key.pem -o StrictHostKeyChecking=no .env ubuntu@${{ secrets.YOUTIL_DEV_HOST }}:/home/ubuntu/1-team-YouTIL-fe/.env
 
       - name: Run Remote Deploy Script
         run: |
-          ssh -i key.pem -o StrictHostKeyChecking=no ubuntu@${{ secrets.YOUTIL_DEV_HOST }} "VERSION=${{ env.VERSION }} bash /home/ubuntu/scripts/fe/deploy.sh"
+          ssh -i key.pem -o StrictHostKeyChecking=no ubuntu@${{ secrets.YOUTIL_DEV_HOST }} "bash /home/ubuntu/scripts/fe/deploy.sh"
