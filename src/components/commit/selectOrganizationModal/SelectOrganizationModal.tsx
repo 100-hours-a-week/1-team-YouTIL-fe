@@ -42,6 +42,7 @@ const SelectOrganizationModal = ({ onClose, onComplete }: Props) => {
           headers: {
             Authorization: `Bearer ${accessToken}`,
           },
+          credentials:'include',
         });
         setOrganizations(response.data.organizations);
       } catch (error) {

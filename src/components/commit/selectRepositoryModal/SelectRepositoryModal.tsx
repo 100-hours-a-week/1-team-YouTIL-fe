@@ -42,6 +42,7 @@ const SelectRepositoryModal = ({ onClose, onComplete }: Props) => {
           headers: {
             Authorization: `Bearer ${accessToken}`,
           },
+          credentials:"include",
         });
         setRepositories(response.data.repositories);
       } catch (err) {

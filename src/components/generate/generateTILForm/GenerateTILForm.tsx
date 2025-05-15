@@ -59,6 +59,7 @@ const GenerateTILForm = () => {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${accessToken}`,
         },
+        credentials:'include',
       });
       
       setIsLoading(false);
