@@ -54,6 +54,7 @@ const CommitList = () => {
           headers: {
             Authorization: `Bearer ${accessToken}`,
           },
+          credentials:'include',
         });
 
         const commits = response?.data?.commits ?? [];

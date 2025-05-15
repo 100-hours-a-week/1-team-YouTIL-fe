@@ -83,6 +83,7 @@ const RepositoryTILList = () => {
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
+        credentials:'include',
       });
       setExpandedTilId(tilId);
       setTilDetailData(response.data);
