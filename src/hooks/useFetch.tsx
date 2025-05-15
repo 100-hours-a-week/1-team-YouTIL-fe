@@ -1,5 +1,6 @@
 import { useCallback } from 'react';
 import useAuthStore from '@/store/authStore';
+import Router from 'next/router';
 
 type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE';
 
@@ -42,6 +43,7 @@ export const useFetch = () => {
       const newAccessToken = response.headers.get('authorization')?.replace('Bearer ', '');
       if (newAccessToken) {
         setAccessToken(newAccessToken);
+        Router.push('/'); 
       }
 
       if (!response.ok) {

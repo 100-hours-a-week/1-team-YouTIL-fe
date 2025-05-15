@@ -39,6 +39,7 @@ const NewTILList = () => {
           headers: {
             Authorization: `Bearer ${accessToken}`,
           },
+          credentials: 'include',
         });
         setTils(response.data);
       } catch (error) {
