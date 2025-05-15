@@ -58,6 +58,7 @@ const RepositoryTILList = () => {
           headers: {
             Authorization: `Bearer ${accessToken}`,
           },
+          credentials:'include',
         });
         setTilData(response.data.tils);
       } catch (error) {

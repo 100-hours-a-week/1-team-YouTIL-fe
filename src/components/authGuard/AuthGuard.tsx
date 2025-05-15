@@ -12,16 +12,16 @@ const AuthGuard = ({ children }: AuthGuardProps) => {
   const router = useRouter();
   const [checked, setChecked] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const token = useGetAccessToken();
+  const accessToken = useGetAccessToken();
 
   useEffect(() => {
-    if (token) {
+    if (accessToken) {
       setIsAuthenticated(true);
     } else {
       router.replace('/login');
     }
     setChecked(true);
-  }, [token, router]);
+  }, [accessToken, router]);
 
   if (!checked) return null;
   if (!isAuthenticated) return null;
