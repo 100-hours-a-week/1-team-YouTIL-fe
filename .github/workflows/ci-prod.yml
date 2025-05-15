@@ -7,7 +7,7 @@ on:
 
 jobs:
   ci:
-    name: CI - Build & Upload
+    name: CI - Build & Upload as Archive
     runs-on: ubuntu-latest
 
     steps:
@@ -41,14 +41,24 @@ jobs:
           echo "${{ secrets.YOUTIL_PROD_SSH_KEY }}" > key.pem
           chmod 600 key.pem
 
-      - name: Upload Build Files to GCP
+      - name: Compress Build Files
+        run: |
+          tar -czf build.tar.gz .next public package.json pnpm-lock.yaml next.config.ts .env
+
+      - name: Upload Archive to GCP
         run: |
           ssh -i key.pem -o StrictHostKeyChecking=no ubuntu@${{ secrets.YOUTIL_PROD_HOST }} \
             "mkdir -p /home/ubuntu/deploy/fe/${{ env.VERSION }}"
 
-          scp -i key.pem -o StrictHostKeyChecking=no -r \
-            .next public package.json pnpm-lock.yaml next.config.js .env \
+          scp -i key.pem -o StrictHostKeyChecking=no build.tar.gz \
             ubuntu@${{ secrets.YOUTIL_PROD_HOST }}:/home/ubuntu/deploy/fe/${{ env.VERSION }}/
+
+      - name: Extract Archive on GCP
+        run: |
+          ssh -i key.pem -o StrictHostKeyChecking=no ubuntu@${{ secrets.YOUTIL_PROD_HOST }} "
+            cd /home/ubuntu/deploy/fe/${{ env.VERSION }} && \
+            tar -xzf build.tar.gz && rm build.tar.gz
+          "
 
       - name: Link Latest on Server
         run: |
@@ -58,7 +68,4 @@ jobs:
 
       - name: Clean Old Versions on Server
         run: |
-          ssh -i key.pem -o StrictHostKeyChecking=no ubuntu@${{ secrets.YOUTIL_PROD_HOST }} "
-            cd /home/ubuntu/deploy/fe && \
-            ls -dt 202* | tail -n +6 | xargs rm -rf || true
-          "
+          ssh -i key.pem -o StrictHostKeyChecking=no ubuntu@${{ secrets.YOUTIL_PROD_HOST }} "bash /home/ubuntu/scripts/fe/clear.sh"
