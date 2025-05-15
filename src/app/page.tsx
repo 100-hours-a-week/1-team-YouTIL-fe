@@ -12,6 +12,8 @@ import WelcomeDescription from '@/components/description/welcomeDescription/Welc
 import TechNews from '@/components/main/techNews/TechNews';
 import NewTILDescription from '@/components/description/newTILDescription/NewTILDescription';
 import NewTILList from '@/components/main/newTILList/NewTILList';
+import useCheckAccess from '@/hooks/useCheckExistAccess';
+import { access } from 'fs';
 
 interface UserInfoResponse {
   data: {
@@ -26,9 +28,11 @@ const Main = () => {
   const { callApi } = useFetch();
   const accessToken = useAuthStore((state) => state.accessToken);
   const setUserInfo = useUserInfoStore((state) => state.setUserInfo);
+  const existAccess = useCheckAccess(accessToken);
 
   useEffect(() => {
     const fetchUserInfo = async () => {
+      if(!existAccess) return;
       try {
         const result = await callApi<UserInfoResponse>({
           method: 'GET',

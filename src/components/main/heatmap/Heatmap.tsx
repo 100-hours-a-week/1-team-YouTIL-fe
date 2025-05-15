@@ -14,6 +14,7 @@ import type { PluginDefinition } from 'cal-heatmap';
 import { useFetch } from '@/hooks/useFetch';
 import useGetAccessToken from '@/hooks/useGetAccessToken';
 import { format } from 'date-fns';
+import useCheckAccess from '@/hooks/useCheckExistAccess';
 
 const weekdays = ['Sun', 'Mon', 'Tues', 'Wed', 'Thur', 'Fri', 'Sat'];
 const currentDate = new Date();
@@ -46,12 +47,14 @@ const Heatmap = () => {
   const heatmapRef = useRef<CalHeatmap | null>(null);
   const [isOpen, setIsOpen] = useState(false);
   const [tilData, setTilData] = useState<TilData[]>([]);
-
   const { callApi } = useFetch();
   const accessToken = useGetAccessToken();
+  const existAccess = useCheckAccess(accessToken);
 
   useEffect(() => {
     const fetchTILData = async () => {
+      if(!existAccess) return;
+      
       try {
         const res = await callApi<TilApiResponse>({
           method: 'GET',

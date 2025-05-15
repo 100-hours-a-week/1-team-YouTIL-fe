@@ -6,6 +6,7 @@ import { useFetch } from '@/hooks/useFetch';
 import useGetAccessToken from '@/hooks/useGetAccessToken';
 import Image from 'next/image';
 import './TechNews.scss';
+import useCheckAccess from '@/hooks/useCheckExistAccess';
 
 interface NewsItem {
   title: string;
@@ -22,10 +23,13 @@ const TechNews = () => {
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const [autoSlideEnabled, setAutoSlideEnabled] = useState(true);
   const [isSliding, setIsSliding] = useState(false);
+  const existAccess = useCheckAccess(accessToken);
 
   const { data } = useQuery({
     queryKey: ['tech-news'],
     queryFn: async () => {
+      if(!existAccess) return;
+      
       const response = await callApi<{ data: { news: NewsItem[] } }>({
         method: 'GET',
         endpoint: '/news',

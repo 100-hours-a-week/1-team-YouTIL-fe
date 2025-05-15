@@ -5,6 +5,8 @@ import { useEffect, useState } from 'react';
 import { useFetch } from '@/hooks/useFetch';
 import useGetAccessToken from '@/hooks/useGetAccessToken';
 import { parseISO, format } from 'date-fns';
+import useCheckAccess from '@/hooks/useCheckExistAccess';
+
 
 interface TILItem {
   id: number;
@@ -29,9 +31,13 @@ const NewTILList = () => {
   const accessToken = useGetAccessToken();
   const [tils, setTils] = useState<TILItem[]>([]);
   const [isError, setIsError] = useState(false);
+  const accessExist = useCheckAccess(accessToken);
 
   useEffect(() => {
     const fetchRecentTILs = async () => {
+
+      if (!accessExist) return;
+
       try {
         const response = await callApi<TILResponse>({
           method: 'GET',
