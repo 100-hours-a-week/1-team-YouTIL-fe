@@ -1,0 +1,31 @@
+name: FE Deploy to Dev
+
+on:
+  push:
+    branches:
+      - dev
+
+jobs:
+  deploy:
+    name: Upload Code & Trigger Remote Build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Prepare SSH Key
+        run: |
+          echo "${{ secrets.YOUTIL_DEV_SSH_KEY }}" > key.pem
+          chmod 600 key.pem
+
+      - name: Generate .env file
+        run: echo "${{ secrets.ENV_DEV }}" > .env
+
+      - name: Upload .env separately
+        run: |
+          scp -i key.pem -o StrictHostKeyChecking=no .env ubuntu@${{ secrets.YOUTIL_DEV_HOST }}:/home/ubuntu/1-team-YouTIL-fe/.env
+
+      - name: Run Remote Deploy Script
+        run: |
+          ssh -i key.pem -o StrictHostKeyChecking=no ubuntu@${{ secrets.YOUTIL_DEV_HOST }} "bash /home/ubuntu/scripts/fe/deploy.sh"
