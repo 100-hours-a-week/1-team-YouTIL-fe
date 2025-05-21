@@ -1,6 +1,7 @@
 'use client';
 
 import CalHeatmap from 'cal-heatmap';
+import { useQuery } from '@tanstack/react-query';
 import { useState, useEffect, useRef } from 'react';
 import 'cal-heatmap/cal-heatmap.css';
 import './Heatmap.scss';
@@ -8,9 +9,6 @@ import Tooltip from 'cal-heatmap/plugins/Tooltip';
 import LegendLite from 'cal-heatmap/plugins/LegendLite';
 import CalendarLabel from 'cal-heatmap/plugins/CalendarLabel';
 import type { PluginDefinition } from 'cal-heatmap';
-// import { TooltipOptions } from 'cal-heatmap/plugins/Tooltip';
-// import { LegendOptions } from 'cal-heatmap/plugins/LegendLite';
-// import { CalendarLabelOptions } from 'cal-heatmap/plugins/CalendarLabel';
 import { useFetch } from '@/hooks/useFetch';
 import useGetAccessToken from '@/hooks/useGetAccessToken';
 import { format } from 'date-fns';
@@ -46,44 +44,41 @@ const Heatmap = () => {
   const [currentMonth, setCurrentMonth] = useState(adjustedCurrentMonth);
   const heatmapRef = useRef<CalHeatmap | null>(null);
   const [isOpen, setIsOpen] = useState(false);
-  const [tilData, setTilData] = useState<TilData[]>([]);
   const { callApi } = useFetch();
   const accessToken = useGetAccessToken();
   const existAccess = useCheckAccess(accessToken);
+  
+  const { data: tilData = [] } = useQuery<TilData[]>({
+    queryKey: ['til-data', year, accessToken ?? ''] as const,
+    queryFn: async () => {
+      const res = await callApi<TilApiResponse>({
+        method: 'GET',
+        endpoint: `/users/tils?year=${year}`,
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+        credentials: 'include',
+      });
 
-  useEffect(() => {
-    const fetchTILData = async () => {
-      if(!existAccess) return;
-      
-      try {
-        const res = await callApi<TilApiResponse>({
-          method: 'GET',
-          endpoint: `/users/tils?year=${year}`,
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-          credentials: 'include',
-        });
+      const raw = res.data?.tils ?? {};
+      const formatted = Object.entries(raw).flatMap(([month, counts]) =>
+        counts.map((count, index) => {
+          const day = String(index + 1).padStart(2, '0');
+          return {
+            date: `${year}-${monthMap[month]}-${day}`,
+            count,
+          };
+        })
+      );
 
-        const raw = res.data?.tils ?? {};
-        const formatted = Object.entries(raw).flatMap(([month, counts]) =>
-          counts.map((count, index) => {
-            const day = String(index + 1).padStart(2, '0');
-            return {
-              date: `${year}-${monthMap[month]}-${day}`,
-              count,
-            };
-          })
-        );
-
-        setTilData(formatted);
-      } catch (error) {
-        console.error('TIL 데이터 로딩 실패:', error);
-      }
-    };
-
-    fetchTILData();
-  }, [year, accessToken, callApi]);
+      return formatted;
+    },
+    enabled: existAccess,
+    staleTime: 1800000, // 30분
+    gcTime: 1800000,
+    retry: 1,
+    refetchOnWindowFocus: false,
+  });
 
   useEffect(() => {
     if (!heatmapRef.current && tilData.length > 0) {
