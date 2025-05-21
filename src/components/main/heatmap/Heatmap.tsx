@@ -3,8 +3,6 @@
 import CalHeatmap from 'cal-heatmap';
 import { useQuery } from '@tanstack/react-query';
 import { useState, useEffect, useRef } from 'react';
-import 'cal-heatmap/cal-heatmap.css';
-import './Heatmap.scss';
 import Tooltip from 'cal-heatmap/plugins/Tooltip';
 import LegendLite from 'cal-heatmap/plugins/LegendLite';
 import CalendarLabel from 'cal-heatmap/plugins/CalendarLabel';
@@ -13,6 +11,8 @@ import { useFetch } from '@/hooks/useFetch';
 import useGetAccessToken from '@/hooks/useGetAccessToken';
 import { format } from 'date-fns';
 import useCheckAccess from '@/hooks/useCheckExistAccess';
+import 'cal-heatmap/cal-heatmap.css';
+import './Heatmap.scss';
 
 const weekdays = ['Sun', 'Mon', 'Tues', 'Wed', 'Thur', 'Fri', 'Sat'];
 const currentDate = new Date();

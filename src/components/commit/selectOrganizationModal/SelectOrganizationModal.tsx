@@ -1,10 +1,12 @@
 'use client';
 
+import { useQuery } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
 import { useFetch } from '@/hooks/useFetch';
 import useGetAccessToken from '@/hooks/useGetAccessToken';
 import './SelectOrganizationModal.scss';
 import { useUserOrganizationStore } from '@/store/userOrganizationStore';
+import useCheckAccess from '@/hooks/useCheckExistAccess';
 
 interface Organization {
   organization_id: number;
@@ -26,34 +28,32 @@ const SelectOrganizationModal = ({ onClose, onComplete }: Props) => {
   const { callApi } = useFetch();
   const accessToken = useGetAccessToken();
 
+  const existAccess = useCheckAccess(accessToken);
   const setSelectedOrganization = useUserOrganizationStore((state) => state.setSelectedOrganization);
 
-  const [organizations, setOrganizations] = useState<Organization[]>([]);
   const [selectedOrgId, setSelectedOrgId] = useState<number | null>(null);
   const [noSelection, setNoSelection] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchOrganizations = async () => {
-      try {
-        const response = await callApi<OrganizationResponse>({
-          method: 'GET',
-          endpoint: '/github/organization',
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-          credentials:'include',
-        });
-        setOrganizations(response.data.organizations);
-      } catch (error) {
-        console.error('조직 불러오기 실패:', error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
 
-    fetchOrganizations();
-  }, [accessToken, callApi]);
+  const { data: organizations = [], isLoading} = useQuery<Organization[]>({
+    queryKey: ['organization', accessToken ?? ''] as const,
+    queryFn: async () => {
+      const response = await callApi<OrganizationResponse>({
+        method: 'GET',
+        endpoint: '/github/organization',
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+        credentials: 'include',
+      });
+      return response.data.organizations;
+    },
+    enabled: existAccess,
+    retry: 1,
+    refetchOnWindowFocus: false,
+    staleTime: 6 * 3600000,
+    gcTime: 6 * 3600000,
+  });
 
   useEffect(() => {
     if (noSelection) {
