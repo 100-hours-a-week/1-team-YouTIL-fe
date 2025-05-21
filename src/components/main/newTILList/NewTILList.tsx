@@ -1,12 +1,11 @@
 'use client';
 
 import './NewTILList.scss';
-import { useEffect, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { useFetch } from '@/hooks/useFetch';
 import useGetAccessToken from '@/hooks/useGetAccessToken';
 import { parseISO, format } from 'date-fns';
 import useCheckAccess from '@/hooks/useCheckExistAccess';
-
 
 interface TILItem {
   id: number;
@@ -29,33 +28,30 @@ interface TILResponse {
 const NewTILList = () => {
   const { callApi } = useFetch();
   const accessToken = useGetAccessToken();
-  const [tils, setTils] = useState<TILItem[]>([]);
-  const [isError, setIsError] = useState(false);
   const existAccess = useCheckAccess(accessToken);
 
-  useEffect(() => {
-    const fetchRecentTILs = async () => {
-
-      if (!existAccess) return;
-
-      try {
-        const response = await callApi<TILResponse>({
-          method: 'GET',
-          endpoint: '/community/recent-tils',
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-          credentials: 'include',
-        });
-        setTils(response.data);
-      } catch (error) {
-        console.error('최근 TIL 데이터를 불러오는 중 오류 발생:', error);
-        setIsError(true);
-      }
-    };
-
-    fetchRecentTILs();
-  }, [callApi, accessToken]);
+  const {
+    data: tils,
+    isError,
+  } = useQuery<TILItem[], Error>({
+    queryKey: ['recent-tils', accessToken ?? ''] as const,
+    queryFn: async () => {
+      const response = await callApi<TILResponse>({
+        method: 'GET',
+        endpoint: '/community/recent-tils',
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+        credentials: 'include',
+      });
+      return response.data;
+    },
+    enabled: existAccess,
+    staleTime: 1800000, // 30분
+    gcTime: 1800000,
+    retry: 1,
+    refetchOnWindowFocus: false,
+  });
 
   if (isError) {
     return <p className="til-list__error">TIL 데이터를 불러오지 못했습니다.</p>;
@@ -63,7 +59,7 @@ const NewTILList = () => {
 
   return (
     <div className="til-list">
-      {tils.map((til) => (
+      {tils?.map((til) => (
         <div key={til.id} className="til-list__card">
           <div className="til-list__header">
             <p className="til-list__title">{til.title}</p>
