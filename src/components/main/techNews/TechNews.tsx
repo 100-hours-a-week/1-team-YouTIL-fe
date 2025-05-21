@@ -26,7 +26,7 @@ const TechNews = () => {
   const existAccess = useCheckAccess(accessToken);
 
   const { data } = useQuery({
-    queryKey: ['tech-news'],
+    queryKey: ['tech-news', accessToken ?? ""] as const,
     queryFn: async () => {
       if(!existAccess) return;
       
@@ -40,6 +40,11 @@ const TechNews = () => {
       });
       return response.data.news;
     },
+    enabled: existAccess,
+    staleTime: 12 * 3600000, //12시간
+    gcTime: 12 * 3600000,
+    retry: 1,
+    refetchOnWindowFocus: false,
   });
 
   const scrollToIndex = useCallback((index: number) => {
