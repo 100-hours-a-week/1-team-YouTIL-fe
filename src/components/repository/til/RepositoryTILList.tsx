@@ -1,9 +1,10 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useFetch } from '@/hooks/useFetch';
 import useGetAccessToken from '@/hooks/useGetAccessToken';
+import useCheckAccess from '@/hooks/useCheckExistAccess';
 import { useRepositoryDateStore } from '@/store/useRepositoryDateStore';
 import { parseISO, format } from 'date-fns';
 import './RepositoryTILList.scss';
@@ -35,14 +36,14 @@ interface TILDetailItem {
 
 const RepositoryTILList = () => {
   const { callApi } = useFetch();
-  const accessToken = useGetAccessToken();
   const { tilDate } = useRepositoryDateStore();
-
-  const [tilData, setTilData] = useState<TILItem[]>([]);
   const [expandedTilId, setExpandedTilId] = useState<number | null>(null);
+  const accessToken = useGetAccessToken();
+  const existAccess = useCheckAccess(accessToken);
 
-  useEffect(() => {
-    const fetchTILs = async () => {
+  const { data: tilData } = useQuery<TILItem[]>({
+    queryKey: ['tilList', tilDate],
+    queryFn: async () => {
       const today = new Date();
       const yyyy = today.getFullYear();
       const mm = String(today.getMonth() + 1).padStart(2, '0');
@@ -51,23 +52,21 @@ const RepositoryTILList = () => {
 
       const targetDate = tilDate || formattedToday;
 
-      try {
-        const response = await callApi<TILResponse>({
-          method: 'GET',
-          endpoint: `/tils?page=0&size=10&date=${targetDate}`,
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-          credentials:'include',
-        });
-        setTilData(response.data.tils);
-      } catch (error) {
-        console.error('TIL 목록 요청 실패:', error);
-      }
-    };
+      const response = await callApi<TILResponse>({
+        method: 'GET',
+        endpoint: `/tils?page=0&size=10&date=${targetDate}`,
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+        credentials: 'include',
+      });
 
-    fetchTILs();
-  }, [tilDate, callApi, accessToken]);
+      return response.data.tils;
+    },
+    enabled: existAccess,
+    staleTime: 3600000,
+    gcTime: 3600000,
+  });
 
   const handleClickTIL = (tilId: number) => {
     if (expandedTilId === tilId) {
@@ -77,7 +76,7 @@ const RepositoryTILList = () => {
     }
   };
 
-  const { data: tilDetailData, isLoading: isDetailLoading} = useQuery({
+  const { data: tilDetailData, isLoading: isDetailLoading } = useQuery<TILDetailItem | null>({
     queryKey: ['tilDetail', expandedTilId],
     queryFn: async () => {
       if (expandedTilId === null) return null;
@@ -93,17 +92,16 @@ const RepositoryTILList = () => {
 
       return response.data;
     },
-    enabled: expandedTilId !== null,
-    staleTime: 3600000 * 24, // 24시간
-    gcTime: 3600000 * 24,
+    enabled: expandedTilId !== null && existAccess,
+    staleTime: 24 * 3600000,
+    gcTime: 24 * 3600000,
   });
-
 
   return (
     <div className="repository-til-list">
       <h2 className="repository-til-list__title">TIL 목록</h2>
       <ul className="repository-til-list__items">
-        {tilData.map((til) => {
+        {tilData?.map((til) => {
           const parsedDate = parseISO(til.createdAt);
           const formattedDate = format(parsedDate, 'yyyy-MM-dd : HH:mm:ss');
 
