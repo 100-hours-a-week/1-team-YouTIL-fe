@@ -1,12 +1,14 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { useUserOrganizationStore } from '@/store/userOrganizationStore';
 import { useUserRepositoryStore } from '@/store/userRepositoryStore';
 import { useUserBranchStore } from '@/store/userBranchStore';
 import { useSelectedDateStore } from '@/store/userDateStore';
 import { useCommitListStore } from '@/store/userCommitListStore';
 import { useFetch } from '@/hooks/useFetch';
+import useCheckAccess from '@/hooks/useCheckExistAccess';
 import useGetAccessToken from '@/hooks/useGetAccessToken';
 import './SelectBranchModal.scss';
 
@@ -44,39 +46,30 @@ const SelectBranchModal = ({ onClose }: Props) => {
 
   const { callApi } = useFetch();
   const accessToken = useGetAccessToken();
+  const existAccess = useCheckAccess(accessToken);
 
-  const [branches, setBranches] = useState<Branch[]>([]);
   const [selectedBranchName, setSelectedBranchName] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  useEffect(() => {
-    const fetchBranches = async () => {
-      if (!selectedRepo) {
-        setBranches([]);
-        setIsLoading(false);
-        return;
-      }
+  const { data: branchData, isLoading } = useQuery({
+    queryKey: ['branches', selectedOrg?.organization_id ?? '', selectedRepo?.repositoryId ?? '', accessToken ?? ''],
+    queryFn: async () => {
 
-      try {
-        const response = await callApi<BranchResponse>({
-          method: 'GET',
-          endpoint: `/github/branches?organizationId=${selectedOrg?.organization_id ?? ''}&repositoryId=${selectedRepo.repositoryId}`,
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-          credentials:'include',
-        });
+      if (!selectedRepo) return { data: { branches: [] } };
 
-        setBranches(response.data.branches);
-      } catch (err) {
-        console.error('브랜치 불러오기 실패:', err);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchBranches();
-  }, [selectedOrg, selectedRepo, accessToken, callApi]);
+      return await callApi<BranchResponse>({
+        method: 'GET',
+        endpoint: `/github/branches?organizationId=${selectedOrg?.organization_id ?? ''}&repositoryId=${selectedRepo.repositoryId}`,
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+        credentials: 'include',
+      });
+    },
+    enabled: existAccess,
+    staleTime: 3600000,
+    gcTime: 3600000,
+  });
 
   const handleSelect = (branch: Branch) => {
     setSelectedBranchName((prev) => (prev === branch.name ? null : branch.name));
@@ -85,7 +78,7 @@ const SelectBranchModal = ({ onClose }: Props) => {
   const handleComplete = async () => {
     if (!selectedBranchName || !selectedRepo || !selectedDate) return;
 
-    setIsLoading(true);
+    setIsSubmitting(true);
 
     try {
       const response = await callApi<CommitDetailResponse>({
@@ -100,14 +93,15 @@ const SelectBranchModal = ({ onClose }: Props) => {
       setCommits(commits);
       setSelectedBranch({ branchName: selectedBranchName });
 
-      setIsLoading(false);
       onClose();
     } catch (err) {
       console.error('커밋 가져오기 실패:', err);
-      setIsLoading(false);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
+  const branches = branchData?.data?.branches ?? [];
   const isCompleteEnabled = selectedBranchName !== null;
 
   return (
@@ -115,10 +109,9 @@ const SelectBranchModal = ({ onClose }: Props) => {
       <div className="branch-modal__overlay" onClick={onClose} />
       <div className="branch-modal__content">
         <h2 className="branch-modal__title">브랜치 선택</h2>
-
-        {isLoading ? (
+        {isLoading || isSubmitting ? (
           <p className="branch-modal__loading">로딩 중...</p>
-        ) : (
+          ) :  (
           <>
             <ul className="branch-modal__list">
               {branches.map((branch) => (
@@ -135,7 +128,7 @@ const SelectBranchModal = ({ onClose }: Props) => {
             <button
               className="branch-modal__close"
               onClick={handleComplete}
-              disabled={!isCompleteEnabled}
+              disabled={!isCompleteEnabled || isSubmitting}
             >
               선택 완료
             </button>
