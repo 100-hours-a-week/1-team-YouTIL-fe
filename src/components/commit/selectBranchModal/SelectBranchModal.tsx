@@ -80,7 +80,7 @@ const SelectBranchModal = ({ onClose }: Props) => {
     const queryKey = ['commits', selectedOrg?.organization_id ?? '', selectedRepo.repositoryId, selectedBranchName, selectedDate];
     const cachedCommitData = queryClient.getQueryData<CommitDetailResponse>(queryKey);
 
-    if (cachedCommitData) { // 캐싱 데이터가 있으면면
+    if (cachedCommitData) { // 캐싱 데이터가 있으면
       const commits = cachedCommitData.data?.commits ?? [];
       setCommits(commits);
       setSelectedBranch({ branchName: selectedBranchName });
@@ -101,7 +101,7 @@ const SelectBranchModal = ({ onClose }: Props) => {
         setCommits(commits);
         setSelectedBranch({ branchName: selectedBranchName });
 
-        queryClient.setQueryData(queryKey, response); // 그리고 캐싱싱
+        queryClient.setQueryData(queryKey, response); // 그리고 캐싱
 
         onClose();
       } catch (err) {
