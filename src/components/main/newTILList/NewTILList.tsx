@@ -30,11 +30,8 @@ const NewTILList = () => {
   const accessToken = useGetAccessToken();
   const existAccess = useCheckAccess(accessToken);
 
-  const {
-    data: tils,
-    isError,
-  } = useQuery<TILItem[], Error>({
-    queryKey: ['recent-tils', accessToken ?? ''] as const,
+  const { data: tils, isError, } = useQuery<TILItem[]>({
+    queryKey: ['recent-tils', accessToken] as const,
     queryFn: async () => {
       const response = await callApi<TILResponse>({
         method: 'GET',
@@ -47,10 +44,10 @@ const NewTILList = () => {
       return response.data;
     },
     enabled: existAccess,
-    staleTime: 1800000, // 30분
-    gcTime: 1800000,
+    staleTime: 600000, // 10분
+    gcTime: 1800000, // 30분
     retry: 1,
-    refetchOnWindowFocus: false,
+    refetchOnWindowFocus: true,
   });
 
   if (isError) {

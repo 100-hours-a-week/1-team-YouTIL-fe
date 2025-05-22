@@ -50,8 +50,8 @@ const SelectOrganizationModal = ({ onClose, onComplete }: Props) => {
     },
     enabled: existAccess,
     retry: 1,
-    refetchOnWindowFocus: false,
-    staleTime: 6 * 3600000,
+    refetchOnWindowFocus: true,
+    staleTime: 6 * 3600000, // 6시간
     gcTime: 6 * 3600000,
   });
 

@@ -64,7 +64,9 @@ const RepositoryTILList = () => {
       return response.data.tils;
     },
     enabled: existAccess,
-    staleTime: 3600000,
+    refetchOnWindowFocus : true,
+    retry : 1,
+    staleTime: 1800000,
     gcTime: 3600000,
   });
 
@@ -93,7 +95,9 @@ const RepositoryTILList = () => {
       return response.data;
     },
     enabled: expandedTilId !== null && existAccess,
-    staleTime: 24 * 3600000,
+    refetchOnWindowFocus : true,
+    retry : 1,
+    staleTime: 24 * 3600000, // 24시간
     gcTime: 24 * 3600000,
   });
 

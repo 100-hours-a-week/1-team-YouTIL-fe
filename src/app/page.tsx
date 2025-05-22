@@ -29,10 +29,9 @@ const Main = () => {
   const setUserInfo = useUserInfoStore((state) => state.setUserInfo);
   const existAccess = useCheckAccess(accessToken);
 
-  useQuery<UserInfoResponse['data'], Error>({
-    queryKey: ['user-info', accessToken ?? ''] as const,
+  useQuery<UserInfoResponse['data']>({
+    queryKey: ['user-info', accessToken] as const,
     queryFn: async () => {
-      if (!existAccess) throw new Error('No access token');
       const result = await callApi<UserInfoResponse>({
         method: 'GET',
         endpoint: '/users?userId=',

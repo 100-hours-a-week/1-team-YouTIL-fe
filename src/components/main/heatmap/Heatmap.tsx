@@ -74,8 +74,8 @@ const Heatmap = () => {
       return formatted;
     },
     enabled: existAccess,
-    staleTime: 1800000, // 30분
-    gcTime: 1800000,
+    staleTime: 3600000, // 1시간
+    gcTime: 3600000,
     retry: 1,
     refetchOnWindowFocus: false,
   });

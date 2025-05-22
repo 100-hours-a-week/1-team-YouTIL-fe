@@ -50,7 +50,7 @@ const SelectRepositoryModal = ({ onClose, onComplete }: Props) => {
     staleTime: 3600000, //1시간
     gcTime: 3600000,
     retry: 1,
-    refetchOnWindowFocus: false,
+    refetchOnWindowFocus: true,
   });
 
   const handleSelect = (repo: Repository) => {

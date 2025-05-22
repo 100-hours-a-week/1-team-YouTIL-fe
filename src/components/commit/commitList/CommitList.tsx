@@ -60,7 +60,9 @@ const CommitList = () => {
       !!selectedBranchName &&
       !!selectedDate &&
       existAccess,
-    staleTime: 3600000,
+      retry : 1,
+    refetchOnWindowFocus : true,
+    staleTime: 1800000, //1 시간
     gcTime: 3600000,
   });
 

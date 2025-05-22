@@ -66,7 +66,9 @@ const SelectBranchModal = ({ onClose }: Props) => {
       });
     },
     enabled: existAccess,
-    staleTime: 3600000,
+    refetchOnWindowFocus : true,
+    retry : 1,
+    staleTime: 3600000, // l시간
     gcTime: 3600000,
   });
 
