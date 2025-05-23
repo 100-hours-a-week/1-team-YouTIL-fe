@@ -6,6 +6,7 @@ import { useFetch } from '@/hooks/useFetch';
 import useGetAccessToken from '@/hooks/useGetAccessToken';
 import Image from 'next/image';
 import './TechNews.scss';
+import useCheckAccess from '@/hooks/useCheckExistAccess';
 
 interface NewsItem {
   title: string;
@@ -22,10 +23,13 @@ const TechNews = () => {
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const [autoSlideEnabled, setAutoSlideEnabled] = useState(true);
   const [isSliding, setIsSliding] = useState(false);
+  const existAccess = useCheckAccess(accessToken);
 
   const { data } = useQuery({
-    queryKey: ['tech-news'],
+    queryKey: ['tech-news', accessToken ?? ""] as const,
     queryFn: async () => {
+      if(!existAccess) return;
+      
       const response = await callApi<{ data: { news: NewsItem[] } }>({
         method: 'GET',
         endpoint: '/news',
@@ -36,6 +40,11 @@ const TechNews = () => {
       });
       return response.data.news;
     },
+    enabled: existAccess,
+    staleTime: 12 * 3600000, //12시간
+    gcTime: 12 * 3600000,
+    retry: 1,
+    refetchOnWindowFocus: false,
   });
 
   const scrollToIndex = useCallback((index: number) => {
