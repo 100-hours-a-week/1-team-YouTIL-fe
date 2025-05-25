@@ -45,10 +45,9 @@ const Main = () => {
       return result.data;
     },
     enabled: existAccess,
-    staleTime: 3600000, // 1시간
+    staleTime: 3600000,
     gcTime: 3600000,
-    retry: 1,
-    refetchOnWindowFocus: false,
+    // 사용자 정보 같은 경우는 거의 변하지 않지만 변경이 가능하므로 수동 갱신
   });
   
   return (

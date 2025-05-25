@@ -64,10 +64,9 @@ const RepositoryTILList = () => {
       return response.data.tils;
     },
     enabled: existAccess,
-    refetchOnWindowFocus : true,
-    retry : 1,
     staleTime: 1800000,
     gcTime: 3600000,
+    //til 생성 후 바로 수동 갱신
   });
 
   const handleClickTIL = (tilId: number) => {
@@ -95,10 +94,9 @@ const RepositoryTILList = () => {
       return response.data;
     },
     enabled: expandedTilId !== null && existAccess,
-    refetchOnWindowFocus : true,
-    retry : 1,
-    staleTime: 24 * 3600000, // 24시간
-    gcTime: 24 * 3600000,
+    staleTime: Infinity,
+    gcTime: 3600000,
+    //한 번 생성된 til 상세는 변하지 않으므로 refetch 및 수동갱신 x
   });
 
   return (

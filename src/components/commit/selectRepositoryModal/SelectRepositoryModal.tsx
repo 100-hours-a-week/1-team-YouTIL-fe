@@ -47,10 +47,9 @@ const SelectRepositoryModal = ({ onClose, onComplete }: Props) => {
       return response.data.repositories;
     },
     enabled: existAccess,
-    staleTime: 3600000, //1시간
+    staleTime: 3600000,
     gcTime: 3600000,
-    retry: 1,
-    refetchOnWindowFocus: true,
+    // 레포지토리 역시 자주 변하지 않으므로 refetch 및 수동 갱신x
   });
 
   const handleSelect = (repo: Repository) => {

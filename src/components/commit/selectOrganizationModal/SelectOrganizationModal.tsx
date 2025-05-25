@@ -49,10 +49,9 @@ const SelectOrganizationModal = ({ onClose, onComplete }: Props) => {
       return response.data.organizations;
     },
     enabled: existAccess,
-    retry: 1,
-    refetchOnWindowFocus: true,
-    staleTime: 6 * 3600000, // 6시간
+    staleTime: 6 * 3600000,
     gcTime: 6 * 3600000,
+    // 조직은 거의 변하지 않으므로 refetch 및 수동 갱신 x
   });
 
   useEffect(() => {

@@ -40,10 +40,9 @@ const TechNews = () => {
       return response.data.news;
     },
     enabled: existAccess,
-    staleTime: 12 * 3600000, //12시간
-    gcTime: 12 * 3600000,
-    retry: 1,
-    refetchOnWindowFocus: false,
+    staleTime: Infinity,
+    gcTime: 3600000,
+    // 테크뉴스는 목록이 거의 바뀌지 않으므로 refetch 제거 및 갱신x
   });
 
   const scrollToIndex = useCallback((index: number) => {

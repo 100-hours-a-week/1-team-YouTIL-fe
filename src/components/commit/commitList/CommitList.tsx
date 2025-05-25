@@ -60,10 +60,10 @@ const CommitList = () => {
       !!selectedBranchName &&
       !!selectedDate &&
       existAccess,
-      retry : 1,
     refetchOnWindowFocus : true,
-    staleTime: 1800000, //1 시간
+    staleTime: 1800000,
     gcTime: 3600000,
+    // 커밋 리스트는 자주 변할 수 있으므로 refetch
   });
 
   const commits = commitData?.data?.commits ?? [];

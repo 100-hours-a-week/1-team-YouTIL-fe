@@ -74,10 +74,9 @@ const Heatmap = () => {
       return formatted;
     },
     enabled: existAccess,
-    staleTime: 3600000, // 1시간
+    staleTime: 600000,
     gcTime: 3600000,
-    retry: 1,
-    refetchOnWindowFocus: false,
+    //til 생성 후 수동 갱신
   });
 
   useEffect(() => {

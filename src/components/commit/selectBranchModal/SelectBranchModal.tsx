@@ -66,10 +66,9 @@ const SelectBranchModal = ({ onClose }: Props) => {
       });
     },
     enabled: existAccess,
-    refetchOnWindowFocus : true,
-    retry : 1,
-    staleTime: 3600000, // l시간
+    staleTime: 1800000,
     gcTime: 3600000,
+    refetchOnWindowFocus : true, // 브랜치 목록은 자주 바뀔 수 있으므로 refetch
   });
 
   const handleSelect = (branch: Branch) => {
