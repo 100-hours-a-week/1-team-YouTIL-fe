@@ -36,7 +36,7 @@ const SelectOrganizationModal = ({ onClose, onComplete }: Props) => {
 
 
   const { data: organizations = [], isLoading} = useQuery<Organization[]>({
-    queryKey: ['organization', accessToken] as const,
+    queryKey: ['organization'] as const,
     queryFn: async () => {
       const response = await callApi<OrganizationResponse>({
         method: 'GET',

@@ -53,7 +53,7 @@ const SelectBranchModal = ({ onClose }: Props) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const {data: branchData,isLoading} = useQuery({
-    queryKey: ['branches', selectedOrg?.organization_id ?? '', selectedRepo?.repositoryId, accessToken],
+    queryKey: ['branches', selectedOrg?.organization_id ?? '', selectedRepo?.repositoryId],
     queryFn: async () => {
       if (!selectedRepo) return { data: { branches: [] } };
       return await callApi<BranchResponse>({

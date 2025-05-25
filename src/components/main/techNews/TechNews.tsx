@@ -26,7 +26,7 @@ const TechNews = () => {
   const existAccess = useCheckAccess(accessToken);
 
   const { data } = useQuery({
-    queryKey: ['tech-news', accessToken ?? ""] as const,
+    queryKey: ['tech-news'] as const,
     queryFn: async () => {
       
       const response = await callApi<{ data: { news: NewsItem[] } }>({

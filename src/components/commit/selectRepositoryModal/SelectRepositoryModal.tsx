@@ -34,7 +34,7 @@ const SelectRepositoryModal = ({ onClose, onComplete }: Props) => {
   const [selectedRepositoryId, setSelectedRepositoryId] = useState<number | null>(null);
 
   const { data: repositories = [], isLoading, } = useQuery<Repository[]>({
-    queryKey: ['repository', selectedOrg?.organization_id ?? '', accessToken] as const,
+    queryKey: ['repository', selectedOrg?.organization_id ?? ''] as const,
     queryFn: async () => {
       const response = await callApi<RepositoryResponse>({
         method: 'GET',

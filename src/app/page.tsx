@@ -30,7 +30,7 @@ const Main = () => {
   const existAccess = useCheckAccess(accessToken);
 
   useQuery<UserInfoResponse['data']>({
-    queryKey: ['user-info', accessToken] as const,
+    queryKey: ['user-info'] as const,
     queryFn: async () => {
       const result = await callApi<UserInfoResponse>({
         method: 'GET',
