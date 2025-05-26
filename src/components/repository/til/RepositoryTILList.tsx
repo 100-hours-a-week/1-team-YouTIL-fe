@@ -41,17 +41,16 @@ const RepositoryTILList = () => {
   const accessToken = useGetAccessToken();
   const existAccess = useCheckAccess(accessToken);
 
+  const today = new Date();
+  const yyyy = today.getFullYear();
+  const mm = String(today.getMonth() + 1).padStart(2, '0');
+  const dd = String(today.getDate()).padStart(2, '0');
+  const formattedToday = `${yyyy}-${mm}-${dd}`;
+
   const { data: tilData } = useQuery<TILItem[]>({
     queryKey: ['tilList', tilDate],
     queryFn: async () => {
-      const today = new Date();
-      const yyyy = today.getFullYear();
-      const mm = String(today.getMonth() + 1).padStart(2, '0');
-      const dd = String(today.getDate()).padStart(2, '0');
-      const formattedToday = `${yyyy}-${mm}-${dd}`;
-
       const targetDate = tilDate || formattedToday;
-
       const response = await callApi<TILResponse>({
         method: 'GET',
         endpoint: `/tils?page=0&size=10&date=${targetDate}`,
