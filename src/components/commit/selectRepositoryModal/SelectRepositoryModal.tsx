@@ -62,12 +62,6 @@ const SelectRepositoryModal = ({ onClose, onComplete }: Props) => {
     }
   };
 
-  const handleCompleteClick = () => {
-    if (selectedRepositoryId !== null) {
-      onComplete();
-    }
-  };
-
   const isCompleteEnabled = selectedRepositoryId !== null;
 
   return (
@@ -96,7 +90,7 @@ const SelectRepositoryModal = ({ onClose, onComplete }: Props) => {
 
             <button
               className="repository-modal__close"
-              onClick={handleCompleteClick}
+              onClick={onComplete}
               disabled={!isCompleteEnabled}
             >
               선택 완료
