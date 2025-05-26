@@ -55,16 +55,15 @@ const SelectOrganizationModal = ({ onClose, onComplete }: Props) => {
   });
 
   useEffect(() => {
-    if (noSelection) {
-      setSelectedOrganization(null);
-    } 
-    else if (selectedOrgId !== null) {
+    if (noSelection) setSelectedOrganization(null);
+  }, [noSelection, setSelectedOrganization]);
+  
+  useEffect(() => {
+    if (selectedOrgId !== null) {
       const selected = organizations.find((org) => org.organization_id === selectedOrgId);
-      if (selected) {
-        setSelectedOrganization(selected);
-      }
+      if (selected) setSelectedOrganization(selected);
     }
-  }, [noSelection, selectedOrgId, organizations, setSelectedOrganization]);
+  }, [selectedOrgId, organizations, setSelectedOrganization]);
 
   const handleSelect = (org: Organization) => {
     if (selectedOrgId === org.organization_id) {
@@ -85,9 +84,6 @@ const SelectOrganizationModal = ({ onClose, onComplete }: Props) => {
     });
   };
 
-  const handleComplete = () => {
-    onComplete();
-  };
 
   const isCompleteEnabled = noSelection || selectedOrgId !== null;
 
@@ -124,7 +120,7 @@ const SelectOrganizationModal = ({ onClose, onComplete }: Props) => {
 
             <button
               className="organization-modal__close"
-              onClick={handleComplete}
+              onClick={onComplete}
               disabled={!isCompleteEnabled}
             >
               선택 완료
