@@ -75,41 +75,54 @@ const SelectBranchModal = ({ onClose }: Props) => {
     setSelectedBranchName((prev) => (prev === branch.name ? null : branch.name));
   };
 
+  const getCachedCommits = (): Commit[] | null => {
+    const queryKey = ['commits', selectedOrg?.organization_id ?? '', selectedRepo?.repositoryId, selectedBranchName, selectedDate];
+    const cached = queryClient.getQueryData<CommitDetailResponse>(queryKey);
+    return cached?.data?.commits ?? null;
+  };
+  
+  const fetchCommitsFromAPI = async (): Promise<Commit[] | null> => {
+    if (!selectedBranchName || !selectedRepo || !selectedDate) return null;
+  
+    const queryKey = ['commits', selectedOrg?.organization_id ?? '', selectedRepo.repositoryId, selectedBranchName, selectedDate];
+  
+    try {
+      const response = await callApi<CommitDetailResponse>({
+        method: 'GET',
+        endpoint: `/github/commits?organizationId=${selectedOrg?.organization_id ?? ''}&repositoryId=${selectedRepo.repositoryId}&branchId=${selectedBranchName}&date=${selectedDate}`,
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+  
+      const commits = response?.data?.commits ?? [];
+      queryClient.setQueryData(queryKey, response);
+      return commits;
+    } catch (err) {
+      console.error('커밋 가져오기 실패:', err);
+      return null;
+    }
+  };
+  
   const handleComplete = async () => {
     if (!selectedBranchName || !selectedRepo || !selectedDate) return;
-
-    const queryKey = ['commits', selectedOrg?.organization_id ?? '', selectedRepo.repositoryId, selectedBranchName, selectedDate];
-    const cachedCommitData = queryClient.getQueryData<CommitDetailResponse>(queryKey);
-
-    if (cachedCommitData) { // 캐싱 데이터가 있으면
-      const commits = cachedCommitData.data?.commits ?? [];
-      setCommits(commits);
+  
+    const cachedCommits = getCachedCommits();
+    if (cachedCommits) {
+      setCommits(cachedCommits);
       setSelectedBranch({ branchName: selectedBranchName });
       onClose();
-    } 
-    else { // 없으면 페치
-      setIsSubmitting(true);
-      try {
-        const response = await callApi<CommitDetailResponse>({
-          method: 'GET',
-          endpoint: `/github/commits?organizationId=${selectedOrg?.organization_id ?? ''}&repositoryId=${selectedRepo.repositoryId}&branchId=${selectedBranchName}&date=${selectedDate}`,
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-        });
-
-        const commits = response?.data?.commits ?? [];
-        setCommits(commits);
-        setSelectedBranch({ branchName: selectedBranchName });
-
-        queryClient.setQueryData(queryKey, response); // 그리고 캐싱
-
-        onClose();
-      } catch (err) {
-        console.error('커밋 가져오기 실패:', err);
-      } finally {
-        setIsSubmitting(false);
-      }
+      return;
+    }
+  
+    setIsSubmitting(true);
+    const freshCommits = await fetchCommitsFromAPI();
+    setIsSubmitting(false);
+  
+    if (freshCommits) {
+      setCommits(freshCommits);
+      setSelectedBranch({ branchName: selectedBranchName });
+      onClose();
     }
   };
 
