@@ -42,6 +42,7 @@ const CommitList = () => {
   const [shake, setShake] = useState(false);
   const [shakeIndex, setShakeIndex] = useState<number | null>(null);
 
+
   const { data: commitData, isLoading } = useQuery({
     queryKey: ['commits',selectedOrganizaion?.organization_id ?? '',selectedRepository?.repositoryId,selectedBranchName?.branchName,selectedDate],
     queryFn: async () => {

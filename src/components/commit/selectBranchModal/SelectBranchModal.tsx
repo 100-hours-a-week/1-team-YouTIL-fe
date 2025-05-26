@@ -16,6 +16,12 @@ interface Branch {
   name: string;
 }
 
+interface BranchResponse {
+  data: {
+    branches: Branch[];
+  };
+}
+
 interface Commit {
   commit_message: string;
   sha: string;
@@ -24,12 +30,6 @@ interface Commit {
 interface CommitDetailResponse {
   data: {
     commits: Commit[];
-  };
-}
-
-interface BranchResponse {
-  data: {
-    branches: Branch[];
   };
 }
 
@@ -52,11 +52,11 @@ const SelectBranchModal = ({ onClose }: Props) => {
   const [selectedBranchName, setSelectedBranchName] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const {data: branchData,isLoading} = useQuery({
-    queryKey: ['branches', selectedOrg?.organization_id ?? '', selectedRepo?.repositoryId],
+  const {data: branches = [],isLoading} = useQuery<Branch[]>({
+    queryKey: ['branch', selectedOrg?.organization_id ?? '', selectedRepo?.repositoryId],
     queryFn: async () => {
-      if (!selectedRepo) return { data: { branches: [] } };
-      return await callApi<BranchResponse>({
+      if (!selectedRepo) return [];
+      const response = await callApi<BranchResponse>({
         method: 'GET',
         endpoint: `/github/branches?organizationId=${selectedOrg?.organization_id ?? ''}&repositoryId=${selectedRepo.repositoryId}`,
         headers: {
@@ -64,6 +64,7 @@ const SelectBranchModal = ({ onClose }: Props) => {
         },
         credentials: 'include',
       });
+      return response.data.branches;
     },
     enabled: existAccess,
     staleTime: 1800000,
@@ -126,17 +127,16 @@ const SelectBranchModal = ({ onClose }: Props) => {
     }
   };
 
-  const branches = branchData?.data?.branches ?? [];
   const isCompleteEnabled = selectedBranchName !== null;
 
-  const isBranchInitiallyLoading = isLoading && !branchData;
+  // const isBranchInitiallyLoading = isLoading && !branches;
 
   return (
     <div className="branch-modal">
       <div className="branch-modal__overlay" onClick={onClose} />
       <div className="branch-modal__content">
         <h2 className="branch-modal__title">브랜치 선택</h2>
-        {isBranchInitiallyLoading || isSubmitting ? (
+        {isLoading || isSubmitting ? (
           <p className="branch-modal__loading">로딩 중...</p>
         ) : (
           <>
