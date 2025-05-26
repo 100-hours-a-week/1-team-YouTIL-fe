@@ -55,7 +55,7 @@ const CommitList = () => {
       });
       return response;
     },
-    enabled: // 다 선택한 경우에 실행
+    enabled:
       !!selectedRepository &&
       !!selectedBranchName &&
       !!selectedDate &&

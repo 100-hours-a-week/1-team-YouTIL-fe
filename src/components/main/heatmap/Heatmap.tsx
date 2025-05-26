@@ -49,7 +49,7 @@ const Heatmap = () => {
   const existAccess = useCheckAccess(accessToken);
   
   const { data: tilData = [] } = useQuery<TilData[]>({
-    queryKey: ['til-data', year] as const,
+    queryKey: ['til-data'] as const,
     queryFn: async () => {
       const res = await callApi<TilApiResponse>({
         method: 'GET',

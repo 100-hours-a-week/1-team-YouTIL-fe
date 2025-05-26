@@ -9,13 +9,25 @@ import useGetAccessToken from '@/hooks/useGetAccessToken';
 import { useFetch } from '@/hooks/useFetch';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useQueryClient } from '@tanstack/react-query';
 import GenerateTILModal from '../generateTILModal/GenerateTILModal';
 import DeadLineModal from '../deadLineModal/DeadLineModal';
+
+interface TILPayload {
+  organizationId: number | string;
+  repositoryId: number;
+  branch: string;
+  commits: { commit_message: string; sha: string }[];
+  title: string;
+  category: string;
+  is_shared: boolean;
+}
 
 const GenerateTILForm = () => {
   const router = useRouter();
   const { selectedCommits } = useSelectedCommitListStore();
   const { callApi } = useFetch();
+  const queryClient = useQueryClient();
 
   const selectedOrganization = useUserOrganizationStore((state) => state.selectedOrganization);
   const selectedRepository = useUserRepositoryStore((state) => state.selectedRepository);
@@ -38,17 +50,17 @@ const GenerateTILForm = () => {
     return true;
   };
   
-  const buildPayload = () => ({
+  const buildPayload = (): TILPayload => ({
     organizationId: selectedOrganization?.organization_id ?? '',
-    repositoryId: selectedRepository?.repositoryId,
-    branch: selectedBranch?.branchName,
+    repositoryId: selectedRepository?.repositoryId ?? 0,
+    branch: selectedBranch?.branchName ?? '',
     commits: selectedCommits,
     title,
     category: category.toUpperCase(),
     is_shared: visibility === 'public',
   });
   
-  const submitTIL = async (payload: any) => {
+  const submitTIL = async (payload: TILPayload) => {
     try {
       await callApi({
         method: 'POST',
@@ -60,6 +72,11 @@ const GenerateTILForm = () => {
         },
         credentials: 'include',
       });
+
+      await queryClient.refetchQueries({
+        queryKey: ['til-data'],
+      });
+
       return { success: true };
     } catch (error) {
       if (error instanceof Error && error.message.includes('503')) {
