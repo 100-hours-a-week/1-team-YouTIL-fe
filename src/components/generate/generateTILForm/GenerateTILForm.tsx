@@ -29,29 +29,28 @@ const GenerateTILForm = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isDeadlineError, setIsDeadlineError] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
+  const validateTitle = (title: string, setShake: (s: boolean) => void): boolean => {
     if (title.trim() === '') {
       setShake(true);
       setTimeout(() => setShake(false), 500);
-      return;
+      return false;
     }
-
-    const payload = {
-      organizationId: selectedOrganization?.organization_id ?? null,
-      repositoryId: selectedRepository?.repositoryId ?? 0,
-      branch: selectedBranch?.branchName ?? '',
-      commits: selectedCommits,
-      title,
-      category: category.toUpperCase(),
-      is_shared: visibility === 'public',
-    };
-
-    setIsLoading(true);
-
+    return true;
+  };
+  
+  const buildPayload = () => ({
+    organizationId: selectedOrganization?.organization_id ?? '',
+    repositoryId: selectedRepository?.repositoryId,
+    branch: selectedBranch?.branchName,
+    commits: selectedCommits,
+    title,
+    category: category.toUpperCase(),
+    is_shared: visibility === 'public',
+  });
+  
+  const submitTIL = async (payload: any) => {
     try {
-      /*const response = */await callApi({
+      await callApi({
         method: 'POST',
         endpoint: '/tils',
         body: payload,
@@ -59,25 +58,34 @@ const GenerateTILForm = () => {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${accessToken}`,
         },
-        credentials:'include',
+        credentials: 'include',
       });
-      
-      setIsLoading(false);
-      router.push('/repository');
+      return { success: true };
     } catch (error) {
-      setIsLoading(false);
-    
-      if (error instanceof Error) {
-        if (error.message.includes('503')) {
-          setIsDeadlineError(true);
-          return;
-        }
-        console.error('TIL 생성 실패:', error.message);
-      } else {
-        console.error('예상치 못한 에러:', error);
+      if (error instanceof Error && error.message.includes('503')) {
+        return { success: false, deadlineError: true };
       }
+      console.error('TIL 생성 실패:', error);
+      return { success: false, deadlineError: false };
     }
-  };    
+  };
+  
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!validateTitle(title, setShake)) return;
+  
+    const payload = buildPayload();
+    setIsLoading(true);
+  
+    const result = await submitTIL(payload);
+    setIsLoading(false);
+  
+    if (result.success) {
+      router.push('/repository');
+    } else if (result.deadlineError) {
+      setIsDeadlineError(true);
+    }
+  };
 
   return (
     <>
