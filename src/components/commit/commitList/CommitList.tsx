@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
 import { useSelectedCommitListStore } from '@/store/selectedCommitListStore';
@@ -9,6 +9,8 @@ import { useUserRepositoryStore } from '@/store/userRepositoryStore';
 import { useUserBranchStore } from '@/store/userBranchStore';
 import { useSelectedDateStore } from '@/store/userDateStore';
 import { useFetch } from '@/hooks/useFetch';
+import { useCommitQueryGuardStore } from '@/store/useCommitQueryGuardStore';
+
 import useCheckAccess from '@/hooks/useCheckExistAccess';
 import useGetAccessToken from '@/hooks/useGetAccessToken';
 import NoCommitDescription from '@/components/description/noCommitDescription/NoCommitDescription';
@@ -31,12 +33,14 @@ const CommitList = () => {
   const { callApi } = useFetch();
   const accessToken = useGetAccessToken();
   const existAccess = useCheckAccess(accessToken);
-
+  
   const selectedOrganizaion = useUserOrganizationStore((state) => state.selectedOrganization);
   const selectedRepository = useUserRepositoryStore((state) => state.selectedRepository);
   const selectedBranchName = useUserBranchStore((state) => state.selectedBranch);
   const selectedDate = useSelectedDateStore((state) => state.selectedDate);
-
+  const isLocked = useCommitQueryGuardStore((state) => state.isLocked);
+  const lock = useCommitQueryGuardStore((state) => state.lock);
+  
   const [selectedIndexes, setSelectedIndexes] = useState<number[]>([]);
   const [userSelectedCommits, setUserSelectedCommits] = useState<Commit[]>([]);
   const [shake, setShake] = useState(false);
@@ -44,7 +48,7 @@ const CommitList = () => {
 
 
   const { data: commitData, isLoading } = useQuery({
-    queryKey: ['commits',selectedOrganizaion?.organization_id ?? '',selectedRepository?.repositoryId,selectedBranchName?.branchName,selectedDate],
+    queryKey: ['commits',selectedOrganizaion?.organization_id ?? '',selectedRepository?.repositoryId, selectedBranchName?.branchName, selectedDate],
     queryFn: async () => {
       const response = await callApi<CommitDetailResponse>({
         method: 'GET',
@@ -60,12 +64,20 @@ const CommitList = () => {
       !!selectedRepository &&
       !!selectedBranchName &&
       !!selectedDate &&
-      existAccess,
+      existAccess &&
+      !isLocked,
     refetchOnWindowFocus : true,
     staleTime: 1800000,
     gcTime: 3600000,
     // 커밋 리스트는 자주 변할 수 있으므로 refetch
   });
+
+  useEffect(() => {
+    if (!isLoading && !isLocked) {
+      lock();
+    }
+  }, [isLoading, isLocked, lock]);
+
 
   const commits = commitData?.data?.commits ?? [];
 

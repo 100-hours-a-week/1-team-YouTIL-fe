@@ -8,6 +8,8 @@ import { useUserBranchStore } from '@/store/userBranchStore';
 import { useSelectedDateStore } from '@/store/userDateStore';
 import { useCommitListStore } from '@/store/userCommitListStore';
 import { useFetch } from '@/hooks/useFetch';
+import { useCommitQueryGuardStore } from '@/store/useCommitQueryGuardStore';
+
 import useCheckAccess from '@/hooks/useCheckExistAccess';
 import useGetAccessToken from '@/hooks/useGetAccessToken';
 import './SelectBranchModal.scss';
@@ -43,12 +45,13 @@ const SelectBranchModal = ({ onClose }: Props) => {
   const selectedDate = useSelectedDateStore((state) => state.selectedDate);
   const setCommits = useCommitListStore((state) => state.setCommits);
   const setSelectedBranch = useUserBranchStore((state) => state.setSelectedBranch);
-
+  const unlockCommitQuery = useCommitQueryGuardStore((state) => state.unlock);
+  
   const { callApi } = useFetch();
   const accessToken = useGetAccessToken();
   const existAccess = useCheckAccess(accessToken);
   const queryClient = useQueryClient();
-
+  
   const [selectedBranchName, setSelectedBranchName] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -112,6 +115,7 @@ const SelectBranchModal = ({ onClose }: Props) => {
     if (cachedCommits) {
       setCommits(cachedCommits);
       setSelectedBranch({ branchName: selectedBranchName });
+      unlockCommitQuery();
       onClose();
       return;
     }
@@ -128,8 +132,6 @@ const SelectBranchModal = ({ onClose }: Props) => {
   };
 
   const isCompleteEnabled = selectedBranchName !== null;
-
-  // const isBranchInitiallyLoading = isLoading && !branches;
 
   return (
     <div className="branch-modal">
