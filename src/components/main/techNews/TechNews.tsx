@@ -19,11 +19,13 @@ interface NewsItem {
 const TechNews = () => {
   const { callApi } = useFetch();
   const accessToken = useGetAccessToken();
+  const existAccess = useCheckAccess(accessToken);
+  
   const scrollRef = useRef<HTMLDivElement>(null);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
+
   const [autoSlideEnabled, setAutoSlideEnabled] = useState(true);
   const [isSliding, setIsSliding] = useState(false);
-  const existAccess = useCheckAccess(accessToken);
 
   const { data } = useQuery({
     queryKey: ['tech-news'] as const,
@@ -110,7 +112,7 @@ const TechNews = () => {
               width={300}
               height={180}
               className="technews__thumbnail"
-              unoptimized
+              unoptimized  // 뉴스 썸네일을 받아오는 도네임이 랜덤이라 next.config.ts에 추가 못함
             />
             <div className="technews__gradient" />
             <div className="technews__headline">{news.title}</div>

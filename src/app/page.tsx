@@ -47,7 +47,7 @@ const Main = () => {
     enabled: existAccess,
     staleTime: 3600000,
     gcTime: 3600000,
-    // 사용자 정보 같은 경우는 거의 변하지 않지만 변경이 가능하므로 수동 갱신
+    //프로필 변경 post 요청 시 수동 갱신
   });
   
   return (

@@ -23,6 +23,8 @@ interface TILPayload {
   is_shared: boolean;
 }
 
+type Category = 'FULLSTACK' | 'AI' | 'CLOUD';
+
 const GenerateTILForm = () => {
   const router = useRouter();
   const { selectedCommits } = useSelectedCommitListStore();
@@ -35,7 +37,7 @@ const GenerateTILForm = () => {
   const accessToken = useGetAccessToken();
 
   const [title, setTitle] = useState('');
-  const [category, setCategory] = useState('풀스택');
+  const [category, setCategory] = useState<Category>('FULLSTACK');
   const [visibility, setVisibility] = useState<'public' | 'private'>('public');
   const [shake, setShake] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -56,7 +58,7 @@ const GenerateTILForm = () => {
     branch: selectedBranch?.branchName ?? '',
     commits: selectedCommits,
     title,
-    category: category.toUpperCase(),
+    category: category,
     is_shared: visibility === 'public',
   });
   
@@ -73,10 +75,10 @@ const GenerateTILForm = () => {
         credentials: 'include',
       });
 
-      await queryClient.refetchQueries({
+      await queryClient.invalidateQueries({
         queryKey: ['til-data'],
       });
-
+      
       return { success: true };
     } catch (error) {
       if (error instanceof Error && error.message.includes('503')) {
@@ -110,7 +112,7 @@ const GenerateTILForm = () => {
       {isDeadlineError && <DeadLineModal onClose={() => setIsDeadlineError(false)} />}
 
       <div className="generate">
-        <form className="generate__form">
+        <form className="generate__form" onSubmit={handleSubmit}>
           <label className="generate__label">
             선택된 커밋 목록
             <section className="generate__commits">
@@ -140,7 +142,7 @@ const GenerateTILForm = () => {
             카테고리
             <select
               value={category}
-              onChange={(e) => setCategory(e.target.value)}
+              onChange={(e) => setCategory(e.target.value as Category)}
               className="generate__select"
             >
               <option value="FULLSTACK">풀스택</option>
@@ -180,7 +182,6 @@ const GenerateTILForm = () => {
 
           <button
             type="submit"
-            onClick={handleSubmit}
             className={`generate__button ${shake ? 'error shake' : ''}`}
           >
             생성하기
