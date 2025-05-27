@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.scss";
-import LayoutWrapper from "@/components/layoutWrapper/LayoutWrapper";
+import LayoutWrapper from "@/app/layoutWrapper/LayoutWrapper";
 
 export const metadata: Metadata = {
   title: "YouTIL",
