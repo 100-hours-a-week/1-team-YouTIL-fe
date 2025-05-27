@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useUserOrganizationStore } from '@/store/userOrganizationStore';
 import { useUserRepositoryStore } from '@/store/userRepositoryStore';
@@ -9,6 +9,7 @@ import { useSelectedDateStore } from '@/store/userDateStore';
 import { useCommitListStore } from '@/store/userCommitListStore';
 import { useFetch } from '@/hooks/useFetch';
 import { useCommitQueryGuardStore } from '@/store/useCommitQueryGuardStore';
+import { useDisplayedRepoNameStore } from '@/store/displayedRepoNameStore';
 
 import useCheckAccess from '@/hooks/useCheckExistAccess';
 import useGetAccessToken from '@/hooks/useGetAccessToken';
@@ -46,11 +47,14 @@ const SelectBranchModal = ({ onClose }: Props) => {
   const setCommits = useCommitListStore((state) => state.setCommits);
   const setSelectedBranch = useUserBranchStore((state) => state.setSelectedBranch);
   const unlockCommitQuery = useCommitQueryGuardStore((state) => state.unlock);
+  const setDisplayedRepoName = useDisplayedRepoNameStore((state) => state.setRepoName);
   
   const { callApi } = useFetch();
   const accessToken = useGetAccessToken();
   const existAccess = useCheckAccess(accessToken);
   const queryClient = useQueryClient();
+  const isLocked = useCommitQueryGuardStore((state) => state.isLocked);
+  const lock = useCommitQueryGuardStore((state) => state.lock);
   
   const [selectedBranchName, setSelectedBranchName] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -74,6 +78,12 @@ const SelectBranchModal = ({ onClose }: Props) => {
     gcTime: 3600000,
     refetchOnWindowFocus : true, // 브랜치 목록은 자주 바뀔 수 있으므로 refetch
   });
+
+  useEffect(() => {
+    if (!isLoading && !isLocked) {
+      lock();
+    }
+  }, [isLoading, isLocked, lock]);
 
   const handleSelect = (branch: Branch) => {
     setSelectedBranchName((prev) => (prev === branch.name ? null : branch.name));
@@ -115,6 +125,7 @@ const SelectBranchModal = ({ onClose }: Props) => {
     if (cachedCommits) {
       setCommits(cachedCommits);
       setSelectedBranch({ branchName: selectedBranchName });
+      setDisplayedRepoName(selectedRepo.repositoryName);
       unlockCommitQuery();
       onClose();
       return;
@@ -127,6 +138,7 @@ const SelectBranchModal = ({ onClose }: Props) => {
     if (freshCommits) {
       setCommits(freshCommits);
       setSelectedBranch({ branchName: selectedBranchName });
+      setDisplayedRepoName(selectedRepo.repositoryName);
       onClose();
     }
   };
