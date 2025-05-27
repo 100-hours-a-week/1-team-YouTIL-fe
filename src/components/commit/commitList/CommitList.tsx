@@ -13,7 +13,7 @@ import { useCommitQueryGuardStore } from '@/store/useCommitQueryGuardStore';
 
 import useCheckAccess from '@/hooks/useCheckExistAccess';
 import useGetAccessToken from '@/hooks/useGetAccessToken';
-import NoCommitDescription from '@/components/description/noCommitDescription/NoCommitDescription';
+import NoCommitDescription from '../noCommitDescription/NoCommitDescription';
 import './CommitList.scss';
 
 interface Commit {
