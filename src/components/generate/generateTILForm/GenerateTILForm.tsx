@@ -101,15 +101,17 @@ const GenerateTILForm = () => {
   
     if (result.success) {
       router.push('/repository');
-    } else if (result.deadlineError) {
-      setIsDeadlineError(true);
     }
+      
+    //else if (result.deadlineError) { //데드라인 모달 트리거거(3시부터 12시 이외엔 CPU 서버를 사용하므로 현재 비활성화화)
+    //   setIsDeadlineError(true);
+    // }
   };
 
   return (
     <>
       {isLoading && <GenerateTILModal />}
-      {isDeadlineError && <DeadLineModal onClose={() => setIsDeadlineError(false)} />}
+      {/* {isDeadlineError && <DeadLineModal onClose={() => setIsDeadlineError(false)} />} */}
 
       <div className="generate">
         <form className="generate__form" onSubmit={handleSubmit}>
