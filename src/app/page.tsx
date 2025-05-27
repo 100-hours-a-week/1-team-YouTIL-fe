@@ -1,11 +1,11 @@
 'use client';
 
-import { useEffect } from 'react';
+import './page.scss';
+import { useQuery } from '@tanstack/react-query';
 import { useFetch } from '@/hooks/useFetch';
 import useAuthStore from '@/store/authStore';
 import useUserInfoStore from '@/store/userInfoStore';
 
-import './page.scss';
 import Heatmap from '@/components/main/heatmap/Heatmap';
 import TILRecordDescription from '@/components/description/TILRecordDescription/TILRecordDescription';
 import WelcomeDescription from '@/components/description/welcomeDescription/WelcomeDescription';
@@ -29,29 +29,27 @@ const Main = () => {
   const setUserInfo = useUserInfoStore((state) => state.setUserInfo);
   const existAccess = useCheckAccess(accessToken);
 
-  useEffect(() => {
-    const fetchUserInfo = async () => {
-      if(!existAccess) return;
-      try {
-        const result = await callApi<UserInfoResponse>({
-          method: 'GET',
-          endpoint: '/users?userId=',
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-          credentials: 'include',
-        });
-
-        const { userId, name, profileUrl, description } = result.data;
-        setUserInfo({ userId, name, profileUrl, description });
-      } catch (error) {
-        console.error('유저 정보 불러오기 실패:', error);
-      }
-    };
-
-    fetchUserInfo();
-  }, [callApi, accessToken, setUserInfo]);
-
+  useQuery<UserInfoResponse['data']>({
+    queryKey: ['user-info'] as const,
+    queryFn: async () => {
+      const result = await callApi<UserInfoResponse>({
+        method: 'GET',
+        endpoint: '/users?userId=',
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+        credentials: 'include',
+      });
+      const { userId, name, profileUrl, description } = result.data;
+      setUserInfo({ userId, name, profileUrl, description });
+      return result.data;
+    },
+    enabled: existAccess,
+    staleTime: 3600000,
+    gcTime: 3600000,
+    //프로필 변경 post 요청 시 수동 갱신
+  });
+  
   return (
     <div className="main-page">
       <WelcomeDescription />
