@@ -11,7 +11,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useQueryClient } from '@tanstack/react-query';
 import GenerateTILModal from '../generateTILModal/GenerateTILModal';
-import DeadLineModal from '../deadLineModal/DeadLineModal';
+// import DeadLineModal from '../deadLineModal/DeadLineModal';
 
 interface TILPayload {
   organizationId: number | string;
@@ -41,7 +41,7 @@ const GenerateTILForm = () => {
   const [visibility, setVisibility] = useState<'public' | 'private'>('public');
   const [shake, setShake] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [isDeadlineError, setIsDeadlineError] = useState(false);
+  // const [isDeadlineError, setIsDeadlineError] = useState(false);
 
   const validateTitle = (title: string, setShake: (s: boolean) => void): boolean => {
     if (title.trim() === '') {
