@@ -14,18 +14,18 @@ const HeaderBackButton = () => {
 
   return (
     <div className="back-icon">
-      <button onClick={handleBack}>
+      <button onClick={handleBack} className="back-icon__button">
         <Image
           src={backicon}
           alt="backicon"
           width={50}
           height={50}
           priority
-          />
+          className="back-icon__image"
+        />
       </button>
     </div>
   );
 };
-
 
 export default HeaderBackButton;

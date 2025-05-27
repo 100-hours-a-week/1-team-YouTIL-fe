@@ -14,7 +14,7 @@ const HeaderLogoutButton = () => {
   };
 
   return (
-    <div className="header-logout-button" onClick={handleLogout}>
+    <div className="header__logout-button" onClick={handleLogout}>
       로그아웃
     </div>
   );
