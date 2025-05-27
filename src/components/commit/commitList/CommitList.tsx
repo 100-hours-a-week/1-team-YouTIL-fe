@@ -1,14 +1,17 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useCommitListStore } from '@/store/userCommitListStore';
+import { useQuery } from '@tanstack/react-query';
 import { useSelectedCommitListStore } from '@/store/selectedCommitListStore';
 import { useUserOrganizationStore } from '@/store/userOrganizationStore';
 import { useUserRepositoryStore } from '@/store/userRepositoryStore';
 import { useUserBranchStore } from '@/store/userBranchStore';
 import { useSelectedDateStore } from '@/store/userDateStore';
 import { useFetch } from '@/hooks/useFetch';
+import { useCommitQueryGuardStore } from '@/store/useCommitQueryGuardStore';
+
+import useCheckAccess from '@/hooks/useCheckExistAccess';
 import useGetAccessToken from '@/hooks/useGetAccessToken';
 import NoCommitDescription from '@/components/description/noCommitDescription/NoCommitDescription';
 import './CommitList.scss';
@@ -26,55 +29,57 @@ interface CommitDetailResponse {
 
 const CommitList = () => {
   const router = useRouter();
-  const { commits, setCommits } = useCommitListStore();
   const { setSelectedCommits } = useSelectedCommitListStore();
   const { callApi } = useFetch();
   const accessToken = useGetAccessToken();
-
+  const existAccess = useCheckAccess(accessToken);
+  
   const selectedOrganizaion = useUserOrganizationStore((state) => state.selectedOrganization);
   const selectedRepository = useUserRepositoryStore((state) => state.selectedRepository);
-  const selectedDate = useSelectedDateStore((state) => state.selectedDate);
   const selectedBranchName = useUserBranchStore((state) => state.selectedBranch);
-
+  const selectedDate = useSelectedDateStore((state) => state.selectedDate);
+  const isLocked = useCommitQueryGuardStore((state) => state.isLocked);
+  const lock = useCommitQueryGuardStore((state) => state.lock);
+  
   const [selectedIndexes, setSelectedIndexes] = useState<number[]>([]);
   const [userSelectedCommits, setUserSelectedCommits] = useState<Commit[]>([]);
   const [shake, setShake] = useState(false);
   const [shakeIndex, setShakeIndex] = useState<number | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
+
+
+  const { data: commitData, isLoading } = useQuery({
+    queryKey: ['commits',selectedOrganizaion?.organization_id ?? '',selectedRepository?.repositoryId, selectedBranchName?.branchName, selectedDate],
+    queryFn: async () => {
+      const response = await callApi<CommitDetailResponse>({
+        method: 'GET',
+        endpoint: `/github/commits?organizationId=${selectedOrganizaion?.organization_id ?? ''}&repositoryId=${selectedRepository?.repositoryId}&branchId=${selectedBranchName?.branchName}&date=${selectedDate}`,
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+        credentials: 'include',
+      });
+      return response;
+    },
+    enabled:
+      !!selectedRepository &&
+      !!selectedBranchName &&
+      !!selectedDate &&
+      existAccess &&
+      !isLocked,
+    refetchOnWindowFocus : true,
+    staleTime: 1800000,
+    gcTime: 3600000,
+    // 커밋 리스트는 자주 변할 수 있으므로 refetch
+  });
 
   useEffect(() => {
-    const fetchCommits = async () => {
-      if (!selectedRepository || !selectedBranchName || !selectedDate) return;
+    if (!isLoading && !isLocked) {
+      lock();
+    }
+  }, [isLoading, isLocked, lock]);
 
-      setIsLoading(true);
-      try {
-        const response = await callApi<CommitDetailResponse>({
-          method: 'GET',
-          endpoint: `/github/commits?&organizationId=${selectedOrganizaion?.organization_id ?? ''}&repositoryId=${selectedRepository.repositoryId}&branchId=${selectedBranchName.branchName}&date=${selectedDate}`,
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-          credentials:'include',
-        });
 
-        const commits = response?.data?.commits ?? [];
-        setCommits(commits);
-        setSelectedIndexes([]);
-        setUserSelectedCommits([]);
-      } catch (err) {
-        console.error('커밋 자동 로딩 실패:', err);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchCommits();
-  }, [
-    selectedDate,
-    callApi,
-    accessToken,
-    setCommits,
-  ]);
+  const commits = commitData?.data?.commits ?? [];
 
   const toggleSelection = (index: number) => {
     const selectedCommit = commits[index];
@@ -108,7 +113,8 @@ const CommitList = () => {
     router.push('/generate');
   };
 
-  const canShowGenerateButton = selectedRepository && selectedBranchName && selectedDate;
+  const canShowGenerateButton =
+    selectedRepository && selectedBranchName && selectedDate;
 
   return (
     <div className="commit-list">
@@ -124,11 +130,11 @@ const CommitList = () => {
       )}
 
       {isLoading ? (
-         <p className="commit-list__loading">
-         <span className="commit-list__spinner" />
-         로딩 중...
-       </p>
-      ) : !commits || commits.length === 0 ? (
+        <p className="commit-list__loading">
+          <span className="commit-list__spinner" />
+          로딩 중...
+        </p>
+      ) : commits.length === 0 ? (
         <div className="commit-list__desc">
           <NoCommitDescription />
         </div>
@@ -139,8 +145,7 @@ const CommitList = () => {
               key={idx}
               className={`commit-list__item
                 ${selectedIndexes.includes(idx) ? 'commit-list__item--selected' : ''}
-                ${shakeIndex === idx ? 'error shake' : ''}
-              `}
+                ${shakeIndex === idx ? 'error shake' : ''}`}
               onClick={() => toggleSelection(idx)}
             >
               {commit.commit_message}
