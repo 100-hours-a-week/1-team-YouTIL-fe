@@ -8,7 +8,6 @@ import './LinkGithubButton.scss';
 
 import { useUserRepositoryStore } from '@/store/userRepositoryStore';
 import { useUserBranchStore } from '@/store/userBranchStore';
-import { useCommitQueryGuardStore } from '@/store/useCommitQueryGuardStore';
 import { useDisplayedRepoNameStore } from '@/store/displayedRepoNameStore';
 import { useUserOrganizationStore } from '@/store/userOrganizationStore';
 
@@ -23,11 +22,9 @@ const LinkGithubButton = () => {
 
   const selectedRepo = useUserRepositoryStore((state) => state.selectedRepository);
   const selectedBranchName = useUserBranchStore((state) => state.selectedBranch);
-  const lockCommitQuery = useCommitQueryGuardStore((state) => state.lock);
   const displayedRepoName = useDisplayedRepoNameStore((state) => state.repoName);
 
   const handleOpenOrganizationModal = () => {
-    lockCommitQuery();
     clearOrganization();
     clearRepository();
     clearBranch();

@@ -55,7 +55,6 @@ const SelectRepositoryModal = ({ onClose, onComplete }: Props) => {
   const handleSelect = (repo: Repository) => {
     if (selectedRepositoryId === repo.repositoryId) {
       setSelectedRepositoryId(null);
-      setRepository({ repositoryId: 0, repositoryName: '' });
     } 
     else {
       setSelectedRepositoryId(repo.repositoryId);

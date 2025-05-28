@@ -9,7 +9,6 @@ import { useUserRepositoryStore } from '@/store/userRepositoryStore';
 import { useUserBranchStore } from '@/store/userBranchStore';
 import { useSelectedDateStore } from '@/store/userDateStore';
 import { useFetch } from '@/hooks/useFetch';
-import { useCommitQueryGuardStore } from '@/store/useCommitQueryGuardStore';
 
 import useCheckAccess from '@/hooks/useCheckExistAccess';
 import useGetAccessToken from '@/hooks/useGetAccessToken';
@@ -38,17 +37,16 @@ const CommitList = () => {
   const selectedRepository = useUserRepositoryStore((state) => state.selectedRepository);
   const selectedBranchName = useUserBranchStore((state) => state.selectedBranch);
   const selectedDate = useSelectedDateStore((state) => state.selectedDate);
-  const isLocked = useCommitQueryGuardStore((state) => state.isLocked);
-  const lock = useCommitQueryGuardStore((state) => state.lock);
   
   const [selectedIndexes, setSelectedIndexes] = useState<number[]>([]);
   const [userSelectedCommits, setUserSelectedCommits] = useState<Commit[]>([]);
   const [shake, setShake] = useState(false);
   const [shakeIndex, setShakeIndex] = useState<number | null>(null);
 
-  useEffect(() =>{
-    lock();
-  },[])
+  useEffect(() => {
+    setSelectedIndexes([]);
+    setUserSelectedCommits([]);
+  }, [selectedDate]);
 
   const { data: commitData, isLoading } = useQuery({
     queryKey: ['commits',selectedOrganizaion?.organization_id ?? '',selectedRepository?.repositoryId, selectedBranchName?.branchName, selectedDate],
@@ -73,12 +71,6 @@ const CommitList = () => {
     gcTime: 3600000,
     // 커밋 리스트는 자주 변할 수 있으므로 refetch
   });
-
-  useEffect(() => {
-    if (!isLoading && !isLocked) {
-      lock();
-    }
-  }, [isLoading, isLocked, lock]);
 
 
   const commits = commitData?.data?.commits ?? [];
@@ -114,6 +106,7 @@ const CommitList = () => {
     setSelectedCommits(userSelectedCommits);
     router.push('/generate');
   };
+
 
   const canShowGenerateButton =
     commits.length > 0 && selectedRepository && selectedBranchName && selectedDate;

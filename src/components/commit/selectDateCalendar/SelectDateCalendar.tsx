@@ -33,7 +33,6 @@ const SelectDateCalendar = () => {
   useEffect(() => {
     const formatted = format(selectedDate, 'yyyy-MM-dd');
     setSelectedDate(formatted);
-    unlockCommitQuery();
   }, [selectedDate, setSelectedDate, unlockCommitQuery]);
 
   const renderHeader = () => (
