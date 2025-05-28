@@ -7,6 +7,7 @@ import useGetAccessToken from '@/hooks/useGetAccessToken';
 import './SelectOrganizationModal.scss';
 import { useUserOrganizationStore } from '@/store/userOrganizationStore';
 import useCheckAccess from '@/hooks/useCheckExistAccess';
+import { useCommitQueryGuardStore } from '@/store/useCommitQueryGuardStore';
 
 interface Organization {
   organization_id: number;
@@ -33,8 +34,7 @@ const SelectOrganizationModal = ({ onClose, onComplete }: Props) => {
 
   const [selectedOrgId, setSelectedOrgId] = useState<number | null>(null);
   const [noSelection, setNoSelection] = useState(false);
-
-
+  const isLock = useCommitQueryGuardStore((state) => state.isLocked);
   const { data: organizations = [], isLoading} = useQuery<Organization[]>({
     queryKey: ['organization'] as const,
     queryFn: async () => {

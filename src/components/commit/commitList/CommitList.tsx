@@ -46,6 +46,9 @@ const CommitList = () => {
   const [shake, setShake] = useState(false);
   const [shakeIndex, setShakeIndex] = useState<number | null>(null);
 
+  useEffect(() =>{
+    lock();
+  },[])
 
   const { data: commitData, isLoading } = useQuery({
     queryKey: ['commits',selectedOrganizaion?.organization_id ?? '',selectedRepository?.repositoryId, selectedBranchName?.branchName, selectedDate],
@@ -64,8 +67,7 @@ const CommitList = () => {
       !!selectedRepository &&
       !!selectedBranchName &&
       !!selectedDate &&
-      existAccess &&
-      !isLocked,
+      existAccess,
     refetchOnWindowFocus : true,
     staleTime: 1800000,
     gcTime: 3600000,
@@ -114,7 +116,7 @@ const CommitList = () => {
   };
 
   const canShowGenerateButton =
-    selectedRepository && selectedBranchName && selectedDate;
+    commits.length > 0 && selectedRepository && selectedBranchName && selectedDate;
 
   return (
     <div className="commit-list">

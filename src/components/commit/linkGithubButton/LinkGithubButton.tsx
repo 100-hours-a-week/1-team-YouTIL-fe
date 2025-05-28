@@ -10,13 +10,17 @@ import { useUserRepositoryStore } from '@/store/userRepositoryStore';
 import { useUserBranchStore } from '@/store/userBranchStore';
 import { useCommitQueryGuardStore } from '@/store/useCommitQueryGuardStore';
 import { useDisplayedRepoNameStore } from '@/store/displayedRepoNameStore';
-
+import { useUserOrganizationStore } from '@/store/userOrganizationStore';
 
 const LinkGithubButton = () => {
   const [organizationModalOpen, setOrganizationModalOpen] = useState(false);
   const [repositoryModalOpen, setRepositoryModalOpen] = useState(false);
   const [branchModalOpen, setBranchModalOpen] = useState(false);
   
+  const { clearBranch } = useUserBranchStore((state) => state);
+  const {clearRepository} = useUserRepositoryStore((state) => state);
+  const {clearOrganization} = useUserOrganizationStore((state) => state);
+
   const selectedRepo = useUserRepositoryStore((state) => state.selectedRepository);
   const selectedBranchName = useUserBranchStore((state) => state.selectedBranch);
   const lockCommitQuery = useCommitQueryGuardStore((state) => state.lock);
@@ -24,6 +28,9 @@ const LinkGithubButton = () => {
 
   const handleOpenOrganizationModal = () => {
     lockCommitQuery();
+    clearOrganization();
+    clearRepository();
+    clearBranch();
     setOrganizationModalOpen(true);
   };
 
