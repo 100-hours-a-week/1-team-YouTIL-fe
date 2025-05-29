@@ -64,6 +64,7 @@ const GenerateTILForm = () => {
   
   const submitTIL = async (payload: TILPayload) => {
     try {
+      console.log("submitTIL 시작")
       await callApi({
         method: 'POST',
         endpoint: '/tils',
@@ -76,7 +77,12 @@ const GenerateTILForm = () => {
       });
 
       await queryClient.invalidateQueries({
-        queryKey: ['til-data'],
+        queryKey: ['tilList'],
+
+      });
+      await queryClient.refetchQueries({
+        queryKey: ['recent-tils'],
+        exact: true,
       });
       
       return { success: true };

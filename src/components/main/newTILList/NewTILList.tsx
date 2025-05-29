@@ -46,7 +46,6 @@ const NewTILList = () => {
     enabled: existAccess,
     staleTime: 600000,
     gcTime: 1800000,
-    refetchOnWindowFocus: true // 변경되어도 즉시 재반영 될 필요가 없지만 사용자가 탭으로 돌아 왔을 때 refetch
   });
 
   if (isError) {
