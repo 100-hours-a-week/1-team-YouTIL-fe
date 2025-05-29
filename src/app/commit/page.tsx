@@ -1,7 +1,6 @@
 import LinkGithubButton from "@/components/commit/linkGithubButton/LinkGithubButton";
 import SelectDateCalendar from "@/components/commit/selectDateCalendar/SelectDateCalendar";
 import CommitList from "@/components/commit/commitList/CommitList";
-
 import './page.scss';
 
 const commit =() =>{

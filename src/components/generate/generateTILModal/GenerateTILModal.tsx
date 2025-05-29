@@ -1,3 +1,5 @@
+'use client';
+
 import './GenerateTILModal.scss';
 
 const GenerateTILModal = () => {
@@ -8,6 +10,9 @@ const GenerateTILModal = () => {
         <p className="generate-modal__text">
           <span className="generate-modal__spinner" />
           TIL 생성중...
+        </p>
+        <p className="generate-modal__subtext">
+          TIL 생성 시 1분 정도의 시간이 소요됩니다
         </p>
       </div>
     </div>

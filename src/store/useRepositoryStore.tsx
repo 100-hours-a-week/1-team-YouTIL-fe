@@ -5,14 +5,14 @@ interface Repository {
   repositoryName: string;
 }
 
-interface UserRepositoryState {
+interface useRepositoryState {
   selectedRepository: Repository | null;
-  setRepository: (repo: Repository | null) => void;
+  setSelectedRepository: (repo: Repository | null) => void;
   clearRepository: () => void;
 }
 
-export const useUserRepositoryStore = create<UserRepositoryState>((set) => ({
+export const useRepositoryStore = create<useRepositoryState>((set) => ({
   selectedRepository: null,
-  setRepository: (repo) => set({ selectedRepository: repo }),
+  setSelectedRepository: (repo) => set({ selectedRepository: repo }),
   clearRepository: () => set({ selectedRepository: null }),
 }));

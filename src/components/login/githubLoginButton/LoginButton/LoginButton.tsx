@@ -2,7 +2,6 @@
 
 import Image from 'next/image';
 import { getGithubAuthUrl } from '@/api/constant/githubLoginConstants';
-import gitlogin from 'public/gitlogin.png';
 import './LoginButton.scss';
 
 const LoginButton = () => {
@@ -20,7 +19,7 @@ const LoginButton = () => {
       role="button"
     >
       <Image
-        src={gitlogin}
+        src="/images/githubLoginButton.png"
         alt="GitHub 로그인"
         width={325}
         height={45}

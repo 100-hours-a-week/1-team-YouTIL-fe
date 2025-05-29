@@ -1,5 +1,3 @@
-'use client';
-
 import { Suspense } from "react";
 import GithubLoginButton from "@/components/login/githubLoginButton/GithubLoginButton/GithubLoginButton";
 import LoginPageIntro from "@/components/login/loginPageIntro/LoginPageIntro";

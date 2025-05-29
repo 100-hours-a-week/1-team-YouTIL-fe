@@ -4,13 +4,13 @@ interface Branch {
   branchName: string;
 }
 
-interface UserBranchState {
+interface BranchState {
   selectedBranch: Branch | null;
   setSelectedBranch: (branch: Branch) => void;
   clearBranch: () => void;
 }
 
-export const useUserBranchStore = create<UserBranchState>((set) => ({
+export const useBranchStore = create<BranchState>((set) => ({
   selectedBranch: null,
   setSelectedBranch: (branch) => set({ selectedBranch: branch }),
   clearBranch: () => set({ selectedBranch: null }),
