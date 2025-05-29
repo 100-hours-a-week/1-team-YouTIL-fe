@@ -1,10 +1,12 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { useState } from 'react';
 import { useUserOrganizationStore } from '@/store/userOrganizationStore';
 import { useUserRepositoryStore } from '@/store/userRepositoryStore';
 import { useFetch } from '@/hooks/useFetch';
 import useGetAccessToken from '@/hooks/useGetAccessToken';
+import useCheckAccess from '@/hooks/useCheckExistAccess';
 import './SelectRepositoryModal.scss';
 
 interface Repository {
@@ -28,31 +30,27 @@ const SelectRepositoryModal = ({ onClose, onComplete }: Props) => {
   const setRepository = useUserRepositoryStore((state) => state.setRepository);
   const { callApi } = useFetch();
   const accessToken = useGetAccessToken();
-
-  const [repositories, setRepositories] = useState<Repository[]>([]);
+  const existAccess = useCheckAccess(accessToken);
   const [selectedRepositoryId, setSelectedRepositoryId] = useState<number | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchRepositories = async () => {
-      try {
-        const response = await callApi<RepositoryResponse>({
-          method: 'GET',
-          endpoint: `/github/repositories?organizationId=${selectedOrg ? selectedOrg.organization_id : ''}`,
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-        });
-        setRepositories(response.data.repositories);
-      } catch (err) {
-        console.error('레포지토리 불러오기 실패:', err);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchRepositories();
-  }, [selectedOrg, accessToken, callApi]);
+  const { data: repositories = [], isLoading, } = useQuery<Repository[]>({
+    queryKey: ['repository', selectedOrg?.organization_id ?? ''] as const,
+    queryFn: async () => {
+      const response = await callApi<RepositoryResponse>({
+        method: 'GET',
+        endpoint: `/github/repositories?organizationId=${selectedOrg ? selectedOrg.organization_id : ''}`,
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+        credentials: 'include',
+      });
+      return response.data.repositories;
+    },
+    enabled: existAccess,
+    staleTime: 3600000,
+    gcTime: 3600000,
+    // 레포지토리 역시 자주 변하지 않으므로 refetch 및 수동 갱신x
+  });
 
   const handleSelect = (repo: Repository) => {
     if (selectedRepositoryId === repo.repositoryId) {
@@ -61,12 +59,6 @@ const SelectRepositoryModal = ({ onClose, onComplete }: Props) => {
     } else {
       setSelectedRepositoryId(repo.repositoryId);
       setRepository(repo);
-    }
-  };
-
-  const handleCompleteClick = () => {
-    if (selectedRepositoryId !== null) {
-      onComplete();
     }
   };
 
@@ -98,7 +90,7 @@ const SelectRepositoryModal = ({ onClose, onComplete }: Props) => {
 
             <button
               className="repository-modal__close"
-              onClick={handleCompleteClick}
+              onClick={onComplete}
               disabled={!isCompleteEnabled}
             >
               선택 완료

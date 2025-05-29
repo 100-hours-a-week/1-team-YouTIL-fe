@@ -1,10 +1,12 @@
 'use client';
 
+import { useQuery } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
 import { useFetch } from '@/hooks/useFetch';
 import useGetAccessToken from '@/hooks/useGetAccessToken';
 import './SelectOrganizationModal.scss';
 import { useUserOrganizationStore } from '@/store/userOrganizationStore';
+import useCheckAccess from '@/hooks/useCheckExistAccess';
 
 interface Organization {
   organization_id: number;
@@ -26,45 +28,42 @@ const SelectOrganizationModal = ({ onClose, onComplete }: Props) => {
   const { callApi } = useFetch();
   const accessToken = useGetAccessToken();
 
+  const existAccess = useCheckAccess(accessToken);
   const setSelectedOrganization = useUserOrganizationStore((state) => state.setSelectedOrganization);
 
-  const [organizations, setOrganizations] = useState<Organization[]>([]);
   const [selectedOrgId, setSelectedOrgId] = useState<number | null>(null);
   const [noSelection, setNoSelection] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
+
+
+  const { data: organizations = [], isLoading} = useQuery<Organization[]>({
+    queryKey: ['organization'] as const,
+    queryFn: async () => {
+      const response = await callApi<OrganizationResponse>({
+        method: 'GET',
+        endpoint: '/github/organization',
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+        credentials: 'include',
+      });
+      return response.data.organizations;
+    },
+    enabled: existAccess,
+    staleTime: 6 * 3600000,
+    gcTime: 6 * 3600000,
+    // 조직은 거의 변하지 않으므로 refetch 및 수동 갱신 x
+  });
 
   useEffect(() => {
-    const fetchOrganizations = async () => {
-      try {
-        const response = await callApi<OrganizationResponse>({
-          method: 'GET',
-          endpoint: '/github/organization',
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-        });
-        setOrganizations(response.data.organizations);
-      } catch (error) {
-        console.error('조직 불러오기 실패:', error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchOrganizations();
-  }, [accessToken, callApi]);
-
+    if (noSelection) setSelectedOrganization(null);
+  }, [noSelection, setSelectedOrganization]);
+  
   useEffect(() => {
-    if (noSelection) {
-      setSelectedOrganization(null);
-    } 
-    else if (selectedOrgId !== null) {
+    if (selectedOrgId !== null) {
       const selected = organizations.find((org) => org.organization_id === selectedOrgId);
-      if (selected) {
-        setSelectedOrganization(selected);
-      }
+      if (selected) setSelectedOrganization(selected);
     }
-  }, [noSelection, selectedOrgId, organizations, setSelectedOrganization]);
+  }, [selectedOrgId, organizations, setSelectedOrganization]);
 
   const handleSelect = (org: Organization) => {
     if (selectedOrgId === org.organization_id) {
@@ -85,9 +84,6 @@ const SelectOrganizationModal = ({ onClose, onComplete }: Props) => {
     });
   };
 
-  const handleComplete = () => {
-    onComplete();
-  };
 
   const isCompleteEnabled = noSelection || selectedOrgId !== null;
 
@@ -124,7 +120,7 @@ const SelectOrganizationModal = ({ onClose, onComplete }: Props) => {
 
             <button
               className="organization-modal__close"
-              onClick={handleComplete}
+              onClick={onComplete}
               disabled={!isCompleteEnabled}
             >
               선택 완료

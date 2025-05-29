@@ -9,13 +9,27 @@ import useGetAccessToken from '@/hooks/useGetAccessToken';
 import { useFetch } from '@/hooks/useFetch';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useQueryClient } from '@tanstack/react-query';
 import GenerateTILModal from '../generateTILModal/GenerateTILModal';
-import DeadLineModal from '../deadLineModal/DeadLineModal';
+// import DeadLineModal from '../deadLineModal/DeadLineModal';
+
+interface TILPayload {
+  organizationId: number | string;
+  repositoryId: number;
+  branch: string;
+  commits: { commit_message: string; sha: string }[];
+  title: string;
+  category: string;
+  is_shared: boolean;
+}
+
+type Category = 'FULLSTACK' | 'AI' | 'CLOUD';
 
 const GenerateTILForm = () => {
   const router = useRouter();
   const { selectedCommits } = useSelectedCommitListStore();
   const { callApi } = useFetch();
+  const queryClient = useQueryClient();
 
   const selectedOrganization = useUserOrganizationStore((state) => state.selectedOrganization);
   const selectedRepository = useUserRepositoryStore((state) => state.selectedRepository);
@@ -23,35 +37,34 @@ const GenerateTILForm = () => {
   const accessToken = useGetAccessToken();
 
   const [title, setTitle] = useState('');
-  const [category, setCategory] = useState('풀스택');
+  const [category, setCategory] = useState<Category>('FULLSTACK');
   const [visibility, setVisibility] = useState<'public' | 'private'>('public');
   const [shake, setShake] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [isDeadlineError, setIsDeadlineError] = useState(false);
+  // const [isDeadlineError, setIsDeadlineError] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
+  const validateTitle = (title: string, setShake: (s: boolean) => void): boolean => {
     if (title.trim() === '') {
       setShake(true);
       setTimeout(() => setShake(false), 500);
-      return;
+      return false;
     }
-
-    const payload = {
-      organizationId: selectedOrganization?.organization_id ?? null,
-      repositoryId: selectedRepository?.repositoryId ?? 0,
-      branch: selectedBranch?.branchName ?? '',
-      commits: selectedCommits,
-      title,
-      category: category.toUpperCase(),
-      is_shared: visibility === 'public',
-    };
-
-    setIsLoading(true);
-
+    return true;
+  };
+  
+  const buildPayload = (): TILPayload => ({
+    organizationId: selectedOrganization?.organization_id ?? '',
+    repositoryId: selectedRepository?.repositoryId ?? 0,
+    branch: selectedBranch?.branchName ?? '',
+    commits: selectedCommits,
+    title,
+    category: category,
+    is_shared: visibility === 'public',
+  });
+  
+  const submitTIL = async (payload: TILPayload) => {
     try {
-      /*const response = */await callApi({
+      await callApi({
         method: 'POST',
         endpoint: '/tils',
         body: payload,
@@ -59,32 +72,49 @@ const GenerateTILForm = () => {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${accessToken}`,
         },
+        credentials: 'include',
+      });
+
+      await queryClient.invalidateQueries({
+        queryKey: ['til-data'],
       });
       
-      setIsLoading(false);
-      router.push('/repository');
+      return { success: true };
     } catch (error) {
-      setIsLoading(false);
-    
-      if (error instanceof Error) {
-        if (error.message.includes('503')) {
-          setIsDeadlineError(true);
-          return;
-        }
-        console.error('TIL 생성 실패:', error.message);
-      } else {
-        console.error('예상치 못한 에러:', error);
+      if (error instanceof Error && error.message.includes('503')) {
+        return { success: false, deadlineError: true };
       }
+      console.error('TIL 생성 실패:', error);
+      return { success: false, deadlineError: false };
     }
-  };    
+  };
+  
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!validateTitle(title, setShake)) return;
+  
+    const payload = buildPayload();
+    setIsLoading(true);
+  
+    const result = await submitTIL(payload);
+    setIsLoading(false);
+  
+    if (result.success) {
+      router.push('/repository');
+    }
+      
+    //else if (result.deadlineError) { //데드라인 모달 트리거거(3시부터 12시 이외엔 CPU 서버를 사용하므로 현재 비활성화화)
+    //   setIsDeadlineError(true);
+    // }
+  };
 
   return (
     <>
       {isLoading && <GenerateTILModal />}
-      {isDeadlineError && <DeadLineModal onClose={() => setIsDeadlineError(false)} />}
+      {/* {isDeadlineError && <DeadLineModal onClose={() => setIsDeadlineError(false)} />} */}
 
       <div className="generate">
-        <form className="generate__form">
+        <form className="generate__form" onSubmit={handleSubmit}>
           <label className="generate__label">
             선택된 커밋 목록
             <section className="generate__commits">
@@ -114,7 +144,7 @@ const GenerateTILForm = () => {
             카테고리
             <select
               value={category}
-              onChange={(e) => setCategory(e.target.value)}
+              onChange={(e) => setCategory(e.target.value as Category)}
               className="generate__select"
             >
               <option value="FULLSTACK">풀스택</option>
@@ -154,7 +184,6 @@ const GenerateTILForm = () => {
 
           <button
             type="submit"
-            onClick={handleSubmit}
             className={`generate__button ${shake ? 'error shake' : ''}`}
           >
             생성하기

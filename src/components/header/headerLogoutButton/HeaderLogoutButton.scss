@@ -1,11 +1,12 @@
-.header-logout-button {
+.header {
+  &__logout-button {
     cursor: pointer;
     font-size: 17px;
     color: #333;
     transition: color 0.2s ease;
-  
+
     &:hover {
       color: #00B6FA;
     }
   }
-  
+}

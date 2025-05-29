@@ -6,8 +6,8 @@ import './Header.scss';
 
 const Header =() =>{
     return(
-        <div className="header-place">
-            <div className="header-button">
+        <div className="header__place">
+            <div className="header__button">
                 <HeaderBackButton/>
                 <HeaderLogo/>
                 <HeaderLogoutButton/>

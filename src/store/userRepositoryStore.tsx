@@ -7,7 +7,7 @@ interface Repository {
 
 interface UserRepositoryState {
   selectedRepository: Repository | null;
-  setRepository: (repo: Repository) => void;
+  setRepository: (repo: Repository | null) => void;
   clearRepository: () => void;
 }
 
