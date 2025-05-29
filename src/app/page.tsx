@@ -3,8 +3,8 @@
 import './page.scss';
 import { useQuery } from '@tanstack/react-query';
 import { useFetch } from '@/hooks/useFetch';
-import useAuthStore from '@/store/authStore';
-import useUserInfoStore from '@/store/userInfoStore';
+import useAuthStore from '@/store/useAuthStore';
+import useUserInfoStore from '@/store/useUserInfoStore';
 
 import Heatmap from '@/components/main/heatmap/Heatmap';
 import TILRecordDescription from '@/components/main/TILRecordDescription/TILRecordDescription';

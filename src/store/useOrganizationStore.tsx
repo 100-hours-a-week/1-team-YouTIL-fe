@@ -5,13 +5,13 @@ interface SelectedOrganization {
   organization_name: string;
 }
 
-interface UserOrganizationState {
+interface useOrganizationState {
   selectedOrganization: SelectedOrganization | null;
   setSelectedOrganization: (org: SelectedOrganization | null) => void;
   clearOrganization: () => void;
 }
 
-export const useUserOrganizationStore = create<UserOrganizationState>((set) => ({
+export const useOrganizationStore = create<useOrganizationState>((set) => ({
   selectedOrganization: null,
   setSelectedOrganization: (org) => set({ selectedOrganization: org }),
   clearOrganization: () => set({ selectedOrganization: null }),

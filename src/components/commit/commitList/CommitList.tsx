@@ -3,13 +3,12 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
-import { useSelectedCommitListStore } from '@/store/selectedCommitListStore';
-import { useUserOrganizationStore } from '@/store/userOrganizationStore';
-import { useUserRepositoryStore } from '@/store/userRepositoryStore';
-import { useUserBranchStore } from '@/store/userBranchStore';
-import { useSelectedDateStore } from '@/store/userDateStore';
+import { useSelectedCommitListStore } from '@/store/useSelectedCommitListStore';
+import { useOrganizationStore } from '@/store/useOrganizationStore';
+import { useRepositoryStore } from '@/store/useRepositoryStore';
+import { useBranchStore } from '@/store/useBranchStore';
+import { useSelectedDateStore } from '@/store/useDateStore';
 import { useFetch } from '@/hooks/useFetch';
-import { useCommitQueryGuardStore } from '@/store/useCommitQueryGuardStore';
 
 import useCheckAccess from '@/hooks/useCheckExistAccess';
 import useGetAccessToken from '@/hooks/useGetAccessToken';
@@ -34,18 +33,20 @@ const CommitList = () => {
   const accessToken = useGetAccessToken();
   const existAccess = useCheckAccess(accessToken);
   
-  const selectedOrganizaion = useUserOrganizationStore((state) => state.selectedOrganization);
-  const selectedRepository = useUserRepositoryStore((state) => state.selectedRepository);
-  const selectedBranchName = useUserBranchStore((state) => state.selectedBranch);
+  const selectedOrganizaion = useOrganizationStore((state) => state.selectedOrganization);
+  const selectedRepository = useRepositoryStore((state) => state.selectedRepository);
+  const selectedBranchName = useBranchStore((state) => state.selectedBranch);
   const selectedDate = useSelectedDateStore((state) => state.selectedDate);
-  const isLocked = useCommitQueryGuardStore((state) => state.isLocked);
-  const lock = useCommitQueryGuardStore((state) => state.lock);
   
   const [selectedIndexes, setSelectedIndexes] = useState<number[]>([]);
   const [userSelectedCommits, setUserSelectedCommits] = useState<Commit[]>([]);
   const [shake, setShake] = useState(false);
   const [shakeIndex, setShakeIndex] = useState<number | null>(null);
 
+  useEffect(() => {
+    setSelectedIndexes([]);
+    setUserSelectedCommits([]);
+  }, [selectedDate]);
 
   const { data: commitData, isLoading } = useQuery({
     queryKey: ['commits',selectedOrganizaion?.organization_id ?? '',selectedRepository?.repositoryId, selectedBranchName?.branchName, selectedDate],
@@ -64,20 +65,11 @@ const CommitList = () => {
       !!selectedRepository &&
       !!selectedBranchName &&
       !!selectedDate &&
-      existAccess &&
-      !isLocked,
+      existAccess,
     refetchOnWindowFocus : true,
     staleTime: 1800000,
     gcTime: 3600000,
-    // 커밋 리스트는 자주 변할 수 있으므로 refetch
   });
-
-  useEffect(() => {
-    if (!isLoading && !isLocked) {
-      lock();
-    }
-  }, [isLoading, isLocked, lock]);
-
 
   const commits = commitData?.data?.commits ?? [];
 
@@ -113,8 +105,9 @@ const CommitList = () => {
     router.push('/generate');
   };
 
+
   const canShowGenerateButton =
-    selectedRepository && selectedBranchName && selectedDate;
+    commits.length > 0 && selectedRepository && selectedBranchName && selectedDate;
 
   return (
     <div className="commit-list">

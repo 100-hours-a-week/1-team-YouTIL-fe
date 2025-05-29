@@ -1,12 +1,12 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useFetch } from '@/hooks/useFetch';
 import useGetAccessToken from '@/hooks/useGetAccessToken';
 import './SelectOrganizationModal.scss';
-import { useUserOrganizationStore } from '@/store/userOrganizationStore';
 import useCheckAccess from '@/hooks/useCheckExistAccess';
+import { useDraftSelectionStore } from '@/store/useDraftSelectionStore';
 
 interface Organization {
   organization_id: number;
@@ -27,50 +27,40 @@ interface Props {
 const SelectOrganizationModal = ({ onClose, onComplete }: Props) => {
   const { callApi } = useFetch();
   const accessToken = useGetAccessToken();
-
   const existAccess = useCheckAccess(accessToken);
-  const setSelectedOrganization = useUserOrganizationStore((state) => state.setSelectedOrganization);
+
+  const { setDraftOrg } = useDraftSelectionStore.getState();
 
   const [selectedOrgId, setSelectedOrgId] = useState<number | null>(null);
   const [noSelection, setNoSelection] = useState(false);
 
-
-  const { data: organizations = [], isLoading} = useQuery<Organization[]>({
-    queryKey: ['organization'] as const,
+  const { data: organizations = [], isLoading } = useQuery<Organization[]>({
+    queryKey: ['organization'],
     queryFn: async () => {
       const response = await callApi<OrganizationResponse>({
         method: 'GET',
         endpoint: '/github/organization',
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
+        headers: { Authorization: `Bearer ${accessToken}` },
         credentials: 'include',
       });
       return response.data.organizations;
     },
     enabled: existAccess,
     staleTime: 6 * 3600000,
-    gcTime: 6 * 3600000,
-    // 조직은 거의 변하지 않으므로 refetch 및 수동 갱신 x
+    gcTime: 3600000,
   });
-
-  useEffect(() => {
-    if (noSelection) setSelectedOrganization(null);
-  }, [noSelection, setSelectedOrganization]);
-  
-  useEffect(() => {
-    if (selectedOrgId !== null) {
-      const selected = organizations.find((org) => org.organization_id === selectedOrgId);
-      if (selected) setSelectedOrganization(selected);
-    }
-  }, [selectedOrgId, organizations, setSelectedOrganization]);
 
   const handleSelect = (org: Organization) => {
     if (selectedOrgId === org.organization_id) {
       setSelectedOrgId(null);
+      setDraftOrg(null);
     } else {
       setSelectedOrgId(org.organization_id);
       setNoSelection(false);
+      setDraftOrg({
+        organization_id: org.organization_id,
+        organization_name: org.organization_name,
+      });
     }
   };
 
@@ -79,11 +69,11 @@ const SelectOrganizationModal = ({ onClose, onComplete }: Props) => {
       const next = !prev;
       if (next) {
         setSelectedOrgId(null);
+        setDraftOrg(null);
       }
       return next;
     });
-  };
-
+  }
 
   const isCompleteEnabled = noSelection || selectedOrgId !== null;
 

@@ -1,7 +1,7 @@
 'use client';
 
 import './WelcomeDescription.scss';
-import useUserInfoStore from '@/store/userInfoStore';
+import useUserInfoStore from '@/store/useUserInfoStore';
 
 const WelcomeDescription = () => {
   const { userInfo } = useUserInfoStore();

@@ -1,7 +1,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import useAuthStore from '@/store/authStore';
+import useAuthStore from '@/store/useAuthStore';
 import './HeaderLogoutButton.scss';
 
 const HeaderLogoutButton = () => {

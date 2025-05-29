@@ -2,7 +2,6 @@
 
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
-import backicon from 'public/backicon.png';
 import './HeaderBackButton.scss';
 
 const HeaderBackButton = () => {
@@ -16,7 +15,7 @@ const HeaderBackButton = () => {
     <div className="back-icon">
       <button onClick={handleBack} className="back-icon__button">
         <Image
-          src={backicon}
+          src="/images/backspace.png"
           alt="backicon"
           width={50}
           height={50}

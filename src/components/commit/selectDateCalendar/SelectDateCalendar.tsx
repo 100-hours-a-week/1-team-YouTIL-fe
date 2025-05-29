@@ -17,12 +17,10 @@ import {
   parseISO,
 } from 'date-fns';
 import './SelectDateCalendar.scss';
-import { useSelectedDateStore } from '@/store/userDateStore';
-import { useCommitQueryGuardStore } from '@/store/useCommitQueryGuardStore';
+import { useSelectedDateStore } from '@/store/useDateStore';
 
 const SelectDateCalendar = () => {
   const { selectedDate: storedDate, setSelectedDate } = useSelectedDateStore();
-  const unlockCommitQuery = useCommitQueryGuardStore((state) => state.unlock);
 
   const parsedStoredDate = storedDate ? parseISO(storedDate) : null;
   const today = new Date();
@@ -33,8 +31,7 @@ const SelectDateCalendar = () => {
   useEffect(() => {
     const formatted = format(selectedDate, 'yyyy-MM-dd');
     setSelectedDate(formatted);
-    unlockCommitQuery();
-  }, [selectedDate, setSelectedDate, unlockCommitQuery]);
+  }, [selectedDate, setSelectedDate]);
 
   const renderHeader = () => (
     <div className="calendar__header">
