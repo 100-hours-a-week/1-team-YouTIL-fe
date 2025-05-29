@@ -26,7 +26,7 @@ jobs:
           version: 10.10.0
 
       - name: Set Docker Image Tag
-        run: echo "IMAGE_TAG=asia-northeast3-docker.pkg.dev/youtil-459304/youtil-docker-registry/fe:$(date +%Y%m%d-%H%M%S)" >> $GITHUB_ENV
+        run: echo "IMAGE_TAG=asia-northeast3-docker.pkg.dev/youtil-459304/youtil-docker-registry/youtil-fe-prod:$(date +%Y%m%d-%H%M%S)" >> $GITHUB_ENV
 
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v2
