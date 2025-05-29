@@ -1,11 +1,11 @@
 name: FE Docker CD Prod
 
 on:
-    workflow_run:
-      workflows: ["FE Docker CI PROD"]
-      types:
-        - completed
-    workflow_dispatch:
+  workflow_run:
+    workflows: ["FE Docker CI PROD"]
+    types:
+      - completed
+  workflow_dispatch:
 
 jobs:
   deploy:
@@ -23,14 +23,13 @@ jobs:
 
       - name: Deploy via SSH
         run: |
-          ssh -i key.pem -o StrictHostKeyChecking=no ubuntu@${{ secrets.YOUTIL_PROD_HOST }} << 'EOF'
-            docker pull ${{ env.IMAGE_TAG }}
+          ssh -i key.pem -o StrictHostKeyChecking=no ubuntu@${{ secrets.YOUTIL_PROD_HOST }} << EOF
+            docker pull $IMAGE_TAG
 
-            docker stop youtil-fe-prod
-            docker rm youtil-fe-prod
+            docker stop youtil-fe-prod || true
+            docker rm youtil-fe-prod || true
 
             docker run -d --name youtil-fe-prod \
               -p 3001:3001 \
-              --env-file /home/ubuntu/env/fe.env \
-              ${{ env.IMAGE_TAG }}
+              $IMAGE_TAG
           EOF
