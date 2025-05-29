@@ -26,8 +26,8 @@ jobs:
           ssh -i key.pem -o StrictHostKeyChecking=no ubuntu@${{ secrets.YOUTIL_PROD_HOST }} << 'EOF'
             docker pull ${{ env.IMAGE_TAG }}
 
-            docker stop youtil-fe-prod || true
-            docker rm youtil-fe-prod || true
+            docker stop youtil-fe-prod
+            docker rm youtil-fe-prod
 
             docker run -d --name youtil-fe-prod \
               -p 3001:3001 \
