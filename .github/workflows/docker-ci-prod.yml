@@ -42,6 +42,9 @@ jobs:
       - name: Configure Docker to use GCP Artifact Registry
         run: gcloud auth configure-docker asia-northeast3-docker.pkg.dev
 
+      - name: Create .env.production file
+        run: echo "${{ secrets.ENV_PROD }}" > .env
+
       - name: Build Docker Image
         run: docker build -t ${{ env.IMAGE_TAG }} -t ${{ env.IMAGE_LATEST }} .
 
