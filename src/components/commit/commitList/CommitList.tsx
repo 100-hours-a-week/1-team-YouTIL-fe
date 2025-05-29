@@ -32,24 +32,25 @@ const CommitList = () => {
   const { callApi } = useFetch();
   const accessToken = useGetAccessToken();
   const existAccess = useCheckAccess(accessToken);
-  
+
+  const MAX_SELECTABLE_COMMITS = 5;
   const selectedOrganizaion = useOrganizationStore((state) => state.selectedOrganization);
   const selectedRepository = useRepositoryStore((state) => state.selectedRepository);
   const selectedBranchName = useBranchStore((state) => state.selectedBranch);
   const selectedDate = useSelectedDateStore((state) => state.selectedDate);
-  
-  const [selectedIndexes, setSelectedIndexes] = useState<number[]>([]);
-  const [userSelectedCommits, setUserSelectedCommits] = useState<Commit[]>([]);
+
+  const [selectedCommitIndexes, setSelectedCommitIndexes] = useState<number[]>([]);
+  const [selectedCommitsPreview, setSelectedCommitsPreview] = useState<Commit[]>([]);
   const [shake, setShake] = useState(false);
   const [shakeIndex, setShakeIndex] = useState<number | null>(null);
 
   useEffect(() => {
-    setSelectedIndexes([]);
-    setUserSelectedCommits([]);
+    setSelectedCommitIndexes([]);
+    setSelectedCommitsPreview([]);
   }, [selectedDate]);
 
   const { data: commitData, isLoading } = useQuery({
-    queryKey: ['commits',selectedOrganizaion?.organization_id ?? '',selectedRepository?.repositoryId, selectedBranchName?.branchName, selectedDate],
+    queryKey: ['commits', selectedOrganizaion?.organization_id ?? '', selectedRepository?.repositoryId, selectedBranchName?.branchName, selectedDate],
     queryFn: async () => {
       const response = await callApi<CommitDetailResponse>({
         method: 'GET',
@@ -61,50 +62,66 @@ const CommitList = () => {
       });
       return response;
     },
-    enabled:
-      !!selectedRepository &&
-      !!selectedBranchName &&
-      !!selectedDate &&
-      existAccess,
-    refetchOnWindowFocus : true,
+    enabled: !!selectedRepository && !!selectedBranchName && !!selectedDate && existAccess,
+    refetchOnWindowFocus: true,
     staleTime: 1800000,
     gcTime: 3600000,
   });
 
   const commits = commitData?.data?.commits ?? [];
 
-  const toggleSelection = (index: number) => {
-    const selectedCommit = commits[index];
-    if (!selectedCommit) return;
+  const isCommitSelectable = (index: number) => {
+    return !!commits[index];
+  };
 
-    setSelectedIndexes((prev) => {
-      let next;
-      if (prev.includes(index)) {
-        next = prev.filter((i) => i !== index);
-      } else {
-        if (prev.length >= 5) {
-          setShakeIndex(index);
-          setTimeout(() => setShakeIndex(null), 500);
-          return prev;
-        }
-        next = [...prev, index];
-      }
-      const selected = next.map((i) => commits[i]);
-      setUserSelectedCommits(selected);
+  const isCommitAlreadySelected = (index: number, selectedIndexes: number[]) => {
+    return selectedIndexes.includes(index);
+  };
+
+  const getNextCommitIndexes = (index: number, selectedIndexes: number[]): number[] | null => {
+    if (isCommitAlreadySelected(index, selectedIndexes)) {
+      return selectedIndexes.filter((i) => i !== index);
+    }
+
+    if (selectedIndexes.length >= MAX_SELECTABLE_COMMITS) {
+      triggerShakeAt(index);
+      return null;
+    }
+
+    return [...selectedIndexes, index];
+  };
+
+  const triggerShakeAt = (index: number) => {
+    setShakeIndex(index);
+    setTimeout(() => setShakeIndex(null), 500);
+  };
+
+  const updateSelectedCommitsPreview = (indexes: number[]) => {
+    const selected = indexes.map((i) => commits[i]);
+    setSelectedCommitsPreview(selected);
+  };
+
+  const handleCommitClick = (index: number) => {
+    if (!isCommitSelectable(index)) return;
+
+    setSelectedCommitIndexes((prev) => {
+      const next = getNextCommitIndexes(index, prev);
+      if (!next) return prev;
+
+      updateSelectedCommitsPreview(next);
       return next;
     });
   };
 
   const handleGenerateClick = () => {
-    if (userSelectedCommits.length === 0) {
+    if (selectedCommitsPreview.length === 0) {
       setShake(true);
       setTimeout(() => setShake(false), 500);
       return;
     }
-    setSelectedCommits(userSelectedCommits);
+    setSelectedCommits(selectedCommitsPreview);
     router.push('/generate');
   };
-
 
   const canShowGenerateButton =
     commits.length > 0 && selectedRepository && selectedBranchName && selectedDate;
@@ -137,9 +154,9 @@ const CommitList = () => {
             <li
               key={idx}
               className={`commit-list__item
-                ${selectedIndexes.includes(idx) ? 'commit-list__item--selected' : ''}
+                ${selectedCommitIndexes.includes(idx) ? 'commit-list__item--selected' : ''}
                 ${shakeIndex === idx ? 'error shake' : ''}`}
-              onClick={() => toggleSelection(idx)}
+              onClick={() => handleCommitClick(idx)}
             >
               {commit.commit_message}
             </li>
