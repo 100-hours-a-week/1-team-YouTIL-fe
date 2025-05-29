@@ -1,5 +1,5 @@
 .layout {
-  &-container {
+  &__container {
     width: 100%;
     min-height: 100vh;
     height: auto;
@@ -20,7 +20,6 @@
   }
 
   @media (max-width: 500px) {
-
     &__frame {
       width: 500px;
       margin: 0;
@@ -31,7 +30,7 @@
   }
 }
 
-main {
+.layout__main {
   display: block;
   min-height: 100%;
   height: auto;

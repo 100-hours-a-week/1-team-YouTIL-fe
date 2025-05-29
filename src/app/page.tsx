@@ -7,10 +7,10 @@ import useAuthStore from '@/store/authStore';
 import useUserInfoStore from '@/store/userInfoStore';
 
 import Heatmap from '@/components/main/heatmap/Heatmap';
-import TILRecordDescription from '@/components/description/TILRecordDescription/TILRecordDescription';
-import WelcomeDescription from '@/components/description/welcomeDescription/WelcomeDescription';
+import TILRecordDescription from '@/components/main/TILRecordDescription/TILRecordDescription';
+import WelcomeDescription from '@/components/main/welcomeDescription/WelcomeDescription';
 import TechNews from '@/components/main/techNews/TechNews';
-import NewTILDescription from '@/components/description/newTILDescription/NewTILDescription';
+import NewTILDescription from '@/components/main/newTILDescription/NewTILDescription';
 import NewTILList from '@/components/main/newTILList/NewTILList';
 import useCheckAccess from '@/hooks/useCheckExistAccess';
 

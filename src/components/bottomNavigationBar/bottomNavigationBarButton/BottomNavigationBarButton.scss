@@ -1,22 +1,21 @@
-
-  
 .nav-button {
   display: flex;
   justify-content: center;
-  padding: 6px 8px;
+  align-items: center;
   background-color: #ffffff;
   font-size: 14px;
   color: #333;
   text-decoration: none;
-  transition: all 0.2s ease;
   width: 100%;
-    &:hover {
-      background-color: #f0f0f0;
-      border-color: #aaa;
-    }
-  
-    &:active {
-      transform: scale(0.98);
-    }
+  height: 40px;
+  text-align: center;
+  margin-bottom: 24px;
+
+  &:hover {
+    background-color: #5FC9F8;
   }
-  
+
+  &:active {
+    transform: scale(0.98);
+  }
+}

@@ -1,10 +1,12 @@
-.header-place {
-  margin-top: 10px;
-  margin-bottom: 30px;
-  .header-button {
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
-    height: 100%; 
+.header {
+    &__place{
+      margin-top: 10px;
+      margin-bottom: 30px;
+    }
+    &__button {
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      height: 100%; 
   }
 }
