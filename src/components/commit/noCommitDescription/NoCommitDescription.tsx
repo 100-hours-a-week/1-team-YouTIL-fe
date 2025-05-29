@@ -1,7 +1,6 @@
 'use client';
 
 import Image from 'next/image';
-import sad from 'public/sad.png';
 import './NoCommitDescription.scss';
 
 const NoCommitDescription = () => {
@@ -9,7 +8,7 @@ const NoCommitDescription = () => {
     <div className="no-commit">
       <Image
         className="no-commit__image"
-        src={sad}
+        src="/images/youtilSadLogo.png"
         alt="nocommit"
         width={60}
         height={80}

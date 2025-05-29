@@ -1,7 +1,4 @@
 'use client';
-
-import logindescription from 'public/logindescription.png';
-import introduction from 'public/introduction.png';
 import Image from 'next/image';
 import './LoginPageIntro.scss';
 
@@ -9,7 +6,7 @@ const LoginPageIntro = () => {
   return (
     <div className="login-intro">
       <Image
-        src={logindescription}
+        src="/images/loginDescription.png"
         alt="YouTIL Login"
         width={600}
         height={165}
@@ -18,7 +15,7 @@ const LoginPageIntro = () => {
       />
 
       <Image
-        src={introduction}
+        src="/images/loginIntroduction.png"
         alt="youTIL introduction"
         width={300}
         height={165}
