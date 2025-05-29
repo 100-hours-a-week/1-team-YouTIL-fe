@@ -2,9 +2,9 @@
 
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { useUserOrganizationStore } from '@/store/userOrganizationStore';
-import { useUserRepositoryStore } from '@/store/userRepositoryStore';
-import { useUserBranchStore } from '@/store/userBranchStore';
+import { useOrganizationStore } from '@/store/useOrganizationStore';
+import { useRepositoryStore } from '@/store/useRepositoryStore';
+import { useBranchStore } from '@/store/useBranchStore';
 import { useFetch } from '@/hooks/useFetch';
 import useCheckAccess from '@/hooks/useCheckExistAccess';
 import useGetAccessToken from '@/hooks/useGetAccessToken';
@@ -31,9 +31,9 @@ const SelectBranchModal = ({ onClose }: Props) => {
   const draftBranch = useDraftSelectionStore((state) => state.draftBranch);
 
   const setDraftBranch = useDraftSelectionStore((state) => state.setDraftBranch);
-  const setSelectedBranch = useUserBranchStore((state) => state.setSelectedBranch);
-  const setSelectedOrganization = useUserOrganizationStore((state) => state.setSelectedOrganization);
-  const setSelectedRepository = useUserRepositoryStore((state) => state.setSelectedRepository);
+  const setSelectedBranch = useBranchStore((state) => state.setSelectedBranch);
+  const setSelectedOrganization = useOrganizationStore((state) => state.setSelectedOrganization);
+  const setSelectedRepository = useRepositoryStore((state) => state.setSelectedRepository);
 
   const { callApi } = useFetch();
   const accessToken = useGetAccessToken();

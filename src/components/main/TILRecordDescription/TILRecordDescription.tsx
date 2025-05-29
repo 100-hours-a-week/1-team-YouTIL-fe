@@ -1,7 +1,7 @@
 'use client';
 
 import './TILRecordDescription.scss';
-import useUserInfoStore from '@/store/userInfoStore';
+import useUserInfoStore from '@/store/useUserInfoStore';
 
 const TILRecordDescription = () => {
   const { userInfo } = useUserInfoStore();

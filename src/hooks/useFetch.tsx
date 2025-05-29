@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import useAuthStore from '@/store/authStore';
+import useAuthStore from '@/store/useAuthStore';
 
 type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE';
 

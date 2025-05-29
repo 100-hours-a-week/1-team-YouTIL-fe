@@ -1,10 +1,10 @@
 'use client';
 
 import './GenerateTILForm.scss';
-import { useSelectedCommitListStore } from '@/store/selectedCommitListStore';
-import { useUserOrganizationStore } from '@/store/userOrganizationStore';
-import { useUserRepositoryStore } from '@/store/userRepositoryStore';
-import { useUserBranchStore } from '@/store/userBranchStore';
+import { useSelectedCommitListStore } from '@/store/useSelectedCommitListStore';
+import { useOrganizationStore } from '@/store/useOrganizationStore';
+import { useRepositoryStore } from '@/store/useRepositoryStore';
+import { useBranchStore } from '@/store/useBranchStore';
 import useGetAccessToken from '@/hooks/useGetAccessToken';
 import { useFetch } from '@/hooks/useFetch';
 import { useState } from 'react';
@@ -31,9 +31,9 @@ const GenerateTILForm = () => {
   const { callApi } = useFetch();
   const queryClient = useQueryClient();
 
-  const selectedOrganization = useUserOrganizationStore((state) => state.selectedOrganization);
-  const selectedRepository = useUserRepositoryStore((state) => state.selectedRepository);
-  const selectedBranch = useUserBranchStore((state) => state.selectedBranch);
+  const selectedOrganization = useOrganizationStore((state) => state.selectedOrganization);
+  const selectedRepository = useRepositoryStore((state) => state.selectedRepository);
+  const selectedBranch = useBranchStore((state) => state.selectedBranch);
   const accessToken = useGetAccessToken();
 
   const [title, setTitle] = useState('');

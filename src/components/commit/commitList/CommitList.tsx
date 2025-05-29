@@ -3,11 +3,11 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
-import { useSelectedCommitListStore } from '@/store/selectedCommitListStore';
-import { useUserOrganizationStore } from '@/store/userOrganizationStore';
-import { useUserRepositoryStore } from '@/store/userRepositoryStore';
-import { useUserBranchStore } from '@/store/userBranchStore';
-import { useSelectedDateStore } from '@/store/userDateStore';
+import { useSelectedCommitListStore } from '@/store/useSelectedCommitListStore';
+import { useOrganizationStore } from '@/store/useOrganizationStore';
+import { useRepositoryStore } from '@/store/useRepositoryStore';
+import { useBranchStore } from '@/store/useBranchStore';
+import { useSelectedDateStore } from '@/store/useDateStore';
 import { useFetch } from '@/hooks/useFetch';
 
 import useCheckAccess from '@/hooks/useCheckExistAccess';
@@ -33,9 +33,9 @@ const CommitList = () => {
   const accessToken = useGetAccessToken();
   const existAccess = useCheckAccess(accessToken);
   
-  const selectedOrganizaion = useUserOrganizationStore((state) => state.selectedOrganization);
-  const selectedRepository = useUserRepositoryStore((state) => state.selectedRepository);
-  const selectedBranchName = useUserBranchStore((state) => state.selectedBranch);
+  const selectedOrganizaion = useOrganizationStore((state) => state.selectedOrganization);
+  const selectedRepository = useRepositoryStore((state) => state.selectedRepository);
+  const selectedBranchName = useBranchStore((state) => state.selectedBranch);
   const selectedDate = useSelectedDateStore((state) => state.selectedDate);
   
   const [selectedIndexes, setSelectedIndexes] = useState<number[]>([]);

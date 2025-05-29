@@ -17,7 +17,7 @@ import {
   parseISO,
 } from 'date-fns';
 import './SelectDateCalendar.scss';
-import { useSelectedDateStore } from '@/store/userDateStore';
+import { useSelectedDateStore } from '@/store/useDateStore';
 
 const SelectDateCalendar = () => {
   const { selectedDate: storedDate, setSelectedDate } = useSelectedDateStore();

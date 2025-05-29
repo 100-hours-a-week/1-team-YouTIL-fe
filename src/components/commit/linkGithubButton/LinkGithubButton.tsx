@@ -6,16 +6,16 @@ import SelectRepositoryModal from '../selectRepositoryModal/SelectRepositoryModa
 import SelectBranchModal from '../selectBranchModal/SelectBranchModal';
 import './LinkGithubButton.scss';
 
-import { useUserRepositoryStore } from '@/store/userRepositoryStore';
-import { useUserBranchStore } from '@/store/userBranchStore';
+import { useRepositoryStore } from '@/store/useRepositoryStore';
+import { useBranchStore } from '@/store/useBranchStore';
 
 const LinkGithubButton = () => {
   const [organizationModalOpen, setOrganizationModalOpen] = useState(false);
   const [repositoryModalOpen, setRepositoryModalOpen] = useState(false);
   const [branchModalOpen, setBranchModalOpen] = useState(false);
 
-  const selectedRepository = useUserRepositoryStore((state) => state.selectedRepository);
-  const selectedBranchName = useUserBranchStore((state) => state.selectedBranch);
+  const selectedRepository = useRepositoryStore((state) => state.selectedRepository);
+  const selectedBranchName = useBranchStore((state) => state.selectedBranch);
 
   const handleOpenOrganizationModal = () => {
     setOrganizationModalOpen(true);
