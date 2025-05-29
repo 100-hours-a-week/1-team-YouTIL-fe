@@ -22,10 +22,6 @@ interface DraftSelectionState {
   setDraftOrg: (org: DraftOrganization | null) => void;
   setDraftRepo: (repo: DraftRepository | null) => void;
   setDraftBranch: (branch: DraftBranch | null) => void;
-
-  setOrgAndReset: (org: DraftOrganization | null) => void;
-
-  resetDraft: () => void;
 }
 
 export const useDraftSelectionStore = create<DraftSelectionState>((set) => ({
@@ -36,18 +32,4 @@ export const useDraftSelectionStore = create<DraftSelectionState>((set) => ({
   setDraftOrg: (org) => set({ draftOrg: org }),
   setDraftRepo: (repo) => set({ draftRepo: repo }),
   setDraftBranch: (branch) => set({ draftBranch: branch }),
-
-  setOrgAndReset: (org) =>
-    set({
-      draftOrg: org,
-      draftRepo: null,
-      draftBranch: null,
-    }),
-
-  resetDraft: () =>
-    set({
-      draftOrg: null,
-      draftRepo: null,
-      draftBranch: null,
-    }),
 }));

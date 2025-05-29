@@ -29,7 +29,7 @@ const SelectOrganizationModal = ({ onClose, onComplete }: Props) => {
   const accessToken = useGetAccessToken();
   const existAccess = useCheckAccess(accessToken);
 
-  const { setOrgAndReset, setDraftOrg, resetDraft } = useDraftSelectionStore.getState();
+  const { setDraftOrg } = useDraftSelectionStore.getState();
 
   const [selectedOrgId, setSelectedOrgId] = useState<number | null>(null);
   const [noSelection, setNoSelection] = useState(false);
@@ -57,7 +57,7 @@ const SelectOrganizationModal = ({ onClose, onComplete }: Props) => {
     } else {
       setSelectedOrgId(org.organization_id);
       setNoSelection(false);
-      setOrgAndReset({
+      setDraftOrg({
         organization_id: org.organization_id,
         organization_name: org.organization_name,
       });
@@ -69,11 +69,11 @@ const SelectOrganizationModal = ({ onClose, onComplete }: Props) => {
       const next = !prev;
       if (next) {
         setSelectedOrgId(null);
-        resetDraft();
+        setDraftOrg(null);
       }
       return next;
     });
-  };
+  }
 
   const isCompleteEnabled = noSelection || selectedOrgId !== null;
 
