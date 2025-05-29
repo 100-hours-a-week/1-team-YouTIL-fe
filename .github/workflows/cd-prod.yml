@@ -5,6 +5,7 @@ on:
     workflows: ["FE CI PROD"]
     types:
       - completed
+  workflow_dispatch:
 
 jobs:
   cd:
