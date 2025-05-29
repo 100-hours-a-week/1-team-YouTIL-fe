@@ -2,12 +2,11 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
-import { useUserOrganizationStore } from '@/store/userOrganizationStore';
-import { useUserRepositoryStore } from '@/store/userRepositoryStore';
 import { useFetch } from '@/hooks/useFetch';
 import useGetAccessToken from '@/hooks/useGetAccessToken';
 import useCheckAccess from '@/hooks/useCheckExistAccess';
 import './SelectRepositoryModal.scss';
+import { useDraftSelectionStore } from '@/store/useDraftSelectionStore';
 
 interface Repository {
   repositoryId: number;
@@ -26,22 +25,22 @@ interface Props {
 }
 
 const SelectRepositoryModal = ({ onClose, onComplete }: Props) => {
-  const selectedOrg = useUserOrganizationStore((state) => state.selectedOrganization);
-  const setRepository = useUserRepositoryStore((state) => state.setRepository);
   const { callApi } = useFetch();
   const accessToken = useGetAccessToken();
   const existAccess = useCheckAccess(accessToken);
+
+  const draftOrg = useDraftSelectionStore((state) => state.draftOrg);
+  const setDraftRepo = useDraftSelectionStore((state) => state.setDraftRepo);
+
   const [selectedRepositoryId, setSelectedRepositoryId] = useState<number | null>(null);
 
-  const { data: repositories = [], isLoading, } = useQuery<Repository[]>({
-    queryKey: ['repository', selectedOrg?.organization_id ?? ''] as const,
+  const { data: repositories = [], isLoading } = useQuery<Repository[]>({
+    queryKey: ['repository', draftOrg?.organization_id ?? ''],
     queryFn: async () => {
       const response = await callApi<RepositoryResponse>({
         method: 'GET',
-        endpoint: `/github/repositories?organizationId=${selectedOrg ? selectedOrg.organization_id : ''}`,
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
+        endpoint: `/github/repositories?organizationId=${draftOrg ? draftOrg.organization_id : ''}`,
+        headers: { Authorization: `Bearer ${accessToken}` },
         credentials: 'include',
       });
       return response.data.repositories;
@@ -49,16 +48,18 @@ const SelectRepositoryModal = ({ onClose, onComplete }: Props) => {
     enabled: existAccess,
     staleTime: 3600000,
     gcTime: 3600000,
-    // 레포지토리 역시 자주 변하지 않으므로 refetch 및 수동 갱신x
   });
 
   const handleSelect = (repo: Repository) => {
     if (selectedRepositoryId === repo.repositoryId) {
       setSelectedRepositoryId(null);
-    } 
-    else {
+      setDraftRepo(null);
+    } else {
       setSelectedRepositoryId(repo.repositoryId);
-      setRepository(repo);
+      setDraftRepo({
+        repositoryId: repo.repositoryId,
+        repositoryName: repo.repositoryName,
+      });
     }
   };
 

@@ -69,9 +69,7 @@ const CommitList = () => {
     refetchOnWindowFocus : true,
     staleTime: 1800000,
     gcTime: 3600000,
-    // 커밋 리스트는 자주 변할 수 있으므로 refetch
   });
-
 
   const commits = commitData?.data?.commits ?? [];
 

@@ -8,26 +8,16 @@ import './LinkGithubButton.scss';
 
 import { useUserRepositoryStore } from '@/store/userRepositoryStore';
 import { useUserBranchStore } from '@/store/userBranchStore';
-import { useDisplayedRepoNameStore } from '@/store/displayedRepoNameStore';
-import { useUserOrganizationStore } from '@/store/userOrganizationStore';
 
 const LinkGithubButton = () => {
   const [organizationModalOpen, setOrganizationModalOpen] = useState(false);
   const [repositoryModalOpen, setRepositoryModalOpen] = useState(false);
   const [branchModalOpen, setBranchModalOpen] = useState(false);
-  
-  const { clearBranch } = useUserBranchStore((state) => state);
-  const {clearRepository} = useUserRepositoryStore((state) => state);
-  const {clearOrganization} = useUserOrganizationStore((state) => state);
 
-  const selectedRepo = useUserRepositoryStore((state) => state.selectedRepository);
+  const selectedRepository = useUserRepositoryStore((state) => state.selectedRepository);
   const selectedBranchName = useUserBranchStore((state) => state.selectedBranch);
-  const displayedRepoName = useDisplayedRepoNameStore((state) => state.repoName);
 
   const handleOpenOrganizationModal = () => {
-    clearOrganization();
-    clearRepository();
-    clearBranch();
     setOrganizationModalOpen(true);
   };
 
@@ -55,9 +45,9 @@ const LinkGithubButton = () => {
 
   return (
     <>
-      {selectedRepo && selectedBranchName? (
+      {selectedRepository && selectedBranchName? (
         <div className="link-github-button__info">
-          <span className="link-github-button__repo-name">{displayedRepoName}</span>
+          <span className="link-github-button__repo-name">{selectedRepository.repositoryName}</span>
           <button
             className="link-github-button__change"
             onClick={handleOpenOrganizationModal}
