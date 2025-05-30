@@ -6,7 +6,7 @@ export const metadata: Metadata = {
   title: "YouTIL",
   description: "YouTIL",
   icons:{
-    icon: '/favicon.png'
+    icon: '/images/favicon.png'
   }
 };
 
