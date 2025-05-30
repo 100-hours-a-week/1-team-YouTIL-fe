@@ -7,15 +7,26 @@ interface AuthState {
   clearAuth: () => void;
 }
 
+const LOCAL_STORAGE_KEY = 'accessToken';
+const SESSION_STORAGE_KEY = 'oauthState';
 const useAuthStore = create<AuthState>()(
   persist(
     (set) => ({
       accessToken: null,
+
       setAccessToken: (token: string) => set({ accessToken: token }),
-      clearAuth: () => set({ accessToken: null }),
+
+      clearAuth: () => {
+        set({ accessToken: null });
+
+        if (typeof window !== 'undefined') {
+          localStorage.removeItem(LOCAL_STORAGE_KEY);
+          sessionStorage.removeItem(SESSION_STORAGE_KEY);
+        }
+      },
     }),
     {
-      name: 'accessToken',
+      name: LOCAL_STORAGE_KEY,
       storage: {
         getItem: (name) => {
           const token = localStorage.getItem(name);

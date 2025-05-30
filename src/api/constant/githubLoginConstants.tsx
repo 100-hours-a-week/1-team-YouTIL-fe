@@ -5,7 +5,7 @@ export const GITHUB_AUTH_SCOPE =
 
   export const getGithubAuthUrl = (clientId: string) => {
     const state = generateState();
-    sessionStorage.setItem('oauth_state', state);
+    sessionStorage.setItem('oauthState', state);
   
     return `https://github.com/login/oauth/authorize?client_id=${clientId}&scope=${encodeURIComponent(
       GITHUB_AUTH_SCOPE

@@ -13,12 +13,13 @@ const GithubLoginButton = () => {
   useEffect(() => {
     const code = searchParams.get('code');
     const returnedState = searchParams.get('state');
-    const expectedState = sessionStorage.getItem('oauth_state');
+    const expectedState = sessionStorage.getItem('oauthState');
 
     if (!code) return;
 
     if (!expectedState || returnedState !== expectedState) {
       console.log('state 검증 실패');
+      router.replace('/login');
       return;
     }
     
