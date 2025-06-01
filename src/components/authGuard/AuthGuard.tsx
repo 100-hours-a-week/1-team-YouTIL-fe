@@ -40,7 +40,7 @@ const AuthGuard = ({ children }: AuthGuardProps) => {
               }
             );
             console.log("response = ", response);
-            const newAccessToken = response.headers.get('Authorization')?.replace('Bearer ', '');
+            const newAccessToken = response.headers.get('authorization')?.replace('Bearer ', '');
             console.log("newAccessToken = ", newAccessToken)
             if (newAccessToken) {
               setAccessToken(newAccessToken);
@@ -48,18 +48,18 @@ const AuthGuard = ({ children }: AuthGuardProps) => {
               return;
             }
 
-            router.replace('/login');
+            //router.replace('/login');
           } catch {
-            router.replace('/login');
+            //router.replace('/login');
           }
         } else {
-          router.replace('/login');
+          //router.replace('/login');
         }
       } finally {
         setIsChecked(true);
       }
     };
-
+    console.log("isChecked = ", isChecked, "isAuthenticated = ", isAuthenticated)
     checkAuth();
   }, [callApi, router, setAccessToken]);
 
