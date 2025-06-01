@@ -2,7 +2,6 @@
 
 import './page.scss';
 import { useQuery } from '@tanstack/react-query';
-import { useFetch } from '@/hooks/useFetch';
 import useAuthStore from '@/store/useAuthStore';
 import useUserInfoStore from '@/store/useUserInfoStore';
 
@@ -37,7 +36,7 @@ const Main = () => {
     });
 
     if (res.status === 401) {
-      throw { code: 401 };
+      throw { code: 401 as const };
     }
 
     if (!res.ok) {
@@ -54,8 +53,13 @@ const Main = () => {
     const token = accessToken ?? '';
     try {
       return await fetchUserInfo(token);
-    } catch (err: any) {
-      if (err.code === 401) {
+    } catch (err: unknown) {
+      if (
+        typeof err === 'object' &&
+        err !== null &&
+        'code' in err &&
+        (err as { code: number }).code === 401
+      ) {
         const refreshRes = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/users?userId=`, {
           method: 'GET',
           credentials: 'include',
