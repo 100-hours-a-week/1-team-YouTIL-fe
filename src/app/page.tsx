@@ -50,11 +50,12 @@ const Main = () => {
     };
 
     const fetchUserInfoWithRetry = async () => {
+      console.log("asdf");
       try {
         // 1차 요청
         await fetchUserInfoWithToken(accessToken ?? '');
       } catch (error) {
-        if (error instanceof Error && error.message.startsWith('HTTP 401')) {
+        if (error instanceof Error && error.message.includes('401')) {
           try {
             console.log('accessToken 만료됨, refresh 시도');
 
