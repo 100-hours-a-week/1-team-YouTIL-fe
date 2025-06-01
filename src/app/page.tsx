@@ -27,7 +27,7 @@ const Main = () => {
   const accessToken = useAuthStore((state) => state.accessToken);
   const setAccessToken = useAuthStore((state) => state.setAccessToken);
   const setUserInfo = useUserInfoStore((state) => state.setUserInfo);
-  console.log("cicd 테스트")
+
   const fetchUserInfoWithRetry = async (): Promise<UserInfoResponse['data']> => {
     const token = accessToken ?? '';
     try {
@@ -45,12 +45,13 @@ const Main = () => {
       return result.data;
 
     } catch (err: unknown) {
+      console.log(err);
       if (err instanceof Error && err.message.startsWith('HTTP 401')) {
         const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/users?userId=`, {
           method: 'GET',
           credentials: 'include',
           headers: {
-            Authorization: `Bearer ${token}`,
+            Authorization: `Bearer `,
           },
         });
 
