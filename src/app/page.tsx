@@ -28,69 +28,59 @@ const Main = () => {
   const setAccessToken = useAuthStore((state) => state.setAccessToken);
   const setUserInfo = useUserInfoStore((state) => state.setUserInfo);
 
-  const fetchUserInfo = async (token: string) => {
-    console.log("asdf")
-    const result = await callApi<UserInfoResponse>({
-      method: 'GET',
-      endpoint: '/users?userId=',
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-      credentials: 'include',
-    });
-    const { userId, name, profileUrl, description } = result.data;
-    setUserInfo({ userId, name, profileUrl, description });
-    return result.data;
-  };
+  const fetchUserInfoWithRetry = async (): Promise<UserInfoResponse['data']> => {
+    const token = accessToken ?? '';
+    try {
+      const result = await callApi<UserInfoResponse>({
+        method: 'GET',
+        endpoint: '/users?userId=',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        credentials: 'include',
+      });
 
-  useQuery<UserInfoResponse['data']>({
-    queryKey: ['user-info'],
-    queryFn: async () => {
-      let token = accessToken;
-      console.log("asdf");
-      if (!token) {
+      const { userId, name, profileUrl, description } = result.data;
+      setUserInfo({ userId, name, profileUrl, description });
+      return result.data;
+
+    } catch (err: unknown) {
+      if (err instanceof Error && err.message.startsWith('HTTP 401')) {
         const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/users?userId=`, {
           method: 'GET',
           credentials: 'include',
           headers: {
-            Authorization: `Bearer ${token ?? ''}`,
+            Authorization: `Bearer ${token}`,
           },
         });
-      
-        if (!response.ok) {
-          throw new Error(`HTTP ${response.status}`);
-        }
-        
+
         const newToken = response.headers.get('authorization')?.replace('Bearer ', '');
         if (!newToken) throw new Error('새 accessToken을 받아오지 못했습니다');
-      
+
         setAccessToken(newToken);
-        token = newToken;
+
+        // 새 토큰으로 재요청
+        const retryResult = await callApi<UserInfoResponse>({
+          method: 'GET',
+          endpoint: '/users?userId=',
+          headers: {
+            Authorization: `Bearer ${newToken}`,
+          },
+          credentials: 'include',
+        });
+
+        const { userId, name, profileUrl, description } = retryResult.data;
+        setUserInfo({ userId, name, profileUrl, description });
+        return retryResult.data;
       }
 
-      try {
-        return await fetchUserInfo(token);
-      } catch (err: unknown) {
-        if (err instanceof Error && err.message.startsWith('HTTP 401')) {
-          console.log("asdf")
-          const response = await fetch(
-            `${process.env.NEXT_PUBLIC_BASE_URL}/users?userId=`,
-            {
-              method: 'GET',
-              credentials: 'include',
-            }
-          );
+      throw err;
+    }
+  };
 
-          const newToken = response.headers.get('authorization')?.replace('Bearer ', '');
-          if (!newToken) throw new Error('새 accessToken을 받아오지 못했습니다');
-
-          setAccessToken(newToken);
-          return await fetchUserInfo(newToken);
-        }
-
-        throw err;
-      }
-    },
+  useQuery({
+    queryKey: ['user-info'],
+    queryFn: fetchUserInfoWithRetry,
     staleTime: 3600000,
     gcTime: 3600000,
     refetchOnWindowFocus: false,
