@@ -27,7 +27,7 @@ const Main = () => {
   const accessToken = useAuthStore((state) => state.accessToken);
   const setAccessToken = useAuthStore((state) => state.setAccessToken);
   const setUserInfo = useUserInfoStore((state) => state.setUserInfo);
-
+  console.log("cicd 테스트")
   const fetchUserInfoWithRetry = async (): Promise<UserInfoResponse['data']> => {
     const token = accessToken ?? '';
     try {
