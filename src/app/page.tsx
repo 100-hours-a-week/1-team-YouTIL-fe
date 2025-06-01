@@ -23,56 +23,52 @@ interface UserInfoResponse {
 }
 
 const Main = () => {
-  const { callApi } = useFetch();
   const accessToken = useAuthStore((state) => state.accessToken);
   const setAccessToken = useAuthStore((state) => state.setAccessToken);
   const setUserInfo = useUserInfoStore((state) => state.setUserInfo);
 
+  const fetchUserInfo = async (token: string): Promise<UserInfoResponse['data']> => {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/users?userId=`, {
+      method: 'GET',
+      credentials: 'include',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (res.status === 401) {
+      throw { code: 401 };
+    }
+
+    if (!res.ok) {
+      throw new Error(`HTTP ${res.status}`);
+    }
+
+    const json = await res.json();
+    const { userId, name, profileUrl, description } = json.data;
+    setUserInfo({ userId, name, profileUrl, description });
+    return json.data;
+  };
+
   const fetchUserInfoWithRetry = async (): Promise<UserInfoResponse['data']> => {
     const token = accessToken ?? '';
     try {
-      const result = await callApi<UserInfoResponse>({
-        method: 'GET',
-        endpoint: '/users?userId=',
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        credentials: 'include',
-      });
-
-      const { userId, name, profileUrl, description } = result.data;
-      setUserInfo({ userId, name, profileUrl, description });
-      return result.data;
-
-    } catch (err: unknown) {
-      console.log(err);
-      if (err instanceof Error && err.message.startsWith('HTTP 401')) {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/users?userId=`, {
+      return await fetchUserInfo(token);
+    } catch (err: any) {
+      if (err.code === 401) {
+        const refreshRes = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/users?userId=`, {
           method: 'GET',
           credentials: 'include',
           headers: {
-            Authorization: `Bearer `,
+            Authorization: 'Bearer ',
           },
         });
 
-        const newToken = response.headers.get('authorization')?.replace('Bearer ', '');
+        const newToken = refreshRes.headers.get('authorization')?.replace('Bearer ', '');
         if (!newToken) throw new Error('새 accessToken을 받아오지 못했습니다');
 
         setAccessToken(newToken);
-
-        // 새 토큰으로 재요청
-        const retryResult = await callApi<UserInfoResponse>({
-          method: 'GET',
-          endpoint: '/users?userId=',
-          headers: {
-            Authorization: `Bearer ${newToken}`,
-          },
-          credentials: 'include',
-        });
-
-        const { userId, name, profileUrl, description } = retryResult.data;
-        setUserInfo({ userId, name, profileUrl, description });
-        return retryResult.data;
+        return await fetchUserInfo(newToken);
       }
 
       throw err;
