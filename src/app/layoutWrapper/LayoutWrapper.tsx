@@ -19,7 +19,7 @@ export default function LayoutWrapper({ children }: { children: React.ReactNode 
           {!isLoginPage && <Header />}
 
           <main className="layout__main">
-            {children} {/* AuthGuard 제거됨 */}
+            {children}
           </main>
 
           {!isLoginPage && <BottomNavigationBar />}
