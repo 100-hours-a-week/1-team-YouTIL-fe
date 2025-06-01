@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react';
 import './page.scss';
-import { useFetch } from '@/hooks/useFetch';
+// import { useFetch } from '@/hooks/useFetch';
 import useAuthStore from '@/store/useAuthStore';
 import useUserInfoStore from '@/store/useUserInfoStore';
 
@@ -13,17 +13,17 @@ import TechNews from '@/components/main/techNews/TechNews';
 import NewTILDescription from '@/components/main/newTILDescription/NewTILDescription';
 import NewTILList from '@/components/main/newTILList/NewTILList';
 
-interface UserInfoResponse {
-  data: {
-    userId: number;
-    name: string;
-    profileUrl: string;
-    description: string;
-  };
-}
+// interface UserInfoResponse {
+//   data: {
+//     userId: number;
+//     name: string;
+//     profileUrl: string;
+//     description: string;
+//   };
+// }
 
 const Main = () => {
-  const { callApi } = useFetch();
+  // const { callApi } = useFetch();
   const accessToken = useAuthStore((state) => state.accessToken);
   const setAccessToken = useAuthStore((state) => state.setAccessToken);
   const setUserInfo = useUserInfoStore((state) => state.setUserInfo);
@@ -56,7 +56,7 @@ const Main = () => {
       } catch (error) {
         if (error instanceof Error && error.message.startsWith('HTTP 401')) {
           try {
-            console.log('🔄 accessToken 만료됨, refresh 시도');
+            console.log('accessToken 만료됨, refresh 시도');
 
             const refreshRes = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/users?userId=`, {
               method: 'GET',
@@ -77,7 +77,7 @@ const Main = () => {
             // 3차 요청
             await fetchUserInfoWithToken(newToken);
           } catch (refreshError) {
-            console.error(' refresh 실패:', refreshError);
+            console.error('refresh 실패:', refreshError);
           }
         } else {
           console.error('유저 정보 요청 실패:', error);
