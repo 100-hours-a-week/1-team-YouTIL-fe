@@ -55,6 +55,7 @@ const Main = () => {
         // 1차 요청
         await fetchUserInfoWithToken(accessToken ?? '');
       } catch (error) {
+        console.log('[디버그] error.message:', error instanceof Error ? error.message : error);
         if (error instanceof Error && error.message.includes('401')) {
           try {
             console.log('accessToken 만료됨, refresh 시도');
