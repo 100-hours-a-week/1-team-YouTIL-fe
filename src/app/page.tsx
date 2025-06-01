@@ -12,7 +12,6 @@ import WelcomeDescription from '@/components/main/welcomeDescription/WelcomeDesc
 import TechNews from '@/components/main/techNews/TechNews';
 import NewTILDescription from '@/components/main/newTILDescription/NewTILDescription';
 import NewTILList from '@/components/main/newTILList/NewTILList';
-import useCheckAccess from '@/hooks/useCheckExistAccess';
 
 interface UserInfoResponse {
   data: {
@@ -26,30 +25,71 @@ interface UserInfoResponse {
 const Main = () => {
   const { callApi } = useFetch();
   const accessToken = useAuthStore((state) => state.accessToken);
+  const setAccessToken = useAuthStore((state) => state.setAccessToken);
   const setUserInfo = useUserInfoStore((state) => state.setUserInfo);
-  const existAccess = useCheckAccess(accessToken);
+
+  const fetchUserInfo = async (token: string) => {
+    const result = await callApi<UserInfoResponse>({
+      method: 'GET',
+      endpoint: '/users?userId=',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      credentials: 'include',
+    });
+
+    const { userId, name, profileUrl, description } = result.data;
+    setUserInfo({ userId, name, profileUrl, description });
+    return result.data;
+  };
 
   useQuery<UserInfoResponse['data']>({
-    queryKey: ['user-info'] as const,
+    queryKey: ['user-info'],
     queryFn: async () => {
-      const result = await callApi<UserInfoResponse>({
-        method: 'GET',
-        endpoint: '/users?userId=',
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-        credentials: 'include',
-      });
-      const { userId, name, profileUrl, description } = result.data;
-      setUserInfo({ userId, name, profileUrl, description });
-      return result.data;
+      let token = accessToken;
+      if (!token) {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/users?userId=`, {
+          method: 'GET',
+          credentials: 'include',
+          headers: {
+            Authorization: `Bearer ${token ?? ''}`,
+          },
+        });
+      
+        const newToken = response.headers.get('authorization')?.replace('Bearer ', '');
+        if (!newToken) throw new Error('새 accessToken을 받아오지 못했습니다');
+      
+        setAccessToken(newToken);
+        token = newToken;
+      }
+
+      try {
+        return await fetchUserInfo(token);
+      } catch (err: unknown) {
+        if (err instanceof Error && err.message.startsWith('HTTP 401')) {
+          const response = await fetch(
+            `${process.env.NEXT_PUBLIC_BASE_URL}/users?userId=`,
+            {
+              method: 'GET',
+              credentials: 'include',
+            }
+          );
+
+          const newToken = response.headers.get('authorization')?.replace('Bearer ', '');
+          if (!newToken) throw new Error('새 accessToken을 받아오지 못했습니다');
+
+          setAccessToken(newToken);
+          return await fetchUserInfo(newToken);
+        }
+
+        throw err;
+      }
     },
-    enabled: existAccess,
     staleTime: 3600000,
     gcTime: 3600000,
-    //프로필 변경 post 요청 시 수동 갱신
+    refetchOnWindowFocus: false,
   });
-  
+
   return (
     <div className="main-page">
       <WelcomeDescription />
