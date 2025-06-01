@@ -53,7 +53,12 @@ const Main = () => {
             credentials: 'include',
           });
 
-          const newToken = refreshRes.headers.get('Authorization')?.replace('Bearer ', '');
+          console.log("asdf");
+          for (const [key, value] of refreshRes.headers.entries()) {
+            console.log(`[헤더] ${key}: ${value}`);
+          }
+          
+          const newToken = refreshRes.headers.get('authorization')?.replace('Bearer ', '');
           console.log("newToken = ", newToken)
           if (!newToken) throw new Error('accessToken 재발급 실패');
 
