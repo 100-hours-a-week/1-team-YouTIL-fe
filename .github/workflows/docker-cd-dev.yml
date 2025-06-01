@@ -1,0 +1,36 @@
+name: FE Docker CD Dev
+
+on:
+  workflow_run:
+    workflows: ["FE Docker CI Dev"]
+    types:
+      - completed
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    name: Deploy to GCP VM
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Set Image Tag
+        run: echo "IMAGE_TAG=asia-northeast3-docker.pkg.dev/youtil-459304/youtil-docker-registry/youtil-fe-dev:latest" >> $GITHUB_ENV
+
+      - name: Prepare SSH Key
+        run: |
+          echo "${{ secrets.YOUTIL_DEV_SSH_KEY }}" > key.pem
+          chmod 600 key.pem
+
+      - name: Deploy via SSH
+        run: |
+          ssh -i key.pem -o StrictHostKeyChecking=no ubuntu@${{ secrets.YOUTIL_DEV_HOST }} << EOF
+            docker pull $IMAGE_TAG
+
+            docker stop youtil-fe-dev || true
+            docker rm youtil-fe-dev || true
+
+            docker run -d --name youtil-fe-dev \
+              -p 3000:3000 \
+              -e NODE_OPTIONS="--max-old-space-size=4096" \
+              $IMAGE_TAG
+          EOF

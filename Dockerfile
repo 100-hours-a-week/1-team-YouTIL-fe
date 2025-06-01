@@ -21,7 +21,7 @@ COPY . .
 RUN pnpm build
 
 # 8. 포트 설정
-EXPOSE 3001
+EXPOSE 3000
 
 # 9. 실행 명령
 CMD ["pnpm", "start"]
