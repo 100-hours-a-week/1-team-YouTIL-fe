@@ -2,6 +2,7 @@
 
 import './page.scss';
 import { useQuery } from '@tanstack/react-query';
+import { useFetch } from '@/hooks/useFetch';
 import useAuthStore from '@/store/useAuthStore';
 import useUserInfoStore from '@/store/useUserInfoStore';
 
@@ -11,6 +12,7 @@ import WelcomeDescription from '@/components/main/welcomeDescription/WelcomeDesc
 import TechNews from '@/components/main/techNews/TechNews';
 import NewTILDescription from '@/components/main/newTILDescription/NewTILDescription';
 import NewTILList from '@/components/main/newTILList/NewTILList';
+import useCheckAccess from '@/hooks/useCheckExistAccess';
 
 interface UserInfoResponse {
   data: {
@@ -22,71 +24,32 @@ interface UserInfoResponse {
 }
 
 const Main = () => {
+  const { callApi } = useFetch();
   const accessToken = useAuthStore((state) => state.accessToken);
-  const setAccessToken = useAuthStore((state) => state.setAccessToken);
   const setUserInfo = useUserInfoStore((state) => state.setUserInfo);
+  const existAccess = useCheckAccess(accessToken);
 
-  const fetchUserInfo = async (token: string): Promise<UserInfoResponse['data']> => {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/users?userId=`, {
-      method: 'GET',
-      credentials: 'include',
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-
-    if (res.status === 401) {
-      throw { code: 401 as const };
-    }
-
-    if (!res.ok) {
-      throw new Error(`HTTP ${res.status}`);
-    }
-
-    const json = await res.json();
-    const { userId, name, profileUrl, description } = json.data;
-    setUserInfo({ userId, name, profileUrl, description });
-    return json.data;
-  };
-
-  const fetchUserInfoWithRetry = async (): Promise<UserInfoResponse['data']> => {
-    const token = accessToken ?? '';
-    try {
-      return await fetchUserInfo(token);
-    } catch (err: unknown) {
-      if (
-        typeof err === 'object' &&
-        err !== null &&
-        'code' in err &&
-        (err as { code: number }).code === 401
-      ) {
-        const refreshRes = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/users?userId=`, {
-          method: 'GET',
-          credentials: 'include',
-          headers: {
-            Authorization: 'Bearer ',
-          },
-        });
-
-        const newToken = refreshRes.headers.get('authorization')?.replace('Bearer ', '');
-        if (!newToken) throw new Error('새 accessToken을 받아오지 못했습니다');
-
-        setAccessToken(newToken);
-        return await fetchUserInfo(newToken);
-      }
-
-      throw err;
-    }
-  };
-
-  useQuery({
-    queryKey: ['user-info'],
-    queryFn: fetchUserInfoWithRetry,
+  useQuery<UserInfoResponse['data']>({
+    queryKey: ['user-info'] as const,
+    queryFn: async () => {
+      const result = await callApi<UserInfoResponse>({
+        method: 'GET',
+        endpoint: '/users?userId=',
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+        credentials: 'include',
+      });
+      const { userId, name, profileUrl, description } = result.data;
+      setUserInfo({ userId, name, profileUrl, description });
+      return result.data;
+    },
+    enabled: existAccess,
     staleTime: 3600000,
     gcTime: 3600000,
-    refetchOnWindowFocus: false,
+    //프로필 변경 post 요청 시 수동 갱신
   });
-
+  
   return (
     <div className="main-page">
       <WelcomeDescription />

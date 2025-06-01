@@ -41,6 +41,7 @@ export const useFetch = () => {
 
       const newAccessToken = response.headers.get('authorization')?.replace('Bearer ', '');
       if (newAccessToken) {
+        console.log('🟢 새 accessToken 발급됨:', newAccessToken); 
         setAccessToken(newAccessToken);
       }
 
