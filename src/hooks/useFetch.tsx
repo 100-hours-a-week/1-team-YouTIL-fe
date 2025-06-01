@@ -1,5 +1,4 @@
 import { useCallback } from 'react';
-import useAuthStore from '@/store/useAuthStore';
 
 type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE';
 
@@ -12,8 +11,6 @@ interface UseFetchParams {
 }
 
 export const useFetch = () => {
-  const setAccessToken = useAuthStore((state) => state.setAccessToken);
-
   const callApi = useCallback(
     async <T,>(params: UseFetchParams): Promise<T> => {
       const {
@@ -38,13 +35,6 @@ export const useFetch = () => {
         },
         body: body ? JSON.stringify(body) : undefined,
       });
-      console.log("asdf1")
-      const newAccessToken = response.headers.get('Authorization')?.replace('Bearer ', '');
-      console.log("asdf2");
-      if (newAccessToken) {
-        console.log('새 accessToken 발급됨:', newAccessToken); 
-        setAccessToken(newAccessToken);
-      }
 
       if (!response.ok) {
         const errorText = await response.text();
@@ -53,7 +43,7 @@ export const useFetch = () => {
 
       return response.json();
     },
-    [setAccessToken]
+    []
   );
 
   return { callApi };

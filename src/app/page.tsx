@@ -42,12 +42,28 @@ const Main = () => {
         const { userId, name, profileUrl, description } = result.data;
         setUserInfo({ userId, name, profileUrl, description });
       } catch (error) {
+        if (error instanceof Error && error.message.startsWith('HTTP 401')) {
+          try {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/users?userId=`, {
+              method: 'GET',
+              credentials: 'include',
+              headers: {
+                Authorization: 'Bearer ',
+              },
+            });
+
+            const newAccessToken = response.headers.get('authorization')?.replace('Bearer ', '');
+            console.log('새로 발급된 accessToken:', newAccessToken);
+
+          } catch (refreshError) {
+            console.error('refresh 요청 실패:', refreshError);
+          }
+        }
         console.error('유저 정보 요청 실패:', error);
       }
     };
 
     fetchUserInfo();
-
   }, [accessToken, callApi, setUserInfo]);
 
   return (
