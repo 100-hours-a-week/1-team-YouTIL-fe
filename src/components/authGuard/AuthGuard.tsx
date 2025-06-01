@@ -37,19 +37,10 @@ const AuthGuard = ({ children }: AuthGuardProps) => {
                 credentials: 'include',
               }
             );
-            const newAccessToken = response.headers.get('authorization')?.replace('Bearer ', '');
+            const newAccessToken = response.headers.get('Authorization')?.replace('Bearer ', '');
+
             if (newAccessToken) {
               setAccessToken(newAccessToken);
-
-              await callApi({
-                method: 'GET',
-                endpoint: '/community/recent-tils',
-                headers: {
-                  Authorization: `Bearer ${newAccessToken}`,
-                },
-                credentials: 'include',
-              });
-
               setIsAuthenticated(true);
               return;
             }
