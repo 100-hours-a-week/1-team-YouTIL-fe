@@ -31,5 +31,6 @@ jobs:
 
             docker run -d --name youtil-fe-dev \
               -p 3000:3000 \
+              -e NODE_OPTIONS="--max-old-space-size=4096" \
               $IMAGE_TAG
           EOF
