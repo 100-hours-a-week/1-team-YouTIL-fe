@@ -18,10 +18,8 @@ const Main = () => {
   const setUserInfo = useUserInfoStore((state) => state.setUserInfo);
 
   useEffect(() => {
-    console.log('초기 accessToken:', accessToken);
-
-    const fetchUserInfoWithToken = async (token: string) => {
-      const result = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/users?userId=`, {
+    const fetchUserInfoWithToken = async (token: string): Promise<Response | null> => {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/users?userId=`, {
         method: 'GET',
         credentials: 'include',
         headers: {
@@ -30,46 +28,30 @@ const Main = () => {
         },
       });
 
-      if (!result.ok) {
-        throw new Error(`HTTP ${result.status}`);
+      if (res.ok) {
+        const json = await res.json();
+        const { userId, name, profileUrl, description } = json.data;
+        setUserInfo({ userId, name, profileUrl, description });
+        return res;
       }
-
-      const json = await result.json();
-      const { userId, name, profileUrl, description } = json.data;
-      setUserInfo({ userId, name, profileUrl, description });
+      return res;
     };
 
     const fetchUserInfoWithRetry = async () => {
-      try {
-        await fetchUserInfoWithToken(accessToken ?? '');
-      } catch (error) {
-        const message = error instanceof Error ? error.message : String(error);
-        console.warn('[디버그] fetch 실패:', message);
-        console.log('accessToken 재시도 로직 실행');
+      const userRes = await fetchUserInfoWithToken(accessToken ?? '');
+      if (userRes && userRes.status !== 401) return;
 
-        try {
-          const refreshRes = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/news`, {
-            method: 'GET',
-            credentials: 'include',
-          });
+      if (userRes?.status === 401) {
+        const refreshRes = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/news`, {
+          method: 'GET',
+          credentials: 'include',
+        });
 
-          console.log("asdf");
-          for (const [key, value] of refreshRes.headers.entries()) {
-            console.log(`[헤더] ${key}: ${value}`);
-          }
-          
-          const newToken = refreshRes.headers.get('authorization')?.replace('Bearer ', '');
-          console.log("newToken = ", newToken)
-          if (!newToken) throw new Error('accessToken 재발급 실패');
+        const newToken = refreshRes.headers.get('authorization')?.replace('Bearer ', '');
+        if (!newToken) return;
 
-          console.log('새로 발급된 accessToken:', newToken);
-          setAccessToken(newToken);
-
-          // 새 토큰으로 다시 유저 정보 요청
-          await fetchUserInfoWithToken(newToken);
-        } catch (refreshError) {
-          console.error('refresh 실패:', refreshError);
-        }
+        setAccessToken(newToken);
+        await fetchUserInfoWithToken(newToken);
       }
     };
 
