@@ -25,46 +25,68 @@ interface UserInfoResponse {
 const Main = () => {
   const { callApi } = useFetch();
   const accessToken = useAuthStore((state) => state.accessToken);
+  const setAccessToken = useAuthStore((state) => state.setAccessToken);
   const setUserInfo = useUserInfoStore((state) => state.setUserInfo);
 
   useEffect(() => {
-    const fetchUserInfo = async () => {
-      try {
-        const result = await callApi<UserInfoResponse>({
-          method: 'GET',
-          endpoint: '/users?userId=',
-          headers: {
-            Authorization: `Bearer ${accessToken ?? ''}`,
-          },
-          credentials: 'include',
-        });
+    console.log('초기 accessToken:', accessToken);
 
-        const { userId, name, profileUrl, description } = result.data;
-        setUserInfo({ userId, name, profileUrl, description });
+    const fetchUserInfoWithToken = async (token: string) => {
+      console.log('요청에 사용된 accessToken:', token);
+
+      const result = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/users?userId=`, {
+        method: 'GET',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!result.ok) throw new Error(`HTTP ${result.status}`);
+      const json = await result.json();
+      const { userId, name, profileUrl, description } = json.data;
+      setUserInfo({ userId, name, profileUrl, description });
+    };
+
+    const fetchUserInfoWithRetry = async () => {
+      try {
+        // 1차 요청
+        await fetchUserInfoWithToken(accessToken ?? '');
       } catch (error) {
         if (error instanceof Error && error.message.startsWith('HTTP 401')) {
           try {
-            const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/users?userId=`, {
+            console.log('🔄 accessToken 만료됨, refresh 시도');
+
+            const refreshRes = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/users?userId=`, {
               method: 'GET',
               credentials: 'include',
               headers: {
+                'Content-Type': 'application/json',
                 Authorization: 'Bearer ',
               },
             });
 
-            const newAccessToken = response.headers.get('authorization')?.replace('Bearer ', '');
-            console.log('새로 발급된 accessToken:', newAccessToken);
+            const newToken = refreshRes.headers.get('authorization')?.replace('Bearer ', '');
 
+            if (!newToken) throw new Error('accessToken 재발급 실패');
+
+            console.log('새로 발급된 accessToken:', newToken);
+            setAccessToken(newToken);
+
+            // 3차 요청
+            await fetchUserInfoWithToken(newToken);
           } catch (refreshError) {
-            console.error('refresh 요청 실패:', refreshError);
+            console.error(' refresh 실패:', refreshError);
           }
+        } else {
+          console.error('유저 정보 요청 실패:', error);
         }
-        console.error('유저 정보 요청 실패:', error);
       }
     };
 
-    fetchUserInfo();
-  }, [accessToken, callApi, setUserInfo]);
+    fetchUserInfoWithRetry();
+  }, [accessToken, setAccessToken, setUserInfo]);
 
   return (
     <div className="main-page">
