@@ -3,7 +3,6 @@
 import { usePathname } from 'next/navigation';
 import Header from '@/components/header/header/Header';
 import BottomNavigationBar from '@/components/bottomNavigationBar/bottomNavigationBar/BottomNavigationBar';
-import AuthGuard from '@/components/authGuard/AuthGuard';
 import './LayoutWrapper.scss';
 
 import { QueryClientProvider } from '@tanstack/react-query';
@@ -20,7 +19,7 @@ export default function LayoutWrapper({ children }: { children: React.ReactNode 
           {!isLoginPage && <Header />}
 
           <main className="layout__main">
-            {isLoginPage ? children : <AuthGuard>{children}</AuthGuard>}
+            {children} {/* AuthGuard 제거됨 */}
           </main>
 
           {!isLoginPage && <BottomNavigationBar />}
