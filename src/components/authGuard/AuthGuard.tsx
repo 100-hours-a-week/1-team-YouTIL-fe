@@ -28,7 +28,9 @@ const AuthGuard = ({ children }: AuthGuardProps) => {
 
         setIsAuthenticated(true);
       } catch (err: unknown) {
+        
         if (err instanceof Error && err.message.startsWith('HTTP 401')) {
+          console.log("에러 401 맞음")
           try {
             const response = await fetch(
               `${process.env.NEXT_PUBLIC_BASE_URL}/community/recent-tils`,
@@ -37,8 +39,9 @@ const AuthGuard = ({ children }: AuthGuardProps) => {
                 credentials: 'include',
               }
             );
+            console.log("response = ", response);
             const newAccessToken = response.headers.get('Authorization')?.replace('Bearer ', '');
-
+            console.log("newAccessToken = ", newAccessToken)
             if (newAccessToken) {
               setAccessToken(newAccessToken);
               setIsAuthenticated(true);
