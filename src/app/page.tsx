@@ -1,7 +1,7 @@
 'use client';
 
+import { useEffect } from 'react';
 import './page.scss';
-import { useQuery } from '@tanstack/react-query';
 import { useFetch } from '@/hooks/useFetch';
 import useAuthStore from '@/store/useAuthStore';
 import useUserInfoStore from '@/store/useUserInfoStore';
@@ -29,27 +29,30 @@ const Main = () => {
   const setUserInfo = useUserInfoStore((state) => state.setUserInfo);
   const existAccess = useCheckAccess(accessToken);
 
-  useQuery<UserInfoResponse['data']>({
-    queryKey: ['user-info'] as const,
-    queryFn: async () => {
-      const result = await callApi<UserInfoResponse>({
-        method: 'GET',
-        endpoint: '/users?userId=',
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-        credentials: 'include',
-      });
-      const { userId, name, profileUrl, description } = result.data;
-      setUserInfo({ userId, name, profileUrl, description });
-      return result.data;
-    },
-    enabled: existAccess,
-    staleTime: 3600000,
-    gcTime: 3600000,
-    //프로필 변경 post 요청 시 수동 갱신
-  });
-  
+  useEffect(() => {
+    const fetchUserInfo = async () => {
+      try {
+        const result = await callApi<UserInfoResponse>({
+          method: 'GET',
+          endpoint: '/users?userId=',
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+          credentials: 'include',
+        });
+
+        const { userId, name, profileUrl, description } = result.data;
+        setUserInfo({ userId, name, profileUrl, description });
+      } catch (error) {
+        console.error('유저 정보 요청 실패:', error);
+      }
+    };
+
+    if (existAccess) {
+      fetchUserInfo();
+    }
+  }, [accessToken, callApi, existAccess, setUserInfo]);
+
   return (
     <div className="main-page">
       <WelcomeDescription />

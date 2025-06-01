@@ -38,10 +38,11 @@ export const useFetch = () => {
         },
         body: body ? JSON.stringify(body) : undefined,
       });
-
-      const newAccessToken = response.headers.get('authorization')?.replace('Bearer ', '');
+      console.log("asdf1")
+      const newAccessToken = response.headers.get('Authorization')?.replace('Bearer ', '');
+      console.log("asdf2");
       if (newAccessToken) {
-        console.log('🟢 새 accessToken 발급됨:', newAccessToken); 
+        console.log('새 accessToken 발급됨:', newAccessToken); 
         setAccessToken(newAccessToken);
       }
 
