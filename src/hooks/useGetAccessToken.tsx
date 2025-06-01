@@ -1,9 +1,10 @@
 'use client';
 
-const useGetAccessToken = (): string | null => {
-  if (typeof window === 'undefined') return null;
+import useAuthStore from '@/store/useAuthStore';
 
-  return localStorage.getItem('accessToken');
+const useGetAccessToken = (): string | null => {
+  const accessToken = useAuthStore((state) => state.accessToken);
+  return accessToken;
 };
 
 export default useGetAccessToken;

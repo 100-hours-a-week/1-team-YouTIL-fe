@@ -35,7 +35,6 @@ export const useGithubLogin = () => {
     const accessToken = result.data.accessToken;
 
     setAccessToken(accessToken);
-    localStorage.setItem('accessToken', accessToken);
 
     return result.data;
   };
