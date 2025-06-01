@@ -51,17 +51,10 @@ const Main = () => {
           const refreshRes = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/users?userId=`, {
             method: 'GET',
             credentials: 'include',
-            headers: {
-              'Content-Type': 'application/json',
-              Authorization: 'Bearer ',
-            },
           });
 
-          if (!refreshRes.ok) {
-            throw new Error(`refresh 실패, 상태코드: ${refreshRes.status}`);
-          }
-
           const newToken = refreshRes.headers.get('authorization')?.replace('Bearer ', '');
+          console.log("newToken = ", newToken)
           if (!newToken) throw new Error('accessToken 재발급 실패');
 
           console.log('새로 발급된 accessToken:', newToken);
