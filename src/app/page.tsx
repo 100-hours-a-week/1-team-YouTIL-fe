@@ -48,12 +48,12 @@ const Main = () => {
         console.log('accessToken 재시도 로직 실행');
 
         try {
-          const refreshRes = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/users?userId=`, {
+          const refreshRes = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/news`, {
             method: 'GET',
             credentials: 'include',
           });
 
-          const newToken = refreshRes.headers.get('authorization')?.replace('Bearer ', '');
+          const newToken = refreshRes.headers.get('Authorization')?.replace('Bearer ', '');
           console.log("newToken = ", newToken)
           if (!newToken) throw new Error('accessToken 재발급 실패');
 
