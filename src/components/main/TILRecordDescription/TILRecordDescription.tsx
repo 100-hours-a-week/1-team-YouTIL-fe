@@ -7,7 +7,7 @@ const TILRecordDescription = () => {
   const { userInfo } = useUserInfoStore();
   return (
     <article className="description">
-      {userInfo.name}님의 TIL 기록입니다
+      {userInfo.name}님의 TIL 기록입니다.
     </article>
   );
 };

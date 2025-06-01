@@ -12,7 +12,6 @@ import WelcomeDescription from '@/components/main/welcomeDescription/WelcomeDesc
 import TechNews from '@/components/main/techNews/TechNews';
 import NewTILDescription from '@/components/main/newTILDescription/NewTILDescription';
 import NewTILList from '@/components/main/newTILList/NewTILList';
-import useCheckAccess from '@/hooks/useCheckExistAccess';
 
 interface UserInfoResponse {
   data: {
@@ -27,7 +26,6 @@ const Main = () => {
   const { callApi } = useFetch();
   const accessToken = useAuthStore((state) => state.accessToken);
   const setUserInfo = useUserInfoStore((state) => state.setUserInfo);
-  const existAccess = useCheckAccess(accessToken);
 
   useEffect(() => {
     const fetchUserInfo = async () => {
@@ -36,7 +34,7 @@ const Main = () => {
           method: 'GET',
           endpoint: '/users?userId=',
           headers: {
-            Authorization: `Bearer ${accessToken}`,
+            Authorization: `Bearer ${accessToken ?? ''}`,
           },
           credentials: 'include',
         });
@@ -48,10 +46,9 @@ const Main = () => {
       }
     };
 
-    if (existAccess) {
-      fetchUserInfo();
-    }
-  }, [accessToken, callApi, existAccess, setUserInfo]);
+    fetchUserInfo();
+
+  }, [accessToken, callApi, setUserInfo]);
 
   return (
     <div className="main-page">
