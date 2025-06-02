@@ -13,17 +13,26 @@ export function middleware(request: NextRequest) {
   const isLoggedIn = !!refreshToken;
 
   const isProtected = PROTECTED_PATHS.includes(pathname);
+  const isPublic = PUBLIC_PATHS.includes(pathname);
 
+  // 로그인된 상태에서 로그인 페이지 접근 → 홈으로
+  if (isLoggedIn && pathname === '/login') {
+    return NextResponse.redirect(new URL('/', request.url));
+  }
+
+  // 로그인 안 됐는데 보호된 페이지 접근 → 로그인으로
   if (!isLoggedIn && isProtected) {
     return NextResponse.redirect(new URL('/login', request.url));
   }
 
+  // 로그인 안 된 상태에서 정의되지 않은 경로 접근 → 로그인으로
   const allValidPaths = [...PUBLIC_PATHS, ...PROTECTED_PATHS];
   const isValidPath = allValidPaths.includes(pathname);
   if (!isLoggedIn && !isValidPath) {
     return NextResponse.redirect(new URL('/login', request.url));
   }
 
+  // 로그인 된 상태에서 정의되지 않은 경로 접근 → 홈으로
   if (isLoggedIn && !isValidPath) {
     return NextResponse.redirect(new URL('/', request.url));
   }

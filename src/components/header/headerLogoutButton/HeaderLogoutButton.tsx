@@ -21,7 +21,6 @@ const HeaderLogoutButton = () => {
       console.error('로그아웃 요청 실패:', error);
     } finally {
       clearAuth();
-      console.log("asdf");
       router.replace('/login');
     }
   };

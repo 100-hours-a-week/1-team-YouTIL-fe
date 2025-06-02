@@ -19,8 +19,6 @@ const GithubLoginButton = () => {
     if (!code) return;
 
     if (!expectedState || returnedState !== expectedState) {
-      console.log('state 검증 실패');
-      console.log("return = ", returnedState, "expected = ", expectedState);
       router.replace('/login');
       return;
     }

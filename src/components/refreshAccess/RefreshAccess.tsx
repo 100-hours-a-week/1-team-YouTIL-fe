@@ -15,7 +15,7 @@ const RefreshAccess = () => {
         });
 
         if (res.status === 401) {
-          const newAccessToken = res.headers.get("Authorization")?.replace("Bearer ", "");
+          const newAccessToken = res.headers.get("Authorization")?.replace("Bearer ", '');
           if (newAccessToken) {
             setAccessToken(newAccessToken);
           } else {
@@ -23,7 +23,7 @@ const RefreshAccess = () => {
           }
         }
       } catch (err) {
-        console.error("refresh error", err);
+        console.error("refresh errosr", err);
       }
     };
 
