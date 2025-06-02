@@ -30,7 +30,7 @@ const GithubLoginButton = () => {
       .catch((error) => {
         console.error('GitHub 로그인 실패:', error);
       });
-  }, [searchParams, login, router]);
+  }, [searchParams, login, router, clearOAuthState]);
 
   return <LoginButton />;
 };
