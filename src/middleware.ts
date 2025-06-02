@@ -13,7 +13,6 @@ export function middleware(request: NextRequest) {
   const isLoggedIn = !!refreshToken;
 
   const isProtected = PROTECTED_PATHS.includes(pathname);
-  const isPublic = PUBLIC_PATHS.includes(pathname);
 
   // 로그인된 상태에서 로그인 페이지 접근 → 홈으로
   if (isLoggedIn && pathname === '/login') {
