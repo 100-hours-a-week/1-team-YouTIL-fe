@@ -2,15 +2,27 @@
 
 import { useRouter } from 'next/navigation';
 import useAuthStore from '@/store/useAuthStore';
+import { useFetch } from '@/hooks/useFetch';
 import './HeaderLogoutButton.scss';
 
 const HeaderLogoutButton = () => {
   const router = useRouter();
   const clearAuth = useAuthStore((state) => state.clearAuth);
+  const { callApi } = useFetch();
 
-  const handleLogout = () => {
-    clearAuth();
-    router.replace('/login');
+  const handleLogout = async () => {
+    try {
+      await callApi({
+        method: 'POST',
+        endpoint: '/users/logout',
+        credentials: 'include',
+      });
+    } catch (error) {
+      console.error('로그아웃 요청 실패:', error);
+    } finally {
+      clearAuth();
+      router.replace('/login');
+    }
   };
 
   return (
