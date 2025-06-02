@@ -14,49 +14,34 @@ import NewTILList from '@/components/main/newTILList/NewTILList';
 
 const Main = () => {
   const accessToken = useAuthStore((state) => state.accessToken);
-  const setAccessToken = useAuthStore((state) => state.setAccessToken);
   const setUserInfo = useUserInfoStore((state) => state.setUserInfo);
 
   useEffect(() => {
-    const fetchUserInfoWithToken = async (token: string): Promise<Response | null> => {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/users?userId=`, {
-        method: 'GET',
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-      });
+    if (!accessToken) return;
 
-      if (res.ok) {
-        const json = await res.json();
-        const { userId, name, profileUrl, description } = json.data;
-        setUserInfo({ userId, name, profileUrl, description });
-        return res;
-      }
-      return res;
-    };
-
-    const fetchUserInfoWithRetry = async () => {
-      const userRes = await fetchUserInfoWithToken(accessToken ?? '');
-      if (userRes && userRes.status !== 401) return;
-
-      if (userRes?.status === 401) {
-        const refreshRes = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/news`, {
+    const fetchUserInfo = async () => {
+      try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/users?userId=`, {
           method: 'GET',
           credentials: 'include',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${accessToken}`,
+          },
         });
 
-        const newToken = refreshRes.headers.get('authorization')?.replace('Bearer ', '');
-        if (!newToken) return;
-
-        setAccessToken(newToken);
-        await fetchUserInfoWithToken(newToken);
+        if (response.ok) {
+          const json = await response.json();
+          const { userId, name, profileUrl, description } = json.data;
+          setUserInfo({ userId, name, profileUrl, description });
+        }
+      } catch (error) {
+        console.error('유저 정보 요청 실패:', error);
       }
     };
 
-    fetchUserInfoWithRetry();
-  }, [accessToken, setAccessToken, setUserInfo]);
+    fetchUserInfo();
+  }, [accessToken, setUserInfo]);
 
   return (
     <div className="main-page">

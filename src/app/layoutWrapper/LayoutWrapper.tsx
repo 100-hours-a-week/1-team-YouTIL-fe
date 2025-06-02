@@ -3,6 +3,7 @@
 import { usePathname } from 'next/navigation';
 import Header from '@/components/header/header/Header';
 import BottomNavigationBar from '@/components/bottomNavigationBar/bottomNavigationBar/BottomNavigationBar';
+import RefreshAccess from '@/components/refreshAccess/RefreshAccess';
 import './LayoutWrapper.scss';
 
 import { QueryClientProvider } from '@tanstack/react-query';
@@ -16,6 +17,8 @@ export default function LayoutWrapper({ children }: { children: React.ReactNode 
     <QueryClientProvider client={queryClient}>
       <div className="layout__container">
         <div className="layout__frame">
+          <RefreshAccess />
+
           {!isLoginPage && <Header />}
 
           <main className="layout__main">
