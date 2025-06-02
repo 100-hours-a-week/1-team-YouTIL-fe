@@ -4,11 +4,13 @@ import { useEffect } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useGithubLogin } from '@/hooks/useGithubLogin';
 import LoginButton from '../LoginButton/LoginButton';
+import useAuthStore from '@/store/useAuthStore';
 
 const GithubLoginButton = () => {
   const searchParams = useSearchParams();
   const router = useRouter();
   const { login } = useGithubLogin();
+  const { clearOAuthState } = useAuthStore();
 
   useEffect(() => {
     const code = searchParams.get('code');
@@ -22,7 +24,7 @@ const GithubLoginButton = () => {
       router.replace('/login');
       return;
     }
-    
+    clearOAuthState();
     login(code)
       .then(() => {
         router.replace('/');
