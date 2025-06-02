@@ -7,13 +7,6 @@ const RefreshAccess = () => {
   const setAccessToken = useAuthStore((state) => state.setAccessToken);
 
   useEffect(() => {
-    const hasRefreshToken = document.cookie.includes('RefreshToken=');
-
-    if (!hasRefreshToken) {
-      console.warn("현재 쿠키가 없습니다");
-      return;
-    }
-
     const checkAndRefresh = async () => {
       try {
         const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/news`, {
@@ -25,12 +18,9 @@ const RefreshAccess = () => {
           const newAccessToken = res.headers.get("Authorization")?.replace("Bearer ", '');
           if (newAccessToken) {
             setAccessToken(newAccessToken);
-          } else {
-            console.warn("401 발생, accessToken 없음");
           }
         }
-      } catch (err) {
-        console.error("refresh error", err);
+      } catch (_) {
       }
     };
 
