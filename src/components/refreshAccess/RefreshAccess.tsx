@@ -15,10 +15,10 @@ const RefreshAccess = () => {
         });
         if (res.status === 401) {
           const newAccessToken = res.headers.get("Authorization")?.replace("Bearer ", '');
-          console.log(newAccessToken);
           if (newAccessToken) {
             setAccessToken(newAccessToken);
-          } else {
+          } 
+          else {
             console.warn("401 발생, accessToken 없음");
           }
         }
