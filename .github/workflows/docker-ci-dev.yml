@@ -3,7 +3,7 @@ name: FE Docker CI Dev
 on:
   push:
     branches:
-      - main
+      - dev
     paths-ignore:
       - '.github/workflows/**'
   workflow_dispatch:

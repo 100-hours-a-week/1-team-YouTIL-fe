@@ -3,6 +3,8 @@ import { create } from 'zustand';
 interface AuthState {
   accessToken: string | null;
   setAccessToken: (token: string) => void;
+  clearAccessToken: () => void;
+  clearOAuthState: () => void;
   clearAuth: () => void;
 }
 
@@ -13,12 +15,19 @@ const useAuthStore = create<AuthState>((set) => ({
 
   setAccessToken: (token: string) => set({ accessToken: token }),
 
-  clearAuth: () => {
+  clearAccessToken: () => {
     set({ accessToken: null });
+  },
 
+  clearOAuthState: () => {
     if (typeof window !== 'undefined') {
       sessionStorage.removeItem(SESSION_STORAGE_KEY);
     }
+  },
+
+  clearAuth: () => {
+    useAuthStore.getState().clearAccessToken();
+    useAuthStore.getState().clearOAuthState();
   },
 }));
 

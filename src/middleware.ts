@@ -7,38 +7,31 @@ export const config = {
   matcher: ['/', '/((?!_next|favicon.ico|static|assets|api|images|fonts).*)'],
 };
 
-export async function middleware(request: NextRequest) {
-  const { pathname, origin } = request.nextUrl;
-
+export function middleware(request: NextRequest) {
+  const { pathname } = request.nextUrl;
   const refreshToken = request.cookies.get('RefreshToken')?.value;
+  const isLoggedIn = !!refreshToken;
+
   const isProtected = PROTECTED_PATHS.includes(pathname);
 
-  if (isProtected) {
-    try {
-      const apiResponse = await fetch(`${origin}/users?userId=`, {
-        method: 'GET',
-        credentials: 'include',
-        headers: {
-          cookie: request.headers.get('cookie') || '',
-        },
-      });
-
-      if (apiResponse.status === 401) {
-        return NextResponse.redirect(new URL('/login', request.url));
-      }
-    } catch {
-      return NextResponse.redirect(new URL('/login', request.url));
-    }
+  // 로그인된 상태에서 로그인 페이지 접근 → 홈으로
+  if (isLoggedIn && pathname === '/login') {
+    return NextResponse.redirect(new URL('/', request.url));
   }
 
-  const isLoggedIn = !!refreshToken;
+  // 로그인 안 됐는데 보호된 페이지 접근 → 로그인으로
+  if (!isLoggedIn && isProtected) {
+    return NextResponse.redirect(new URL('/login', request.url));
+  }
+
+  // 로그인 안 된 상태에서 정의되지 않은 경로 접근 → 로그인으로
   const allValidPaths = [...PUBLIC_PATHS, ...PROTECTED_PATHS];
   const isValidPath = allValidPaths.includes(pathname);
-
   if (!isLoggedIn && !isValidPath) {
     return NextResponse.redirect(new URL('/login', request.url));
   }
 
+  // 로그인 된 상태에서 정의되지 않은 경로 접근 → 홈으로
   if (isLoggedIn && !isValidPath) {
     return NextResponse.redirect(new URL('/', request.url));
   }
