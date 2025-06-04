@@ -86,11 +86,6 @@ const RepositoryTILList = () => {
     setShowInterviewModal(false);
   };
 
-  const handleGenerateInterview = (level: '쉬움' | '보통' | '어려움') => {
-    console.log(`TIL ID ${expandedTilId} - 선택된 난이도:`, level);
-    setShowInterviewModal(false);
-  };
-
   const { data: tilDetailData, isLoading: isDetailLoading } = useQuery<TILDetailItem | null>({
     queryKey: ['tilDetail', expandedTilId],
     queryFn: async () => {
@@ -166,10 +161,10 @@ const RepositoryTILList = () => {
         })}
       </ul>
 
-      {showInterviewModal && (
+      {showInterviewModal && expandedTilId !== null && (
         <SelectInterviewLevelModal
+          tilId={expandedTilId}
           onClose={handleCloseInterviewModal}
-          onGenerate={handleGenerateInterview}
         />
       )}
     </div>

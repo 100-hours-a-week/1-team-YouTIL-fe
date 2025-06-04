@@ -1,36 +1,64 @@
 'use client';
 
 import { useState } from 'react';
+import { useMutation } from '@tanstack/react-query';
 import './SelectInterviewLevelModal.scss';
 import Image from 'next/image';
+import { useFetch } from '@/hooks/useFetch';
+import useGetAccessToken from '@/hooks/useGetAccessToken';
 
 interface Props {
+  tilId: number;
   onClose: () => void;
-  onGenerate: (level: '쉬움' | '보통' | '어려움') => void;
 }
 
 const difficultyOptions: {
   label: '쉬움' | '보통' | '어려움';
   image: string;
+  value: 3 | 2 | 1;
 }[] = [
-  { label: '쉬움', image: '/images/intervieweasy.png' },
-  { label: '보통', image: '/images/interviewmedium.png' },
-  { label: '어려움', image: '/images/interviewhard.png' },
+  { label: '쉬움', image: '/images/intervieweasy.png', value: 3 },
+  { label: '보통', image: '/images/interviewmedium.png', value: 2 },
+  { label: '어려움', image: '/images/interviewhard.png', value: 1 },
 ];
 
-const SelectInterviewLevelModal = ({ onClose, onGenerate }: Props) => {
-  const [selectedLevel, setSelectedLevel] = useState<null | string>(null);
+const SelectInterviewLevelModal = ({ onClose, tilId }: Props) => {
+  const [selectedLevel, setSelectedLevel] = useState<null | 1 | 2 | 3>(null);
   const [errorShake, setErrorShake] = useState(false);
+  const { callApi } = useFetch();
+  const accessToken = useGetAccessToken();
+  const [selectedTILId, setSelectedTILId] = useState(tilId);
 
-  const toggleSelect = (level: string) => {
-    setSelectedLevel((prev) => (prev === level ? null : level));
+  const toggleSelect = (value: 1 | 2 | 3) => {
+    setSelectedLevel((prev) => (prev === value ? null : value));
     setErrorShake(false);
   };
 
+  const mutation = useMutation({
+    mutationFn: async () => {
+      return await callApi<{ message: string }>({
+        method: 'POST',
+        endpoint: '/interviews',
+        body: {
+          tilId: selectedTILId,
+          level: selectedLevel,
+        },
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+        credentials: 'include',
+      });
+    },
+    onSuccess: () => {
+      onClose();
+    },
+  });
+
   const handleGenerate = () => {
     if (selectedLevel) {
-      onGenerate(selectedLevel as '쉬움' | '보통' | '어려움');
-    } else {
+      mutation.mutate();
+    } 
+    else {
       setErrorShake(true);
       setTimeout(() => setErrorShake(false), 500);
     }
@@ -43,13 +71,13 @@ const SelectInterviewLevelModal = ({ onClose, onGenerate }: Props) => {
         <h2 className="interview-level-modal__title">면접 난이도를 선택해주세요</h2>
 
         <div className="interview-level-modal__levels">
-          {difficultyOptions.map(({ label, image }) => (
+          {difficultyOptions.map(({ label, image, value }) => (
             <div
               key={label}
               className={`interview-level-modal__level ${
-                selectedLevel === label ? 'selected' : ''
+                selectedLevel === value ? 'selected' : ''
               }`}
-              onClick={() => toggleSelect(label)}
+              onClick={() => toggleSelect(value)}
             >
               <Image src={image} alt={label} width={40} height={47} />
               <span>{label}</span>
