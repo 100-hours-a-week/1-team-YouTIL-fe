@@ -9,6 +9,12 @@ import { parseISO, format } from 'date-fns';
 import { useState } from 'react';
 import './RepositoryInterviewList.scss';
 
+
+interface InterviewResponse {
+  data: {
+    interviews: InterviewItem[];
+  };
+}
 interface InterviewItem {
   id: number;
   title: string;
@@ -16,16 +22,8 @@ interface InterviewItem {
   createdAt: string;
 }
 
-interface InterviewQuestion {
-  questionId: number;
-  question: string;
-  answer: string;
-}
-
-interface InterviewResponse {
-  data: {
-    interviews: InterviewItem[];
-  };
+interface InterviewDetailResponse {
+  data: InterviewDetail;
 }
 
 interface InterviewDetail {
@@ -36,9 +34,10 @@ interface InterviewDetail {
   questions: InterviewQuestion[];
 }
 
-
-interface InterviewDetailResponse {
-  data: InterviewDetail;
+interface InterviewQuestion {
+  questionId: number;
+  question: string;
+  answer: string;
 }
 
 const RepositoryInterviewList = () => {

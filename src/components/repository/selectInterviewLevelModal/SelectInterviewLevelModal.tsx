@@ -39,7 +39,7 @@ const SelectInterviewLevelModal = ({ onClose, tilId }: Props) => {
         method: 'POST',
         endpoint: '/interviews',
         body: {
-          tilId: tilId,
+          tilId,
           level: selectedLevel,
         },
         headers: {
@@ -56,8 +56,7 @@ const SelectInterviewLevelModal = ({ onClose, tilId }: Props) => {
   const handleGenerate = () => {
     if (selectedLevel) {
       mutation.mutate();
-    } 
-    else {
+    } else {
       setErrorShake(true);
       setTimeout(() => setErrorShake(false), 500);
     }
@@ -65,38 +64,50 @@ const SelectInterviewLevelModal = ({ onClose, tilId }: Props) => {
 
   return (
     <div className="interview-level-modal">
-      <div className="interview-level-modal__overlay" onClick={onClose} />
-      <div className="interview-level-modal__content">
-        <h2 className="interview-level-modal__title">면접 난이도를 선택해주세요</h2>
-
-        <div className="interview-level-modal__levels">
-          {difficultyOptions.map(({ label, image, value }) => (
-            <div
-              key={label}
-              className={`interview-level-modal__level ${
-                selectedLevel === value ? 'selected' : ''
-              }`}
-              onClick={() => toggleSelect(value)}
-            >
-              <Image src={image} alt={label} width={40} height={47} />
-              <span>{label}</span>
+      <div className="interview-level-modal__overlay" />
+      <div className={`interview-level-modal__content ${ mutation.isPending ? 'interview-level-modal__content--loading' : '' }`}
+    >
+  {mutation.isPending ? (
+    <div className="interview-level-modal__loading">
+      <div className="interview-level-modal__loading-spinner-text">
+        <div className="spinner" />
+        <p className="loading__text">면접질문 생성중...</p>
+      </div>
+      <p className="loading__subtext">면접질문 생성시 30초 정도의 시간이 소요 됩니다</p>
+    </div>
+        ) : (
+          <>
+            <h2 className="interview-level-modal__title">면접 난이도를 선택해주세요</h2>
+            <div className="interview-level-modal__levels">
+              {difficultyOptions.map(({ label, image, value }) => (
+                <div
+                  key={label}
+                  className={`interview-level-modal__level ${
+                    selectedLevel === value ? 'selected' : ''
+                  }`}
+                  onClick={() => toggleSelect(value)}
+                >
+                  <Image src={image} alt={label} width={40} height={47} />
+                  <span>{label}</span>
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
 
-        <div className="interview-level-modal__buttons">
-          <button className="interview-level-modal__button cancel" onClick={onClose}>
-            취소
-          </button>
-          <button
-            className={`interview-level-modal__button ${
-              errorShake ? 'error shake' : ''
-            }`}
-            onClick={handleGenerate}
-          >
-            생성
-          </button>
-        </div>
+            <div className="interview-level-modal__buttons">
+              <button className="interview-level-modal__button cancel" onClick={onClose}>
+                취소
+              </button>
+              <button
+                className={`interview-level-modal__button ${
+                  errorShake ? 'error shake' : ''
+                }`}
+                onClick={handleGenerate}
+              >
+                생성
+              </button>
+            </div>
+          </>
+        )}
       </div>
     </div>
   );
