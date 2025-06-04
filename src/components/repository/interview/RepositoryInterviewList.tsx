@@ -16,10 +16,29 @@ interface InterviewItem {
   createdAt: string;
 }
 
+interface InterviewQuestion {
+  questionId: number;
+  question: string;
+  answer: string;
+}
+
 interface InterviewResponse {
   data: {
     interviews: InterviewItem[];
   };
+}
+
+interface InterviewDetail {
+  id: number;
+  title: string;
+  level: string;
+  createdAt: string;
+  questions: InterviewQuestion[];
+}
+
+
+interface InterviewDetailResponse {
+  data: InterviewDetail;
 }
 
 const RepositoryInterviewList = () => {
@@ -28,6 +47,7 @@ const RepositoryInterviewList = () => {
   const existAccess = useCheckAccess(accessToken);
   const { interviewDate } = useRepositoryDateStore();
   const [expandedInterviewId, setExpandedInterviewId] = useState<number | null>(null);
+  const [visibleAnswerMap, setVisibleAnswerMap] = useState<Record<number, boolean>>({});
 
   const today = new Date();
   const yyyy = today.getFullYear();
@@ -47,33 +67,47 @@ const RepositoryInterviewList = () => {
         },
         credentials: 'include',
       });
-
       return response.data.interviews;
     },
     enabled: existAccess,
+    staleTime: 1800000,
+    gcTime: 3600000,
+  });
+
+  const { data: interviewDetailData } = useQuery<InterviewDetail | null>({
+    queryKey: ['interviewDetail', expandedInterviewId],
+    queryFn: async () => {
+      if (expandedInterviewId === null) return null;
+      const response = await callApi<InterviewDetailResponse>({
+        method: 'GET',
+        endpoint: `/interviews/${expandedInterviewId}`,
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+        credentials: 'include',
+      });
+      return response.data;
+    },
+    enabled: expandedInterviewId !== null && existAccess,
     staleTime: Infinity,
     gcTime: 3600000,
   });
 
   const mapLevelToLabel = (level: 'EASY' | 'MEDIUM' | 'HARD'): string => {
     switch (level) {
-      case 'EASY':
-        return '쉬움';
-      case 'MEDIUM':
-        return '보통';
-      case 'HARD':
-        return '어려움';
-      default:
-        return '-';
+      case 'EASY': return '쉬움';
+      case 'MEDIUM': return '보통';
+      case 'HARD': return '어려움';
+      default: return '-';
     }
   };
 
   const handleClickInterview = (interviewId: number) => {
-    if (expandedInterviewId === interviewId) {
-      setExpandedInterviewId(null);
-    } else {
-      setExpandedInterviewId(interviewId);
-    }
+    setExpandedInterviewId(prev => (prev === interviewId ? null : interviewId));
+  };
+
+  const toggleAnswerVisibility = (questionId: number) => {
+    setVisibleAnswerMap(prev => ({ ...prev, [questionId]: !prev[questionId] }));
   };
 
   return (
@@ -97,11 +131,23 @@ const RepositoryInterviewList = () => {
                 </div>
                 <p className="repository-interview-list__item-date">{formattedDate}</p>
               </div>
-              {isExpanded && (
+
+              {isExpanded && interviewDetailData && (
                 <div className="repository-interview-list__item-detail">
-                  <p className="repository-interview-list__item-content">
-                    여기에 더미 내용이 들어갑니다. 이 면접 질문에 대한 예시 답변이나 참고 자료를 넣을 수 있습니다.
-                  </p>
+                  {interviewDetailData.questions.map((q) => (
+                    <div key={q.questionId} className="repository-interview-list__item-question-block">
+                      <p className="repository-interview-list__item-question">{q.question}</p>
+                      <button
+                        onClick={() => toggleAnswerVisibility(q.questionId)}
+                        className="repository-interview-list__item-toggle"
+                      >
+                        정답 보기
+                      </button>
+                      {visibleAnswerMap[q.questionId] && (
+                        <p className="repository-interview-list__item-answer">{q.answer}</p>
+                      )}
+                    </div>
+                  ))}
                 </div>
               )}
             </li>
