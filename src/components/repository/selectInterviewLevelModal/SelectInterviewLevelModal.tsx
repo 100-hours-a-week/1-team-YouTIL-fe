@@ -27,7 +27,6 @@ const SelectInterviewLevelModal = ({ onClose, tilId }: Props) => {
   const [errorShake, setErrorShake] = useState(false);
   const { callApi } = useFetch();
   const accessToken = useGetAccessToken();
-  const [selectedTILId, setSelectedTILId] = useState(tilId);
 
   const toggleSelect = (value: 1 | 2 | 3) => {
     setSelectedLevel((prev) => (prev === value ? null : value));
@@ -40,7 +39,7 @@ const SelectInterviewLevelModal = ({ onClose, tilId }: Props) => {
         method: 'POST',
         endpoint: '/interviews',
         body: {
-          tilId: selectedTILId,
+          tilId: tilId,
           level: selectedLevel,
         },
         headers: {
