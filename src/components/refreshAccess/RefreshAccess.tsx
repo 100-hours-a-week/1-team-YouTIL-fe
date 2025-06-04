@@ -9,12 +9,12 @@ const RefreshAccess = () => {
   useEffect(() => {
     const checkAndRefresh = async () => {
       try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/news`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/users/refresh`, {
           method: 'GET',
           credentials: 'include',
         });
-        if (res.status === 401) {
-          const newAccessToken = res.headers.get("Authorization")?.replace("Bearer ", '');
+        if (response.status === 401) {
+          const newAccessToken = response.headers.get("Authorization")?.replace("Bearer ", '');
           if (newAccessToken) {
             setAccessToken(newAccessToken);
           } 
