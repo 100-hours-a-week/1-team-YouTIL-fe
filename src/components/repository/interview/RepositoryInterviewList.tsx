@@ -9,7 +9,6 @@ import { parseISO, format } from 'date-fns';
 import { useState } from 'react';
 import './RepositoryInterviewList.scss';
 
-
 interface InterviewResponse {
   data: {
     interviews: InterviewItem[];
@@ -47,6 +46,7 @@ const RepositoryInterviewList = () => {
   const { interviewDate } = useRepositoryDateStore();
   const [expandedInterviewId, setExpandedInterviewId] = useState<number | null>(null);
   const [visibleAnswerMap, setVisibleAnswerMap] = useState<Record<number, boolean>>({});
+  const [selectedInterviewIds, setSelectedInterviewIds] = useState<number[]>([]);
 
   const today = new Date();
   const yyyy = today.getFullYear();
@@ -102,11 +102,19 @@ const RepositoryInterviewList = () => {
   };
 
   const handleClickInterview = (interviewId: number) => {
+    if (selectedInterviewIds.includes(interviewId)) return;
     setExpandedInterviewId(prev => (prev === interviewId ? null : interviewId));
   };
 
-  const toggleAnswerVisibility = (questionId: number) => {
-    setVisibleAnswerMap(prev => ({ ...prev, [questionId]: !prev[questionId] }));
+  const toggleInterviewSelection = (interviewId: number) => {
+    setSelectedInterviewIds(prev =>
+      prev.includes(interviewId)
+        ? prev.filter(id => id !== interviewId)
+        : [...prev, interviewId]
+    );
+    if (expandedInterviewId === interviewId) {
+      setExpandedInterviewId(null);
+    }
   };
 
   return (
@@ -116,19 +124,32 @@ const RepositoryInterviewList = () => {
         {interviewData?.map((interview) => {
           const formattedDate = format(parseISO(interview.createdAt), 'yyyy-MM-dd : HH:mm:ss');
           const isExpanded = expandedInterviewId === interview.id;
+          const isSelected = selectedInterviewIds.includes(interview.id);
 
           return (
-            <li key={interview.id} className="repository-interview-list__item">
-              <div
-                className="repository-interview-list__item-header"
-                onClick={() => handleClickInterview(interview.id)}
-              >
-                <div className="repository-interview-list__item-header-top">
-                  <h3 className="repository-interview-list__item-title">
+            <li
+              key={interview.id}
+              className={`repository-interview-list__item ${isSelected ? 'selected' : ''}`}
+            >
+              <div className="repository-interview-list__item-header-wrapper">
+                <div
+                  className="repository-interview-list__item-header"
+                  onClick={() => handleClickInterview(interview.id)}
+                >
+                  <div className="repository-interview-list__item-header-top">
+                  <h3 className={`repository-interview-list__item-title${ isExpanded ? ' repository-interview-list__item-title--expanded' : ''}`}>
                     {interview.title} ({mapLevelToLabel(interview.level)})
                   </h3>
+                  </div>
+                  <p className="repository-interview-list__item-date">{formattedDate}</p>
                 </div>
-                <p className="repository-interview-list__item-date">{formattedDate}</p>
+
+                <input
+                  type="checkbox"
+                  className="repository-interview-list__item-checkbox"
+                  checked={isSelected}
+                  onChange={() => toggleInterviewSelection(interview.id)}
+                />
               </div>
 
               {isExpanded && interviewDetailData && (
@@ -137,7 +158,12 @@ const RepositoryInterviewList = () => {
                     <div key={q.questionId} className="repository-interview-list__item-question-block">
                       <p className="repository-interview-list__item-question">{q.question}</p>
                       <button
-                        onClick={() => toggleAnswerVisibility(q.questionId)}
+                        onClick={() =>
+                          setVisibleAnswerMap(prev => ({
+                            ...prev,
+                            [q.questionId]: !prev[q.questionId],
+                          }))
+                        }
                         className="repository-interview-list__item-toggle"
                       >
                         정답 보기

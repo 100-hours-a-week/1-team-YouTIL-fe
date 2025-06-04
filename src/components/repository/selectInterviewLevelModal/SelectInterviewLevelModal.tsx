@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
+import { useQueryClient } from '@tanstack/react-query';
 import './SelectInterviewLevelModal.scss';
 import Image from 'next/image';
 import { useFetch } from '@/hooks/useFetch';
@@ -26,6 +27,7 @@ const SelectInterviewLevelModal = ({ onClose, tilId }: Props) => {
   const [selectedLevel, setSelectedLevel] = useState<null | 1 | 2 | 3>(null);
   const [errorShake, setErrorShake] = useState(false);
   const { callApi } = useFetch();
+  const queryClient = useQueryClient();
   const accessToken = useGetAccessToken();
 
   const toggleSelect = (value: 1 | 2 | 3) => {
@@ -49,6 +51,7 @@ const SelectInterviewLevelModal = ({ onClose, tilId }: Props) => {
       });
     },
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['interviewList'] });
       onClose();
     },
   });
