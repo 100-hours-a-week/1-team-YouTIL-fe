@@ -16,7 +16,7 @@ interface InterviewResponse {
 interface InterviewItem {
   id: number;
   title: string;
-  level: 'EASY' | 'MEDIUM' | 'HARD';
+  level: 'EASY' | 'NORMAL' | 'HARD';
   createdAt: string;
 }
 
@@ -90,10 +90,10 @@ const RepositoryInterviewList = () => {
     gcTime: 3600000,
   });
 
-  const mapLevelToLabel = (level: 'EASY' | 'MEDIUM' | 'HARD'): string => {
+  const mapLevelToLabel = (level: 'EASY' | 'NORMAL' | 'HARD'): string => {
     switch (level) {
       case 'EASY': return '쉬움';
-      case 'MEDIUM': return '보통';
+      case 'NORMAL': return '보통';
       case 'HARD': return '어려움';
       default: return '-';
     }

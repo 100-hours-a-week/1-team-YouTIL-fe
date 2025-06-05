@@ -19,7 +19,7 @@ const difficultyOptions: {
   value: 3 | 2 | 1;
 }[] = [
   { label: '쉬움', image: '/images/intervieweasy.png', value: 3 },
-  { label: '보통', image: '/images/interviewmedium.png', value: 2 },
+  { label: '보통', image: '/images/interviewnormal.png', value: 2 },
   { label: '어려움', image: '/images/interviewhard.png', value: 1 },
 ];
 
