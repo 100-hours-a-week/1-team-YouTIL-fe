@@ -67,7 +67,7 @@ const SelectInterviewLevelModal = ({ onClose, tilId }: Props) => {
 
   return (
     <div className="interview-level-modal">
-      <div className="interview-level-modal__overlay" />
+      <div className="interview-level-modal__overlay" onClick={onClose}/>
       <div className={`interview-level-modal__content ${ mutation.isPending ? 'interview-level-modal__content--loading' : '' }`}
     >
   {mutation.isPending ? (

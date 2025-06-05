@@ -5,14 +5,13 @@ import { useFetch } from '@/hooks/useFetch';
 import { useRepositoryDateStore } from '@/store/useRepositoryDateStore';
 import useGetAccessToken from '@/hooks/useGetAccessToken';
 import useCheckAccess from '@/hooks/useCheckExistAccess';
+import CheckDeleteInterviewModal from '../checkDeleteInterviewModal/CheckDeleteInterviewModal';
 import { parseISO, format } from 'date-fns';
 import { useState } from 'react';
 import './RepositoryInterviewList.scss';
 
 interface InterviewResponse {
-  data: {
-    interviews: InterviewItem[];
-  };
+  data: { interviews: InterviewItem[] };
 }
 interface InterviewItem {
   id: number;
@@ -47,6 +46,9 @@ const RepositoryInterviewList = () => {
   const [expandedInterviewId, setExpandedInterviewId] = useState<number | null>(null);
   const [visibleAnswerMap, setVisibleAnswerMap] = useState<Record<number, boolean>>({});
   const [selectedInterviewIds, setSelectedInterviewIds] = useState<number[]>([]);
+  const [shakeDelete, setShakeDelete] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+
 
   const today = new Date();
   const yyyy = today.getFullYear();
@@ -61,9 +63,7 @@ const RepositoryInterviewList = () => {
       const response = await callApi<InterviewResponse>({
         method: 'GET',
         endpoint: `/interviews?page=0&size=10&date=${targetDate}`,
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
+        headers: { Authorization: `Bearer ${accessToken}` },
         credentials: 'include',
       });
       return response.data.interviews;
@@ -80,9 +80,7 @@ const RepositoryInterviewList = () => {
       const response = await callApi<InterviewDetailResponse>({
         method: 'GET',
         endpoint: `/interviews/${expandedInterviewId}`,
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
+        headers: { Authorization: `Bearer ${accessToken}` },
         credentials: 'include',
       });
       return response.data;
@@ -117,10 +115,28 @@ const RepositoryInterviewList = () => {
     }
   };
 
+  const handleDeleteClick = () => {
+    if (selectedInterviewIds.length === 0) {
+      setShakeDelete(true);
+      setTimeout(() => setShakeDelete(false), 500);
+    } else {
+      setShowDeleteModal(true);
+    }
+  };
   return (
     <div className="repository-interview-list">
-      <h2 className="repository-interview-list__title">면접 질문 목록</h2>
+      <div className="repository-interview-list__header">
+        <h2 className="repository-interview-list__title">면접 질문 목록</h2>
+        <button
+          className={`repository-interview-list__button${shakeDelete ? ' error shake' : ''}`}
+          onClick={handleDeleteClick}
+        >
+          삭제
+        </button>
+      </div>
+
       <ul className="repository-interview-list__items">
+
         {interviewData?.map((interview) => {
           const formattedDate = format(parseISO(interview.createdAt), 'yyyy-MM-dd : HH:mm:ss');
           const isExpanded = expandedInterviewId === interview.id;
@@ -137,9 +153,9 @@ const RepositoryInterviewList = () => {
                   onClick={() => handleClickInterview(interview.id)}
                 >
                   <div className="repository-interview-list__item-header-top">
-                  <h3 className={`repository-interview-list__item-title${ isExpanded ? ' repository-interview-list__item-title--expanded' : ''}`}>
-                    {interview.title} ({mapLevelToLabel(interview.level)})
-                  </h3>
+                    <h3 className={`repository-interview-list__item-title${ isExpanded ? ' repository-interview-list__item-title--expanded' : ''}`}>
+                      {interview.title} ({mapLevelToLabel(interview.level)})
+                    </h3>
                   </div>
                   <p className="repository-interview-list__item-date">{formattedDate}</p>
                 </div>
@@ -179,6 +195,13 @@ const RepositoryInterviewList = () => {
           );
         })}
       </ul>
+      {showDeleteModal && (
+        <CheckDeleteInterviewModal
+          interviewIds={selectedInterviewIds}
+          onClose={() => setShowDeleteModal(false)}
+          onDeleteComplete={() => setSelectedInterviewIds([])}
+        />
+      )}
     </div>
   );
 };
