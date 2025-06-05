@@ -179,13 +179,13 @@ const Heatmap = () => {
       <div className="heatmap-wrapper__container">
         <div className="heatmap-wrapper__content">
           <div className="heatmap-wrapper__controls-left">
-            <button onClick={handlePrevDomain}>&lt;</button>
+            <button  className={prevStep === 0 ? 'disabled' : ''} onClick={handlePrevDomain}>&lt;</button>
           </div>
 
           <div id="ex-ghDay" className="heatmap-wrapper__calendar"></div>
 
           <div className="heatmap-wrapper__controls-right">
-            <button onClick={handleNextDomain}>&gt;</button>
+            <button className={nextStep === 0 ? 'disabled' : ''} onClick={handleNextDomain} >&gt;</button>
           </div>
         </div>
 
