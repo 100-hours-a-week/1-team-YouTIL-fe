@@ -11,14 +11,17 @@ import { useFetch } from '@/hooks/useFetch';
 import useGetAccessToken from '@/hooks/useGetAccessToken';
 import { format } from 'date-fns';
 import useCheckAccess from '@/hooks/useCheckExistAccess';
+import { usePrevDomainStep } from '@/hooks/usePrevDomainStep';
+import { useNextDomainStep } from '@/hooks/useNextDomainStep';
 import 'cal-heatmap/cal-heatmap.css';
 import './Heatmap.scss';
 
 const weekdays = ['Sun', 'Mon', 'Tues', 'Wed', 'Thur', 'Fri', 'Sat'];
 const currentDate = new Date();
 const basicYear = currentDate.getFullYear();
-const rawCurrentMonth = currentDate.getMonth();
-const adjustedCurrentMonth = rawCurrentMonth >= 9 ? 8 : rawCurrentMonth;
+
+const rawCurrentMonth = currentDate.getMonth() + 1; // 0 ~ 11
+const adjustedCurrentMonth = rawCurrentMonth >= 9 ? 9 : rawCurrentMonth;
 
 interface TilApiResponse {
   data: {
@@ -38,6 +41,8 @@ interface TilData {
   count: number;
 }
 
+
+
 const Heatmap = () => {
   const [cal, setCal] = useState<CalHeatmap | null>(null);
   const [year, setYear] = useState(basicYear);
@@ -47,6 +52,8 @@ const Heatmap = () => {
   const { callApi } = useFetch();
   const accessToken = useGetAccessToken();
   const existAccess = useCheckAccess(accessToken);
+  const prevStep = usePrevDomainStep(currentMonth);
+  const nextStep = useNextDomainStep(currentMonth);
   
   const { data: tilData = [] } = useQuery<TilData[]>({
     queryKey: ['til-data'] as const,
@@ -81,7 +88,7 @@ const Heatmap = () => {
 
   useEffect(() => {
     if (!heatmapRef.current && tilData.length > 0) {
-      const startMonthDate = new Date(`${year}-${String(currentMonth + 1).padStart(2, '0')}-01`);
+      const startMonthDate = new Date(`${year}-${String(currentMonth).padStart(2, '0')}-01`);
 
       heatmapRef.current = new CalHeatmap();
 
@@ -124,7 +131,9 @@ const Heatmap = () => {
             y: 'count',
             groupY: 'max',
           },
-          date: { start: startMonthDate },
+          date: { 
+            start: startMonthDate
+          },
           range: 4,
           scale: {
             color: {
@@ -152,15 +161,17 @@ const Heatmap = () => {
   };
 
   const handlePrevDomain = () => {
-    if (currentMonth - 4 < 0) return;
-    setCurrentMonth(prev => prev - 4);
-    cal?.previous(4);
+    if (prevStep === 0) return;
+  
+    setCurrentMonth(prev => prev - prevStep);
+    cal?.previous(prevStep);
   };
-
+  
   const handleNextDomain = () => {
-    if (currentMonth + 4 > 11) return;
-    setCurrentMonth(prev => prev + 4);
-    cal?.next(4);
+    if (nextStep === 0) return;
+  
+    setCurrentMonth(prev => prev + nextStep);
+    cal?.next(nextStep);
   };
 
   return (
