@@ -213,7 +213,7 @@ const Heatmap = () => {
                   setIsOpen(false);
                   handleNextClick(basicYear + offset);
                   setYear(basicYear + offset);
-                  setCurrentMonth(0);
+                  setCurrentMonth(1);
                 }}
               >
                 {basicYear + offset}
