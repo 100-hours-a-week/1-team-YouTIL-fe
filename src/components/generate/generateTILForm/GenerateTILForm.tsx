@@ -64,7 +64,6 @@ const GenerateTILForm = () => {
   
   const submitTIL = async (payload: TILPayload) => {
     try {
-      console.log("submitTIL 시작")
       await callApi({
         method: 'POST',
         endpoint: '/tils',

@@ -8,6 +8,7 @@ import useCheckAccess from '@/hooks/useCheckExistAccess';
 import { useRepositoryDateStore } from '@/store/useRepositoryDateStore';
 import { parseISO, format } from 'date-fns';
 import './RepositoryTILList.scss';
+import SelectInterviewLevelModal from '../selectInterviewLevelModal/SelectInterviewLevelModal';
 
 interface TILItem {
   tilId: number;
@@ -38,6 +39,7 @@ const RepositoryTILList = () => {
   const { callApi } = useFetch();
   const { tilDate } = useRepositoryDateStore();
   const [expandedTilId, setExpandedTilId] = useState<number | null>(null);
+  const [showInterviewModal, setShowInterviewModal] = useState(false);
   const accessToken = useGetAccessToken();
   const existAccess = useCheckAccess(accessToken);
 
@@ -65,7 +67,6 @@ const RepositoryTILList = () => {
     enabled: existAccess,
     staleTime: 1800000,
     gcTime: 3600000,
-    //til 생성 후 바로 수동 갱신
   });
 
   const handleClickTIL = (tilId: number) => {
@@ -74,6 +75,15 @@ const RepositoryTILList = () => {
     } else {
       setExpandedTilId(tilId);
     }
+  };
+
+  const handleOpenInterviewModal = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setShowInterviewModal(true);
+  };
+
+  const handleCloseInterviewModal = () => {
+    setShowInterviewModal(false);
   };
 
   const { data: tilDetailData, isLoading: isDetailLoading } = useQuery<TILDetailItem | null>({
@@ -95,7 +105,6 @@ const RepositoryTILList = () => {
     enabled: expandedTilId !== null && existAccess,
     staleTime: Infinity,
     gcTime: 3600000,
-    //한 번 생성된 til 상세는 변하지 않으므로 refetch 및 수동갱신 x
   });
 
   return (
@@ -112,7 +121,17 @@ const RepositoryTILList = () => {
                 className="repository-til-list__item-header"
                 onClick={() => handleClickTIL(til.tilId)}
               >
-                <h3 className="repository-til-list__item-title">{til.title}</h3>
+                <div className="repository-til-list__item-header-top">
+                  <h3 className="repository-til-list__item-title">{til.title}</h3>
+                  {expandedTilId === til.tilId && (
+                    <button
+                      className="repository-til-list__item-generate-button"
+                      onClick={handleOpenInterviewModal}
+                    >
+                      면접질문생성
+                    </button>
+                  )}
+                </div>
                 <p className="repository-til-list__item-date">{formattedDate}</p>
               </div>
 
@@ -141,6 +160,13 @@ const RepositoryTILList = () => {
           );
         })}
       </ul>
+
+      {showInterviewModal && expandedTilId !== null && (
+        <SelectInterviewLevelModal
+          tilId={expandedTilId}
+          onClose={handleCloseInterviewModal}
+        />
+      )}
     </div>
   );
 };
