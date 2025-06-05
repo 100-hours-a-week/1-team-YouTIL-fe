@@ -29,6 +29,7 @@ const SelectInterviewLevelModal = ({ onClose, tilId }: Props) => {
   const { callApi } = useFetch();
   const queryClient = useQueryClient();
   const accessToken = useGetAccessToken();
+  const [isGenerating, setIsGenerating] = useState(false);
 
   const toggleSelect = (value: 1 | 2 | 3) => {
     setSelectedLevel((prev) => (prev === value ? null : value));
@@ -50,11 +51,18 @@ const SelectInterviewLevelModal = ({ onClose, tilId }: Props) => {
         credentials: 'include',
       });
     },
+    onMutate: () => {
+      setIsGenerating(true);
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['interviewList'] });
       onClose();
     },
+    onSettled: () => {
+      setIsGenerating(false);
+    },
   });
+  
 
   const handleGenerate = () => {
     if (selectedLevel) {
@@ -67,7 +75,7 @@ const SelectInterviewLevelModal = ({ onClose, tilId }: Props) => {
 
   return (
     <div className="interview-level-modal">
-      <div className="interview-level-modal__overlay" onClick={onClose}/>
+      <div className="interview-level-modal__overlay" onClick={isGenerating ? undefined : onClose}/>
       <div className={`interview-level-modal__content ${ mutation.isPending ? 'interview-level-modal__content--loading' : '' }`}
     >
   {mutation.isPending ? (
