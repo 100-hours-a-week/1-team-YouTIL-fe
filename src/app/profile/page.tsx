@@ -1,7 +1,13 @@
+import UserNickNameDescription from "@/components/profile/userNickNameDescription/UserNickNameDescription";
+import UserProfileInfo from "@/components/profile/userProfileInfo/UserProfileInfo";
+import UserTILButton from "@/components/profile/userTILButton/UserTILButton";
+
 const profile =() =>{
     return(
         <div>
-            곧 출시 예정인 서비스입니다!
+            <UserNickNameDescription/>
+            <UserProfileInfo/>
+            <UserTILButton/>
         </div>
     )
 }
