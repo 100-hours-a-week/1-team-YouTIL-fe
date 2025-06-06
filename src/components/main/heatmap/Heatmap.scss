@@ -35,8 +35,11 @@
       cursor: pointer;
       font-size: 1.5rem;
       background: transparent;
-      border: none;
       padding: 0.25rem;
+
+      &.disabled {
+        color: #ccc;
+      }
     }
   } 
 
