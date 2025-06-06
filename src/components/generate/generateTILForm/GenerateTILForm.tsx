@@ -9,7 +9,7 @@ import useGetAccessToken from '@/hooks/useGetAccessToken';
 import { useFetch } from '@/hooks/useFetch';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useQueryClient } from '@tanstack/react-query';
+import { useQueryClient, useMutation } from '@tanstack/react-query';
 import GenerateTILModal from '../generateTILModal/GenerateTILModal';
 // import DeadLineModal from '../deadLineModal/DeadLineModal';
 
@@ -63,9 +63,9 @@ const GenerateTILForm = () => {
     is_shared: visibility === 'public',
   });
   
-  const submitTIL = async (payload: TILPayload) => {
-    try {
-      await callApi({
+  const mutation = useMutation({
+    mutationFn: async (payload: TILPayload) => {
+      return await callApi({
         method: 'POST',
         endpoint: '/tils',
         body: payload,
@@ -75,41 +75,30 @@ const GenerateTILForm = () => {
         },
         credentials: 'include',
       });
-
-      await queryClient.invalidateQueries({
-        queryKey: ['tilList'],
-
-      });
-      await queryClient.refetchQueries({
-        queryKey: ['recent-tils'],
-        exact: true,
-      });
-      
-      return { success: true };
-    } catch (error) {
-      if (error instanceof Error && error.message.includes('503')) {
-        return { success: false, deadlineError: true };
-      }
-      console.error('TIL 생성 실패:', error);
-      return { success: false, deadlineError: false };
-    }
-  };
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['tilList'] });
+      queryClient.refetchQueries({ queryKey: ['recent-tils'], exact: true });
+      router.push('/repository');
+    },
+    onError: () => {
+      setSubmitResult({ success: false });
+    },
+    onMutate: () => {
+      setIsLoading(true);
+    },
+    onSettled: () => {
+      setIsLoading(false);
+    },
+  });
   
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validateTitle(title, setShake)) return;
   
     const payload = buildPayload();
-    setIsLoading(true);
+    mutation.mutate(payload);
   
-    const result = await submitTIL(payload);
-    setIsLoading(false);
-    setSubmitResult(result);
-  
-    if (result.success) {
-      router.push('/repository');
-    }
-      
     //else if (result.deadlineError) { //데드라인 모달 트리거거(3시부터 12시 이외엔 CPU 서버를 사용하므로 현재 비활성화화)
     //   setIsDeadlineError(true);
     // }

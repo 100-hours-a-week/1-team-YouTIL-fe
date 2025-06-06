@@ -10,6 +10,11 @@ interface UseFetchParams {
   credentials?: RequestCredentials;
 }
 
+interface FetchError {
+  status: number;
+  message: string;
+}
+
 export const useFetch = () => {
   const callApi = useCallback(
     async <T,>(params: UseFetchParams): Promise<T> => {
@@ -23,7 +28,10 @@ export const useFetch = () => {
 
       const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
       if (!baseUrl) {
-        throw new Error('환경변수 NEXT_PUBLIC_BASE_URL이 설정되지 않았습니다.');
+        return Promise.reject({
+          status: 500,
+          message: '환경변수 NEXT_PUBLIC_BASE_URL이 설정되지 않았습니다.',
+        });
       }
 
       const response = await fetch(`${baseUrl}${endpoint}`, {
@@ -38,7 +46,10 @@ export const useFetch = () => {
 
       if (!response.ok) {
         const errorText = await response.text();
-        throw new Error(`HTTP ${response.status}: ${errorText}`);
+        return Promise.reject({
+          status: response.status,
+          message: errorText,
+        } as FetchError);
       }
 
       return response.json();
