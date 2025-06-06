@@ -98,11 +98,11 @@ const SelectInterviewLevelModal = ({ onClose, tilId }: Props) => {
           </div>
         ) : resultMessage === 'success' ? (
             <div className="interview-level-modal__result success">
-              <SuccessIcon />
               <div className="interview-level-modal__text">
                 <p className="interview-level-modal__line1">면접질문 생성에 성공하였습니다!</p>
-                <p className="interview-level-modal__line2">면접 질문을 확인해보세요요</p>
+                <p className="interview-level-modal__line2">면접 질문을 확인해보세요</p>
               </div>
+              <SuccessIcon />
             </div>
         ) : resultMessage === 'error' ? (
             <div className="interview-level-modal__result error">

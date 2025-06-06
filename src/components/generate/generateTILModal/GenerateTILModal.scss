@@ -52,6 +52,32 @@
     font-size: 0.85rem;
   }
 
+  &__result {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 1rem;
+  
+    &--error {
+      color: #ff4d4f;
+    }
+  }
+  
+  &__text-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  &__line1 {
+    margin-bottom: 0.4rem;
+  }
+  
+  &__line2 {
+    margin: 0;
+  }
+
   @keyframes spin {
     0%   { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }

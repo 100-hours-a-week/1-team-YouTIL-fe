@@ -41,6 +41,7 @@ const GenerateTILForm = () => {
   const [visibility, setVisibility] = useState<'public' | 'private'>('public');
   const [shake, setShake] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [submitResult, setSubmitResult] = useState<{ success: boolean } | null>(null);
   // const [isDeadlineError, setIsDeadlineError] = useState(false);
 
   const validateTitle = (title: string, setShake: (s: boolean) => void): boolean => {
@@ -103,6 +104,7 @@ const GenerateTILForm = () => {
   
     const result = await submitTIL(payload);
     setIsLoading(false);
+    setSubmitResult(result);
   
     if (result.success) {
       router.push('/repository');
@@ -115,7 +117,12 @@ const GenerateTILForm = () => {
 
   return (
     <>
-      {isLoading && <GenerateTILModal />}
+      {(isLoading || submitResult?.success === false) && (
+        <GenerateTILModal
+          isError={submitResult?.success === false}
+          onClose={() => setSubmitResult(null)}
+        />
+      )}
       {/* {isDeadlineError && <DeadLineModal onClose={() => setIsDeadlineError(false)} />} */}
 
       <div className="generate">
