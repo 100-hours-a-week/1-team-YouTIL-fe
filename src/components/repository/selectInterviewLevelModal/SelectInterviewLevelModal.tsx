@@ -7,6 +7,8 @@ import './SelectInterviewLevelModal.scss';
 import Image from 'next/image';
 import { useFetch } from '@/hooks/useFetch';
 import useGetAccessToken from '@/hooks/useGetAccessToken';
+import SuccessIcon from '@/components/icon/SuccessIcon';
+import FailedIcon from '@/components/icon/FailedIcon';
 
 interface Props {
   tilId: number;
@@ -26,6 +28,7 @@ const difficultyOptions: {
 const SelectInterviewLevelModal = ({ onClose, tilId }: Props) => {
   const [selectedLevel, setSelectedLevel] = useState<null | 1 | 2 | 3>(null);
   const [errorShake, setErrorShake] = useState(false);
+  const [resultMessage, setResultMessage] = useState<'success' | 'error' | null>(null);
   const { callApi } = useFetch();
   const queryClient = useQueryClient();
   const accessToken = useGetAccessToken();
@@ -53,16 +56,20 @@ const SelectInterviewLevelModal = ({ onClose, tilId }: Props) => {
     },
     onMutate: () => {
       setIsGenerating(true);
+      setResultMessage(null);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['interviewList'] });
-      onClose();
+      setResultMessage('success');
+      setTimeout(onClose, 1500);
+    },
+    onError: () => {
+      setResultMessage('error');
     },
     onSettled: () => {
       setIsGenerating(false);
     },
   });
-  
 
   const handleGenerate = () => {
     if (selectedLevel) {
@@ -75,17 +82,36 @@ const SelectInterviewLevelModal = ({ onClose, tilId }: Props) => {
 
   return (
     <div className="interview-level-modal">
-      <div className="interview-level-modal__overlay" onClick={isGenerating ? undefined : onClose}/>
-      <div className={`interview-level-modal__content ${ mutation.isPending ? 'interview-level-modal__content--loading' : '' }`}
-    >
-  {mutation.isPending ? (
-    <div className="interview-level-modal__loading">
-      <div className="interview-level-modal__loading-spinner-text">
-        <div className="spinner" />
-        <p className="loading__text">면접질문 생성중...</p>
-      </div>
-      <p className="loading__subtext">면접질문 생성시 30초 정도의 시간이 소요 됩니다</p>
-    </div>
+      <div className="interview-level-modal__overlay" onClick={isGenerating ? undefined : onClose} />
+      <div
+        className={`interview-level-modal__content ${
+          mutation.isPending ? 'interview-level-modal__content--loading' : ''
+        }`}
+      >
+        {mutation.isPending ? (
+          <div className="interview-level-modal__loading">
+            <div className="interview-level-modal__loading-spinner-text">
+              <div className="spinner" />
+              <p className="loading__text">면접질문 생성중...</p>
+            </div>
+            <p className="loading__subtext">면접질문 생성시 30초 정도의 시간이 소요 됩니다</p>
+          </div>
+        ) : resultMessage === 'success' ? (
+            <div className="interview-level-modal__result success">
+              <SuccessIcon />
+              <div className="interview-level-modal__text">
+                <p className="interview-level-modal__line1">면접질문 생성에 성공하였습니다!</p>
+                <p className="interview-level-modal__line2">면접 질문을 확인해보세요요</p>
+              </div>
+            </div>
+        ) : resultMessage === 'error' ? (
+            <div className="interview-level-modal__result error">
+              <div className="interview-level-modal__text">
+                <p className="interview-level-modal__line1">면접질문 생성에 실패하였습니다</p>
+                <p className="interview-level-modal__line2">다시 시도해주세요</p>
+              </div>
+              <FailedIcon />
+            </div>
         ) : (
           <>
             <h2 className="interview-level-modal__title">면접 난이도를 선택해주세요</h2>
@@ -109,9 +135,7 @@ const SelectInterviewLevelModal = ({ onClose, tilId }: Props) => {
                 취소
               </button>
               <button
-                className={`interview-level-modal__button ${
-                  errorShake ? 'error shake' : ''
-                }`}
+                className={`interview-level-modal__button ${errorShake ? 'error shake' : ''}`}
                 onClick={handleGenerate}
               >
                 생성
