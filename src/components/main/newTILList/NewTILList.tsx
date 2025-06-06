@@ -4,8 +4,12 @@ import './NewTILList.scss';
 import { useQuery } from '@tanstack/react-query';
 import { useFetch } from '@/hooks/useFetch';
 import useGetAccessToken from '@/hooks/useGetAccessToken';
-import { parseISO, format } from 'date-fns';
 import useCheckAccess from '@/hooks/useCheckExistAccess';
+import { parseISO, format } from 'date-fns';
+
+interface TILResponse {
+  data: TILItem[];
+}
 
 interface TILItem {
   id: number;
@@ -21,16 +25,12 @@ interface TILItem {
   createdAt: string;
 }
 
-interface TILResponse {
-  data: TILItem[];
-}
-
 const NewTILList = () => {
   const { callApi } = useFetch();
   const accessToken = useGetAccessToken();
   const existAccess = useCheckAccess(accessToken);
 
-  const { data: tils, isError, } = useQuery<TILItem[]>({
+  const { data: tils, isError } = useQuery<TILItem[]>({
     queryKey: ['recent-tils'] as const,
     queryFn: async () => {
       const response = await callApi<TILResponse>({
