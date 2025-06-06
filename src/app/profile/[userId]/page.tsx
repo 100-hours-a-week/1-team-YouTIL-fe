@@ -43,7 +43,10 @@ const ProfilePage = () => {
     resetOtherUserInfo();
   }, [parsedUserId, resetOtherUserInfo]);
 
-  useQuery<UserInfoResponse>({
+  const {
+    isLoading: isUserInfoLoading,
+    isError: isUserInfoError,
+  } = useQuery<UserInfoResponse>({
     queryKey: ['userInfo'],
     queryFn: async () => {
       const response = await callApi<UserInfoResponse>({
@@ -65,7 +68,10 @@ const ProfilePage = () => {
     gcTime: 3600000,
   });
 
-  const { isError } = useQuery<UserInfo>({
+  const {
+    isLoading: isOtherUserInfoLoading,
+    isError: isOtherUserInfoError,
+  } = useQuery<UserInfo>({
     queryKey: ['otheruser-info', parsedUserId],
     queryFn: async () => {
       const response = await callApi<UserInfoResponse>({
@@ -89,7 +95,13 @@ const ProfilePage = () => {
     refetchOnWindowFocus: false,
   });
 
-  if (isError) return <div>유저 정보를 불러오는 데 실패했습니다.</div>;
+  if (isUserInfoError || isOtherUserInfoError) {
+    return <div>유저 정보를 불러오는 데 실패했습니다.</div>;
+  }
+
+  if (isUserInfoLoading || isOtherUserInfoLoading) {
+    return null;
+  }
 
   return (
     <div>
