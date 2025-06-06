@@ -73,9 +73,10 @@ const NewTILList = () => {
                 className="til-list__profile-image"
               />
             </Link>
-            <Link href={`/profile/${til.userId}`}>
-              <span className="til-list__nickname">{til.nickname}</span>
+            <Link href={`/profile/${til.userId}`} className="til-list__nickname">
+              {til.nickname}
             </Link>
+
             <span className="til-list__views">조회수 {til.visitedCount}</span>
             <span className="til-list__likes">추천 {til.recommendCount}</span>
             <span className="til-list__date">

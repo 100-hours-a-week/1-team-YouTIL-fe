@@ -81,9 +81,32 @@
     border-radius: 50%;
     object-fit: cover;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+    transition: transform 0.2s ease;
+    cursor: pointer;
+    margin-right: 4px;
+
+    &:hover {
+      transform: scale(1.15);
+    }
   }
 
-  &__nickname,
+  &__nickname {
+    white-space: nowrap;
+    text-decoration: none;
+    color: inherit;
+    transition: transform 0.2s ease;
+    cursor: pointer;
+    margin-right: 6px;
+
+    &:hover {
+      transform: scale(1.1);
+    }
+
+    &:visited {
+      color: inherit;
+    }
+  }
+
   &__views,
   &__likes {
     white-space: nowrap;
