@@ -1,10 +1,10 @@
 'use client';
 
 import './UserNickNameDescription.scss';
-import useUserInfoStore from '@/store/useUserInfoStore';
+import useOtherUserInfoStore from '@/store/useOtherUserInfoStore';
 
 const UserNickNameDescription = () => {
-  const name = useUserInfoStore((state) => state.userInfo.name);
+  const name = useOtherUserInfoStore((state) => state.otherUserInfo.name);
 
   return (
     <div className="user-nickname">

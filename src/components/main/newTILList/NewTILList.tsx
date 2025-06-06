@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import './NewTILList.scss';
 import { useQuery } from '@tanstack/react-query';
 import { useFetch } from '@/hooks/useFetch';
@@ -65,7 +66,16 @@ const NewTILList = () => {
             ))}
           </div>
           <div className="til-list__footer">
-            <span className="til-list__nickname">{til.nickname}</span>
+            <Link href={`/profile/${til.userId}`}>
+              <img
+                src={til.profileImageUrl}
+                alt={`${til.nickname}의 프로필 이미지`}
+                className="til-list__profile-image"
+              />
+            </Link>
+            <Link href={`/profile/${til.userId}`}>
+              <span className="til-list__nickname">{til.nickname}</span>
+            </Link>
             <span className="til-list__views">조회수 {til.visitedCount}</span>
             <span className="til-list__likes">추천 {til.recommendCount}</span>
             <span className="til-list__date">

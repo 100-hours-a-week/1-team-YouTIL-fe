@@ -1,10 +1,12 @@
 'use client';
 
 import './UserProfileInfo.scss';
-import useUserInfoStore from '@/store/useUserInfoStore';
+import useOtherUserInfoStore from '@/store/useOtherUserInfoStore';
 
 const UserProfileInfo = () => {
-  const { profileUrl, description } = useUserInfoStore((state) => state.userInfo);
+  const { profileUrl, description } = useOtherUserInfoStore(
+    (state) => state.otherUserInfo
+  );
 
   return (
     <div className="user-profile">
