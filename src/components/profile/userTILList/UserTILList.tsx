@@ -1,12 +1,13 @@
 'use client';
 
 import Link from 'next/link';
-import { useQuery } from '@tanstack/react-query';
+import { useInfiniteQuery, type QueryFunctionContext } from '@tanstack/react-query';
 import { useParams } from 'next/navigation';
 import { useFetch } from '@/hooks/useFetch';
 import useAuthStore from '@/store/useAuthStore';
 import { parseISO, format } from 'date-fns';
 import Image from 'next/image';
+import { useCallback, useRef } from 'react';
 import './UserTILList.scss';
 
 interface TILItem {
@@ -29,66 +30,100 @@ const UserTILList = () => {
   const { callApi } = useFetch();
   const accessToken = useAuthStore((state) => state.accessToken);
   const { userId } = useParams<{ userId: string }>();
+  const observer = useRef<IntersectionObserver | null>(null);
 
-  const { data, isError } = useQuery({
+  const { data, isError, isFetchingNextPage, hasNextPage, fetchNextPage } = useInfiniteQuery<TILResponse, Error>({
     queryKey: ['user-tils', userId],
-    queryFn: async () => {
-      return await callApi<TILResponse>({
-        method: 'GET',
-        endpoint: `/users/${userId}/tils?page=0&offset=20`,
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-        credentials: 'include',
-      });
+    queryFn: async ({ pageParam }: QueryFunctionContext) => {
+        const page = (pageParam as number) ?? 0;
+      
+        return await callApi<TILResponse>({
+          method: 'GET',
+          endpoint: `/users/${userId}/tils?page=${page}&offset=20`,
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+          credentials: 'include',
+        });
+      },
+    initialPageParam: 0,
+    getNextPageParam: (lastPage, allPages) => {
+      if (lastPage.data.tils.length < 20) return undefined;
+      return allPages.length;
     },
     enabled: !!userId,
     staleTime: 300000,
     gcTime: 300000,
   });
 
+  const lastItemRef = useCallback(
+    (node: HTMLDivElement | null) => {
+      if (isFetchingNextPage || !hasNextPage) return;
+      if (observer.current) observer.current.disconnect();
+
+      observer.current = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting) {
+          fetchNextPage();
+        }
+      });
+
+      if (node) observer.current.observe(node);
+    },
+    [isFetchingNextPage, hasNextPage, fetchNextPage]
+  );
+
   if (isError || !data) return <div>에러가 발생했습니다.</div>;
 
   return (
     <div className="usertil-list">
-      {data.data.tils.map((til) => (
-        <div key={til.tilId} className="usertil-list__item">
-          <div className="usertil-list__header">
-            <p className="usertil-list__title">{til.title}</p>
-          </div>
+      {data.pages.map((page, pageIndex) =>
+        page.data.tils.map((til, tilIndex) => {
+          const isLastItem =
+            pageIndex === data.pages.length - 1 &&
+            tilIndex === page.data.tils.length - 1;
 
-          <div className="usertil-list__tags">
-            {til.tags.map((tag, i) => (
-              <span key={i} className="usertil-list__tag">
-                #{tag}
-              </span>
-            ))}
-          </div>
+          return (
+            <div
+              key={til.tilId}
+              className="usertil-list__item"
+              ref={isLastItem ? lastItemRef : undefined}
+            >
+              <div className="usertil-list__header">
+                <p className="usertil-list__title">{til.title}</p>
+              </div>
 
-          <div className="usertil-list__footer">
-            <Link href={`/profile/${userId}`}>
-              <Image
-                src={til.userProfileImageUrl}
-                alt={`${til.userName}의 프로필 이미지`}
-                width={24}
-                height={24}
-                className="usertil-list__profile-image"
-              />
-            </Link>
-            <Link href={`/profile/${userId}`} className="usertil-list__nickname">
-              {til.userName}
-            </Link>
+              <div className="usertil-list__tags">
+                {til.tags.map((tag, i) => (
+                  <span key={i} className="usertil-list__tag">
+                    #{tag}
+                  </span>
+                ))}
+              </div>
 
-            <span className="usertil-list__views">조회수 0</span>
-            <span className="usertil-list__likes">추천 0</span>
-           
+              <div className="usertil-list__footer">
+                <Link href={`/profile/${userId}`}>
+                  <Image
+                    src={til.userProfileImageUrl}
+                    alt={`${til.userName}의 프로필 이미지`}
+                    width={24}
+                    height={24}
+                    className="usertil-list__profile-image"
+                  />
+                </Link>
+                <Link href={`/profile/${userId}`} className="usertil-list__nickname">
+                  {til.userName}
+                </Link>
 
-            <span className="usertil-list__date">
-              {format(parseISO(til.createdAt), 'yyyy-MM-dd : HH:mm:ss')}
-            </span>
-          </div>
-        </div>
-      ))}
+                <span className="usertil-list__views">조회수 0</span>
+                <span className="usertil-list__likes">추천 0</span>
+                <span className="usertil-list__date">
+                  {format(parseISO(til.createdAt), 'yyyy-MM-dd : HH:mm:ss')}
+                </span>
+              </div>
+            </div>
+          );
+        })
+      )}
     </div>
   );
 };
