@@ -11,7 +11,7 @@ const UserNickNameDescription = () => {
   return (
     <div className="user-nickname">
       <div className="user-nickname__box">
-        {`${name} 님의 마이페이지`}
+        {name ? `${name} 님의 마이페이지` : '닉네임 정보 없음'}
       </div>
     </div>
   );

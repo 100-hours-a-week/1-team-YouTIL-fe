@@ -1,6 +1,6 @@
 import { useCallback } from 'react';
 
-type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE';
+type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
 
 interface UseFetchParams {
   method: HttpMethod;
@@ -8,6 +8,7 @@ interface UseFetchParams {
   body?: unknown | null;
   headers?: Record<string, string> | null;
   credentials?: RequestCredentials;
+  isFormData?: boolean; // 🔥 추가된 옵션
 }
 
 interface FetchError {
@@ -24,6 +25,7 @@ export const useFetch = () => {
         body = null,
         headers = null,
         credentials = 'same-origin',
+        isFormData = false,
       } = params;
 
       const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
@@ -34,14 +36,23 @@ export const useFetch = () => {
         });
       }
 
+      const mergedHeaders: Record<string, string> = {
+        ...(headers || {}),
+      };
+
+      if (!isFormData) {
+        mergedHeaders['Content-Type'] = 'application/json';
+      }
+
       const response = await fetch(`${baseUrl}${endpoint}`, {
         method,
         credentials,
-        headers: {
-          'Content-Type': 'application/json',
-          ...(headers || {}),
-        },
-        body: body ? JSON.stringify(body) : undefined,
+        headers: mergedHeaders,
+        body: body
+          ? isFormData
+            ? (body as FormData)
+            : JSON.stringify(body)
+          : undefined,
       });
 
       if (!response.ok) {

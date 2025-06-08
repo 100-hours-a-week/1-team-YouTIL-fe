@@ -1,37 +1,151 @@
 'use client';
 
+import { useRef, useState } from 'react';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import './UserProfileInfo.scss';
+
 import useOtherUserInfoStore from '@/store/useOtherUserInfoStore';
 import useUserInfoStore from '@/store/useUserInfoStore';
+import { useFetch } from '@/hooks/useFetch';
+import useGetAccessToken from '@/hooks/useGetAccessToken';
 
 const UserProfileInfo = () => {
-    const { profileUrl, description, userId: otherUserId } = useOtherUserInfoStore(
-      (state) => state.otherUserInfo
-    );
-    const myUserId = useUserInfoStore((state) => state.userInfo.userId);
-  
-    if (otherUserId === null || myUserId === null) return null;
-  
-    const isOwner = myUserId === otherUserId;
-  
-    return (
-      <div className="user-profile">
-        {isOwner && <button className="user-profile__edit-button">수정</button>}
-        <div className="user-profile__content">
-          {profileUrl && (
-            <img
-              src={profileUrl}
-              alt="유저 프로필 이미지"
-              className="user-profile__image"
-            />
-          )}
-          <div className="user-profile__introduction">
-            {description ?? '유저 소개 없음'}
-          </div>
-        </div>
-      </div>
-    );
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const accessToken = useGetAccessToken();
+  const { callApi } = useFetch();
+  const queryClient = useQueryClient();
+
+  const {
+    profileUrl: originalProfileUrl,
+    description: originalDescription,
+    userId: otherUserId,
+    name,
+  } = useOtherUserInfoStore((state) => state.otherUserInfo);
+  const setOtherUserInfo = useOtherUserInfoStore((state) => state.setOtherUserInfo);
+
+  const myUserId = useUserInfoStore((state) => state.userInfo.userId);
+  const isOwner = myUserId === otherUserId;
+
+  const [editMode, setEditMode] = useState(false);
+  const [selectedImageFile, setSelectedImageFile] = useState<File | null>(null);
+  const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(originalProfileUrl);
+  const [updatedDescription, setUpdatedDescription] = useState(originalDescription ?? '');
+
+  const mutation = useMutation({
+    mutationFn: async () => {
+      let newProfileImageUrl = originalProfileUrl;
+
+      if (selectedImageFile) {
+        const formData = new FormData();
+        formData.append('image', selectedImageFile);
+
+        const GCPImageUrl = await callApi<{ data: { imageUrl: string } }>({
+          method: 'POST',
+          endpoint: '/GCP/images',
+          body: formData,
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+          credentials: 'include',
+          isFormData: true,
+        });
+
+        newProfileImageUrl = GCPImageUrl.data.imageUrl;
+      }
+
+      await callApi({
+        method: 'PATCH',
+        endpoint: '/users',
+        body: {
+          description: updatedDescription,
+          profileImageUrl: newProfileImageUrl,
+        },
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${accessToken}`,
+        },
+        credentials: 'include',
+      });
+
+      setOtherUserInfo({
+        userId: otherUserId,
+        name,
+        profileUrl: newProfileImageUrl,
+        description: updatedDescription,
+      });
+
+      await queryClient.invalidateQueries({
+        queryKey: ['otheruser-info', otherUserId],
+      });
+
+      setEditMode(false);
+    },
+  });
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setSelectedImageFile(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreviewUrl(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
   };
-  
+
+  const handleSubmit = () => {
+    mutation.mutate();
+  };
+
+  if (!isOwner || !myUserId || !otherUserId) return null;
+
+  return (
+    <div className="user-profile">
+      {!editMode ? (
+        <button className="user-profile__edit-button" onClick={() => setEditMode(true)}>
+          수정
+        </button>
+      ) : (
+        <button className="user-profile__edit-button" onClick={handleSubmit}>
+          확인
+        </button>
+      )}
+
+      <div className="user-profile__content">
+        <div
+          className="user-profile__image-wrapper"
+          onClick={() => {
+            if (editMode) fileInputRef.current?.click();
+          }}
+        >
+          {imagePreviewUrl && (
+            <img src={imagePreviewUrl} alt="프로필 이미지" className="user-profile__image" />
+          )}
+          {editMode && <div className="user-profile__image-overlay">+</div>}
+          <input
+            type="file"
+            accept="image/*"
+            ref={fileInputRef}
+            onChange={handleFileChange}
+            style={{ display: 'none' }}
+          />
+        </div>
+
+        {!editMode ? (
+          <div className="user-profile__introduction">
+            {originalDescription ?? '유저 소개 없음'}
+          </div>
+        ) : (
+          <textarea
+            className="user-profile__textarea"
+            value={updatedDescription}
+            onChange={(e) => setUpdatedDescription(e.target.value)}
+          />
+        )}
+      </div>
+    </div>
+  );
+};
 
 export default UserProfileInfo;
