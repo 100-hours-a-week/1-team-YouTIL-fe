@@ -1,7 +1,7 @@
 const UserTILButton =() =>{
     return(
         <div>
-            유저 TIL 보러가기
+            til 버튼
         </div>
     )
 }
