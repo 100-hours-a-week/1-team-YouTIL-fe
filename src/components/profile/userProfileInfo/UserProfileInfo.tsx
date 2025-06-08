@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useState } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import './UserProfileInfo.scss';
 
@@ -8,6 +8,7 @@ import useOtherUserInfoStore from '@/store/useOtherUserInfoStore';
 import useUserInfoStore from '@/store/useUserInfoStore';
 import { useFetch } from '@/hooks/useFetch';
 import useGetAccessToken from '@/hooks/useGetAccessToken';
+import Image from 'next/image';
 
 const UserProfileInfo = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -30,6 +31,11 @@ const UserProfileInfo = () => {
   const [selectedImageFile, setSelectedImageFile] = useState<File | null>(null);
   const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(originalProfileUrl);
   const [updatedDescription, setUpdatedDescription] = useState(originalDescription ?? '');
+
+  useEffect(() => {
+    setImagePreviewUrl(originalProfileUrl);
+    setUpdatedDescription(originalDescription ?? '');
+  }, [originalProfileUrl, originalDescription]);
 
   const mutation = useMutation({
     mutationFn: async () => {
@@ -77,7 +83,9 @@ const UserProfileInfo = () => {
       await queryClient.invalidateQueries({
         queryKey: ['otheruser-info', otherUserId],
       });
-
+      await queryClient.invalidateQueries({
+        queryKey: ['recent-tils'],
+      });
       setEditMode(false);
     },
   });
@@ -98,31 +106,41 @@ const UserProfileInfo = () => {
     mutation.mutate();
   };
 
-  if (!isOwner || !myUserId || !otherUserId) return null;
+  if (!myUserId || !otherUserId) return null;
 
   return (
     <div className="user-profile">
-      {!editMode ? (
-        <button className="user-profile__edit-button" onClick={() => setEditMode(true)}>
-          수정
-        </button>
-      ) : (
-        <button className="user-profile__edit-button" onClick={handleSubmit}>
-          확인
-        </button>
+      {isOwner && (
+        !editMode ? (
+          <button className="user-profile__edit-button" onClick={() => setEditMode(true)}>
+            수정
+          </button>
+        ) : (
+          <button className="user-profile__edit-button" onClick={handleSubmit}>
+            확인
+          </button>
+        )
       )}
 
       <div className="user-profile__content">
         <div
           className="user-profile__image-wrapper"
           onClick={() => {
-            if (editMode) fileInputRef.current?.click();
+            if (editMode && isOwner) fileInputRef.current?.click();
           }}
         >
           {imagePreviewUrl && (
-            <img src={imagePreviewUrl} alt="프로필 이미지" className="user-profile__image" />
+            <Image
+              src={imagePreviewUrl}
+              alt="프로필 이미지"
+              className="user-profile__image"
+              width={120}
+              height={120}
+            />
           )}
-          {editMode && <div className="user-profile__image-overlay">+</div>}
+          {editMode && isOwner && (
+            <div className="user-profile__image-overlay">+</div>
+          )}
           <input
             type="file"
             accept="image/*"
