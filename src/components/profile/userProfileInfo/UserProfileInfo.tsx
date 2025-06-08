@@ -82,6 +82,7 @@ const UserProfileInfo = () => {
 
       await queryClient.invalidateQueries({ queryKey: ['otheruser-info', otherUserId] });
       await queryClient.invalidateQueries({ queryKey: ['recent-tils'] });
+      await queryClient.invalidateQueries({ queryKey: ['user-tils'] });
       setEditMode(false);
     },
   });
@@ -101,8 +102,6 @@ const UserProfileInfo = () => {
   const handleSubmit = () => {
     mutation.mutate();
   };
-
-  if (!myUserId || !otherUserId) return null;
 
   return (
     <div className="user-profile">
