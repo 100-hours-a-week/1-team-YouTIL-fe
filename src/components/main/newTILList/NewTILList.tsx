@@ -7,6 +7,7 @@ import { useFetch } from '@/hooks/useFetch';
 import useGetAccessToken from '@/hooks/useGetAccessToken';
 import useCheckAccess from '@/hooks/useCheckExistAccess';
 import { parseISO, format } from 'date-fns';
+import Image from 'next/image';
 
 interface TILResponse {
   data: TILItem[];
@@ -67,9 +68,11 @@ const NewTILList = () => {
           </div>
           <div className="til-list__footer">
             <Link href={`/profile/${til.userId}`}>
-              <img
+              <Image
                 src={til.profileImageUrl}
                 alt={`${til.nickname}의 프로필 이미지`}
+                width={32}
+                height={32}
                 className="til-list__profile-image"
               />
             </Link>
