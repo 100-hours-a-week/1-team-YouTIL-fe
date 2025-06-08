@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
 
@@ -14,6 +14,7 @@ import useUserInfoStore from '@/store/useUserInfoStore';
 import UserNickNameDescription from '@/components/profile/userNickNameDescription/UserNickNameDescription';
 import UserProfileInfo from '@/components/profile/userProfileInfo/UserProfileInfo';
 import UserTILButton from '@/components/profile/userTILButton/UserTILButton';
+import UserTILList from '@/components/profile/userTILList/UserTILList';
 
 interface UserInfo {
   userId: number;
@@ -38,6 +39,7 @@ const ProfilePage = () => {
   const resetOtherUserInfo = useOtherUserInfoStore((state) => state.clearOtherUserInfo);
 
   const setMyUserInfo = useUserInfoStore((state) => state.setUserInfo);
+  const [showTILList, setShowTILList] = useState(false);
 
   useEffect(() => {
     resetOtherUserInfo();
@@ -101,7 +103,8 @@ const ProfilePage = () => {
     <div>
       <UserNickNameDescription />
       <UserProfileInfo />
-      <UserTILButton />
+      <UserTILButton onClick={() => setShowTILList(prev => !prev)} />
+      {showTILList && <UserTILList />} 
     </div>
   );
 };
