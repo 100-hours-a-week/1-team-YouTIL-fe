@@ -80,12 +80,8 @@ const UserProfileInfo = () => {
         description: updatedDescription,
       });
 
-      await queryClient.invalidateQueries({
-        queryKey: ['otheruser-info', otherUserId],
-      });
-      await queryClient.invalidateQueries({
-        queryKey: ['recent-tils'],
-      });
+      await queryClient.invalidateQueries({ queryKey: ['otheruser-info', otherUserId] });
+      await queryClient.invalidateQueries({ queryKey: ['recent-tils'] });
       setEditMode(false);
     },
   });
@@ -155,11 +151,21 @@ const UserProfileInfo = () => {
             {originalDescription ?? '유저 소개 없음'}
           </div>
         ) : (
-          <textarea
-            className="user-profile__textarea"
-            value={updatedDescription}
-            onChange={(e) => setUpdatedDescription(e.target.value)}
-          />
+          <div className="user-profile__textarea-wrapper">
+            <textarea
+              className="user-profile__textarea"
+              value={updatedDescription}
+              onChange={(e) => {
+                if (e.target.value.length <= 40) {
+                  setUpdatedDescription(e.target.value);
+                }
+              }}
+              maxLength={40}
+            />
+            <div className="user-profile__textarea-count">
+              {updatedDescription.length} / 40
+            </div>
+          </div>
         )}
       </div>
     </div>
