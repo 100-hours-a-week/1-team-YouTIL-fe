@@ -1,102 +1,119 @@
 .til-list {
-    height: 100%;
-    padding: 1rem;
-    box-sizing: border-box;
-    color: #000;
-    margin-bottom: 45px;
-    
-    &__card {
-      background-color: #fff;
-      border: 1px solid #e0e0e0;
-      border-radius: 8px;
-      padding: 0.75rem;
-      margin-bottom: 0.5rem;
-      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
-      cursor: pointer;
-      
-      &:hover {
-        transform: scale(1.02);
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
-      }
-    }
-  
-    &__header {
-      display: flex;
-      align-items: center;
-      gap: 0.4rem;
-      margin-bottom: 0.2rem;
-      height: 24px;
-    }
-  
-    &__image {
-      width: 24px;
-      height: 24px;
-      background-color: #ccc;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 0.625rem;
-      color: #fff;
-    }
-  
-    &__title {
-      font-weight: 600;
-      font-size: 0.8125rem;
-      line-height: 1;
-      display: flex;
-      align-items: center;
-    }
-  
-    &__tags {
-      display: flex;
-      gap: 0.5rem;
-      margin-bottom: 0.3rem;
-      overflow-x: auto;
-      white-space: nowrap;
-      padding-bottom: 0.25rem;
-      scrollbar-width: none;
-    
-      &::-webkit-scrollbar {
-        display: none;
-      }
-    }
-    
-    &__tag {
-      display: inline-block;
-      font-size: 0.75rem;
-      background-color: #007bff;
-      color: white;
-      padding: 0.2rem 0.5rem;
-      border-radius: 4px;
-      border: 1px solid #007bff;
-      white-space: nowrap;
-      flex-shrink: 0;
-    }
-    
-  
-    &__footer {
-      display: flex;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 0.375rem;
-      font-size: 0.75rem;
-      color: #000;
-    }
-  
-    &__nickname,
-    &__views,
-    &__likes {
-      white-space: nowrap;
-    }
-  
-    &__date {
-      margin-left: auto;
-      white-space: nowrap;
+  height: 100%;
+  padding: 1rem;
+  box-sizing: border-box;
+  color: #000;
+  margin-bottom: 45px;
+
+  &__card {
+    background-color: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 0.75rem;
+    margin-bottom: 0.5rem;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    cursor: pointer;
+
+    &:hover {
+      transform: scale(1.02);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
     }
   }
-  
+
+  &__header {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin-bottom: 0.2rem;
+    height: 24px;
+  }
+
+  &__title {
+    font-weight: 600;
+    font-size: 0.8125rem;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+  }
+
+  &__tags {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 0.3rem;
+    overflow-x: auto;
+    white-space: nowrap;
+    padding-bottom: 0.25rem;
+    scrollbar-width: none;
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
+  }
+
+  &__tag {
+    display: inline-block;
+    font-size: 0.75rem;
+    background-color: #007bff;
+    color: white;
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    border: 1px solid #007bff;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  &__footer {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.375rem;
+    font-size: 0.75rem;
+    color: #000;
+  }
+
+  &__profile-image {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    object-fit: cover;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+    transition: transform 0.2s ease;
+    cursor: pointer;
+    margin-right: 4px;
+
+    &:hover {
+      transform: scale(1.15);
+    }
+  }
+
+  &__nickname {
+    white-space: nowrap;
+    text-decoration: none;
+    color: inherit;
+    transition: transform 0.2s ease;
+    cursor: pointer;
+    margin-right: 6px;
+
+    &:hover {
+      transform: scale(1.1);
+    }
+
+    &:visited {
+      color: inherit;
+    }
+  }
+
+  &__views,
+  &__likes {
+    white-space: nowrap;
+  }
+
+  &__date {
+    margin-left: auto;
+    white-space: nowrap;
+  }
+}
