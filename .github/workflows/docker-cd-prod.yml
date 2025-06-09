@@ -14,16 +14,17 @@ jobs:
 
     steps:
       - name: Set Image Tag
-        run: echo "IMAGE_TAG=asia-northeast3-docker.pkg.dev/youtil-459304/youtil-docker-registry/youtil-fe-prod:latest" >> $GITHUB_ENV
+        run: echo "IMAGE_TAG=asia-northeast3-docker.pkg.dev/youtil-459908/youtil-docker-registry/youtil-fe-prod:latest" >> $GITHUB_ENV
 
-      - name: Prepare SSH Key
+      - name: Prepare SSH Keys
         run: |
-          echo "${{ secrets.YOUTIL_PROD_SSH_KEY }}" > key.pem
-          chmod 600 key.pem
+          echo "${{ secrets.YOUTIL_PROD_SSH_KEY }}" > prod_key.pem
+          echo "${{ secrets.YOUTIL_BASTION_SSH_KEY }}" > bastion_key.pem
+          chmod 600 prod_key.pem bastion_key.pem
 
       - name: Deploy via SSH
         run: |
-          ssh -i key.pem -o StrictHostKeyChecking=no ubuntu@${{ secrets.YOUTIL_PROD_HOST }} << EOF
+          ssh -i prod_key.pem -o StrictHostKeyChecking=no -J ubuntu@${{ secrets.YOUTIL_BASTION_HOST }} ubuntu@${{ secrets.YOUTIL_PROD_HOST }} << EOF
             docker pull $IMAGE_TAG
 
             docker stop youtil-fe-prod || true
