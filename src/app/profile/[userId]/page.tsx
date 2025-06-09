@@ -102,7 +102,7 @@ const ProfilePage = () => {
     otherUserInfo.name === null ||
     otherUserInfo.name === undefined
   ) {
-    return null; // 또는 <LoadingSpinner />
+    return null;
   }
 
   if (isUserInfoError || isOtherUserInfoError) {
