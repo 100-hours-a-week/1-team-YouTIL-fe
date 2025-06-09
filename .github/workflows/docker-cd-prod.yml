@@ -14,16 +14,25 @@ jobs:
 
     steps:
       - name: Set Image Tag
-        run: echo "IMAGE_TAG=asia-northeast3-docker.pkg.dev/youtil-459304/youtil-docker-registry/youtil-fe-prod:latest" >> $GITHUB_ENV
+        run: echo "IMAGE_TAG=asia-northeast3-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/youtil-docker-registry/youtil-fe-prod:latest" >> $GITHUB_ENV
 
-      - name: Prepare SSH Key
+      - name: Prepare SSH Keys
         run: |
-          echo "${{ secrets.YOUTIL_PROD_SSH_KEY }}" > key.pem
-          chmod 600 key.pem
+          echo "${{ secrets.YOUTIL_PROD_SSH_KEY }}" > prod_key.pem
+          echo "${{ secrets.YOUTIL_BASTION_SSH_KEY }}" > bastion_key.pem
+          chmod 600 prod_key.pem bastion_key.pem
 
-      - name: Deploy via SSH
+      - name: Deploy via SSH Tunnel
         run: |
-          ssh -i key.pem -o StrictHostKeyChecking=no ubuntu@${{ secrets.YOUTIL_PROD_HOST }} << EOF
+          # Create SSH tunnel through bastion host
+          ssh -i bastion_key.pem -o StrictHostKeyChecking=no -N -L 2222:${{ secrets.YOUTIL_PROD_HOST }}:22 ubuntu@${{ secrets.YOUTIL_BASTION_HOST }} &
+          TUNNEL_PID=$!
+          
+          # Wait for tunnel to establish
+          sleep 5
+          
+          # Execute commands through the tunnel
+          ssh -i prod_key.pem -o StrictHostKeyChecking=no -p 2222 ubuntu@localhost << EOF
             docker pull $IMAGE_TAG
 
             docker stop youtil-fe-prod || true
@@ -33,3 +42,6 @@ jobs:
               -p 3000:3000 \
               $IMAGE_TAG
           EOF
+          
+          # Clean up tunnel
+          kill $TUNNEL_PID
