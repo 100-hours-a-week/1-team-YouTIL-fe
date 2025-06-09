@@ -2,7 +2,7 @@
 
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { useFetch } from '@/hooks/useFetch';
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import useOtherUserInfoStore from '@/store/useOtherUserInfoStore';
 import useGetAccessToken from '@/hooks/useGetAccessToken';
 import useCheckAccess from '@/hooks/useCheckExistAccess';
@@ -110,32 +110,33 @@ const ProfileCommentList = () => {
   });
 
   useEffect(() => {
-    if (!loadMoreRef.current || !hasNextPage) return;
-
+    const target = loadMoreRef.current;
+    if (!target || !hasNextPage) return;
+  
     observerRef.current = new IntersectionObserver(
       (entries) => {
         if (entries[0].isIntersecting) fetchNextPage();
       },
       { threshold: 1.0 }
     );
-
-    observerRef.current.observe(loadMoreRef.current);
-
+  
+    observerRef.current.observe(target);
+  
     return () => {
-      if (observerRef.current && loadMoreRef.current) {
-        observerRef.current.unobserve(loadMoreRef.current);
+      if (observerRef.current && target) {
+        observerRef.current.unobserve(target);
       }
     };
   }, [fetchNextPage, hasNextPage]);
 
   const handleToggleEdit = (targetId: number, content: string) => {
     setEditingId(prev => (prev === targetId ? null : targetId));
-    setEditingContent(prev => (editingId === targetId ? '' : content));
+    setEditingContent((editingId === targetId ? '' : content));
   };
 
   const handleReply = (commentId: number, topId: number) => {
     setReplyingToId(prev => (prev === commentId ? null : commentId));
-    setReplyTopId(prev => (replyingToId === commentId ? null : topId));
+    setReplyTopId((replyingToId === commentId ? null : topId));
   };
 
   const formatDate = (iso: string) => new Date(iso).toLocaleString();
