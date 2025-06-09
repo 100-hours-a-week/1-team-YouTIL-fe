@@ -8,6 +8,7 @@ import useGetAccessToken from '@/hooks/useGetAccessToken';
 import useCheckAccess from '@/hooks/useCheckExistAccess';
 import Image from 'next/image';
 import ProfileCommentUtils from '../profileCommentUtils/ProfileCommentUtils';
+import CheckDeleteCommentModal from '../checkDeleteCommentModal/CheckDeleteCommentModal';
 import './ProfileCommentList.scss';
 
 interface GuestbookReply {
@@ -51,6 +52,7 @@ const ProfileCommentList = () => {
   const { otherUserInfo } = useOtherUserInfoStore();
   const userId = otherUserInfo.userId;
   const existAccess = useCheckAccess(accessToken);
+  const [deleteTargetId, setDeleteTargetId] = useState<number | null>(null);
 
   const [openMenuId, setOpenMenuId] = useState<number | null>(null);
   const refs = useRef<Record<number, HTMLDivElement | null>>({});
@@ -82,7 +84,6 @@ const ProfileCommentList = () => {
         },
         credentials: 'include',
       });
-      console.log(response);
       return response;
     },
     enabled: !!userId && existAccess,
@@ -139,7 +140,14 @@ const ProfileCommentList = () => {
                     <span />
                     <span />
                   </button>
-                  {isMenuOpen && <ProfileCommentUtils guestId={item.guestId} guestbookId={item.id} />}
+                  {isMenuOpen && (
+                    <ProfileCommentUtils
+                      guestId={item.guestId}
+                      guestbookId={item.id}
+                      onCloseDropdown={() => setOpenMenuId(null)}
+                      onRequestDelete={(id) => setDeleteTargetId(id)}
+                    />
+                  )}
                 </div>
               </div>
             </div>
@@ -160,6 +168,14 @@ const ProfileCommentList = () => {
           {comment.replies?.map((reply) => renderItem(reply, true))}
         </div>
       ))}
+
+      {deleteTargetId !== null && (
+        <CheckDeleteCommentModal
+          guestbookId={deleteTargetId}
+          onClose={() => setDeleteTargetId(null)}
+          onDeleteComplete={() => setDeleteTargetId(null)}
+        />
+      )}
     </div>
   );
 };

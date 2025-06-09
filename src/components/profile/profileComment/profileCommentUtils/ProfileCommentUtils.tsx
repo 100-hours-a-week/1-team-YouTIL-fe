@@ -1,48 +1,46 @@
 'use client';
 
-import { useState } from 'react';
-import CheckDeleteCommentModal from '../checkDeleteCommentModal/CheckDeleteCommentModal';
 import './ProfileCommentUtils.scss';
 import useUserInfoStore from '@/store/useUserInfoStore';
 
 interface Props {
   guestId: number;
   guestbookId: number;
+  onCloseDropdown: () => void;
 }
 
-const ProfileCommentUtils = ({ guestId, guestbookId }: Props) => {
+interface Props {
+  guestId: number;
+  guestbookId: number;
+  onCloseDropdown: () => void;
+  onRequestDelete: (guestbookId: number) => void;
+}
+
+const ProfileCommentUtils = ({ guestId, guestbookId, onCloseDropdown, onRequestDelete }: Props) => {
   const myUserId = useUserInfoStore((state) => state.userInfo.userId);
   const isOwner = myUserId === guestId;
 
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const handleDeleteClick = () => {
+    onCloseDropdown();
+    onRequestDelete(guestbookId);
+  };
 
   return (
-    <>
-      <div className="comment-utils-dropdown">
-        {isOwner && (
-          <>
-            <button className="comment-utils-dropdown__item">수정</button>
-            <button
-              className="comment-utils-dropdown__item"
-              onClick={() => setShowDeleteModal(true)}
-            >
-              삭제
-            </button>
-          </>
-        )}
-        <button className="comment-utils-dropdown__item">대댓글</button>
-      </div>
-
-      {showDeleteModal && (
-        <CheckDeleteCommentModal
-          guestbookId = {guestbookId}
-          onClose={() => setShowDeleteModal(false)}
-          onDeleteComplete={() => {
-            setShowDeleteModal(false);
-          }}
-        />
+    <div className="comment-utils-dropdown">
+      {isOwner && (
+        <>
+          <button className="comment-utils-dropdown__item" onClick={onCloseDropdown}>
+            수정
+          </button>
+          <button className="comment-utils-dropdown__item" onClick={handleDeleteClick}>
+            삭제
+          </button>
+        </>
       )}
-    </>
+      <button className="comment-utils-dropdown__item" onClick={onCloseDropdown}>
+        대댓글
+      </button>
+    </div>
   );
 };
 
