@@ -72,10 +72,9 @@ const ProfileCommentList = () => {
     data,
     fetchNextPage,
     hasNextPage,
-    isFetchingNextPage,
   } = useInfiniteQuery({
     queryKey: ['guestbooks-list', userId],
-    queryFn: async ({ pageParam = 0 }) => {
+    queryFn: async ({ pageParam = 0 }: { pageParam?: number }) => {
       return await callApi<GuestbookResponse>({
         method: 'GET',
         endpoint: `/users/${userId}/guestbooks?page=${pageParam}&offset=${PAGE_SIZE}`,
@@ -193,7 +192,7 @@ const ProfileCommentList = () => {
             </div>
             <div className="comment-list__text">
               {item.deleted ? (
-                '삭제된 댓글입니다.'
+                <del>삭제된 댓글입니다.</del>
               ) : isEditing ? (
                 <ProfileEditCommentInput
                   originalContent={editingContent}
@@ -244,7 +243,6 @@ const ProfileCommentList = () => {
       )}
 
       <div ref={loadMoreRef} style={{ height: '1px' }} />
-      {isFetchingNextPage && <p className="comment-list__loading">로딩 중...</p>}
     </div>
   );
 };
