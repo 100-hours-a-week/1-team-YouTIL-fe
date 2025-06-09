@@ -8,7 +8,7 @@ interface UseFetchParams {
   body?: unknown | null;
   headers?: Record<string, string> | null;
   credentials?: RequestCredentials;
-  isFormData?: boolean; // 🔥 추가된 옵션
+  isFormData?: boolean;
 }
 
 interface FetchError {
