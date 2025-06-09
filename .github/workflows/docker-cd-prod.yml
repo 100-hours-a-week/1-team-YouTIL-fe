@@ -22,9 +22,17 @@ jobs:
           echo "${{ secrets.YOUTIL_BASTION_SSH_KEY }}" > bastion_key.pem
           chmod 600 prod_key.pem bastion_key.pem
 
-      - name: Deploy via SSH
+      - name: Deploy via SSH Tunnel
         run: |
-          ssh -i prod_key.pem -o StrictHostKeyChecking=no -J ubuntu@${{ secrets.YOUTIL_BASTION_HOST }} ubuntu@${{ secrets.YOUTIL_PROD_HOST }} << EOF
+          # Create SSH tunnel through bastion host
+          ssh -i bastion_key.pem -o StrictHostKeyChecking=no -N -L 2222:${{ secrets.YOUTIL_PROD_HOST }}:22 ubuntu@${{ secrets.YOUTIL_BASTION_HOST }} &
+          TUNNEL_PID=$!
+          
+          # Wait for tunnel to establish
+          sleep 5
+          
+          # Execute commands through the tunnel
+          ssh -i prod_key.pem -o StrictHostKeyChecking=no -p 2222 ubuntu@localhost << EOF
             docker pull $IMAGE_TAG
 
             docker stop youtil-fe-prod || true
@@ -34,3 +42,6 @@ jobs:
               -p 3000:3000 \
               $IMAGE_TAG
           EOF
+          
+          # Clean up tunnel
+          kill $TUNNEL_PID
