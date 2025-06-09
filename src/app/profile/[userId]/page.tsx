@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
 
@@ -14,6 +14,8 @@ import useUserInfoStore from '@/store/useUserInfoStore';
 import UserNickNameDescription from '@/components/profile/userNickNameDescription/UserNickNameDescription';
 import UserProfileInfo from '@/components/profile/userProfileInfo/UserProfileInfo';
 import UserTILButton from '@/components/profile/userTILButton/UserTILButton';
+import UserTILList from '@/components/profile/userTILList/UserTILList';
+import ProfileComment from '@/components/profile/profileComment/ProfileComment';
 
 interface UserInfo {
   userId: number;
@@ -36,14 +38,17 @@ const ProfilePage = () => {
 
   const setOtherUserInfo = useOtherUserInfoStore((state) => state.setOtherUserInfo);
   const resetOtherUserInfo = useOtherUserInfoStore((state) => state.clearOtherUserInfo);
-
   const setMyUserInfo = useUserInfoStore((state) => state.setUserInfo);
+
+  const myUserInfo = useUserInfoStore((state) => state.userInfo);
+  const otherUserInfo = useOtherUserInfoStore((state) => state.otherUserInfo);
+  const [showTILList, setShowTILList] = useState(false);
 
   useEffect(() => {
     resetOtherUserInfo();
   }, [parsedUserId, resetOtherUserInfo]);
 
-  const { isLoading: isUserInfoLoading, isError: isUserInfoError} = useQuery<UserInfoResponse>({
+  const { isLoading: isUserInfoLoading, isError: isUserInfoError } = useQuery<UserInfoResponse>({
     queryKey: ['userInfo'],
     queryFn: async () => {
       const response = await callApi<UserInfoResponse>({
@@ -89,19 +94,27 @@ const ProfilePage = () => {
     refetchOnWindowFocus: false,
   });
 
-  if (isUserInfoError || isOtherUserInfoError) {
-    return <div>유저 정보를 불러오는 데 실패했습니다.</div>;
+  if (
+    isUserInfoLoading ||
+    isOtherUserInfoLoading ||
+    !myUserInfo.userId ||
+    !otherUserInfo.userId ||
+    otherUserInfo.name === null ||
+    otherUserInfo.name === undefined
+  ) {
+    return null;
   }
 
-  if (isUserInfoLoading || isOtherUserInfoLoading) {
-    return null;
+  if (isUserInfoError || isOtherUserInfoError) {
+    return <div>유저 정보를 불러오는 데 실패했습니다.</div>;
   }
 
   return (
     <div>
       <UserNickNameDescription />
       <UserProfileInfo />
-      <UserTILButton />
+      <UserTILButton onClick={() => setShowTILList((prev) => !prev)} isTILMode={showTILList} />
+      {showTILList ? <UserTILList /> : <ProfileComment />}
     </div>
   );
 };
