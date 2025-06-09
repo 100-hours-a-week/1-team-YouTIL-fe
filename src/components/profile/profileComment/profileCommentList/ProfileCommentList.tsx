@@ -74,7 +74,7 @@ const ProfileCommentList = () => {
   const { data } = useQuery<GuestbookResponse>({
     queryKey: ['guestbooks-list', userId],
     queryFn: async () => {
-      return await callApi<GuestbookResponse>({
+      const response = await callApi<GuestbookResponse>({
         method: 'GET',
         endpoint: `/users/${userId}/guestbooks?page=0&offset=20`,
         headers: {
@@ -82,6 +82,8 @@ const ProfileCommentList = () => {
         },
         credentials: 'include',
       });
+      console.log(response);
+      return response;
     },
     enabled: !!userId && existAccess,
     staleTime: 300000,
@@ -137,7 +139,7 @@ const ProfileCommentList = () => {
                     <span />
                     <span />
                   </button>
-                  {isMenuOpen && <ProfileCommentUtils />}
+                  {isMenuOpen && <ProfileCommentUtils guestId={item.guestId} guestbookId={item.id} />}
                 </div>
               </div>
             </div>
