@@ -68,6 +68,21 @@ const ProfileCommentList = () => {
   const observerRef = useRef<IntersectionObserver | null>(null);
   const loadMoreRef = useRef<HTMLDivElement | null>(null);
 
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const currentMenu = openMenuId !== null ? refs.current[openMenuId] : null;
+  
+      if (currentMenu && !currentMenu.contains(event.target as Node)) {
+        setOpenMenuId(null);
+      }
+    };
+  
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [openMenuId]);
+
   const {
     data,
     fetchNextPage,
