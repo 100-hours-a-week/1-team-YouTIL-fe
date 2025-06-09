@@ -127,14 +127,15 @@ const RepositoryInterviewList = () => {
     <div className="repository-interview-list">
       <div className="repository-interview-list__header">
         <h2 className="repository-interview-list__title">면접 질문 목록</h2>
-        <button
-          className={`repository-interview-list__button${shakeDelete ? ' error shake' : ''}`}
-          onClick={handleDeleteClick}
-        >
-          삭제
-        </button>
+        {interviewData && interviewData.length > 0 && (
+          <button
+            className={`repository-interview-list__button${shakeDelete ? ' error shake' : ''}`}
+            onClick={handleDeleteClick}
+          >
+            삭제
+          </button>
+        )}
       </div>
-
       <ul className="repository-interview-list__items">
 
         {interviewData?.map((interview) => {
