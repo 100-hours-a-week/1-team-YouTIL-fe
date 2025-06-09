@@ -21,7 +21,10 @@ const ProfileCommentInput = () => {
       return await callApi({
         method: 'POST',
         endpoint: `/users/${otherUserId}/guestbooks`,
-        body: { content },
+        body: {
+          topGuestbookId: null,
+          content,
+        },
         headers: {
           Authorization: `Bearer ${accessToken}`,
           'Content-Type': 'application/json',

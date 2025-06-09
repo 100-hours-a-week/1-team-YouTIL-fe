@@ -1,8 +1,8 @@
 'use client';
 
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useInfiniteQuery } from '@tanstack/react-query';
 import { useFetch } from '@/hooks/useFetch';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import useOtherUserInfoStore from '@/store/useOtherUserInfoStore';
 import useGetAccessToken from '@/hooks/useGetAccessToken';
 import useCheckAccess from '@/hooks/useCheckExistAccess';
@@ -10,6 +10,7 @@ import Image from 'next/image';
 import ProfileCommentUtils from '../profileCommentUtils/ProfileCommentUtils';
 import CheckDeleteCommentModal from '../checkDeleteCommentModal/CheckDeleteCommentModal';
 import ProfileEditCommentInput from '../profileEditCommentInput/ProfileEditCommentInput';
+import ProfileReplyCommentInput from '../profileReplyCommentInput/ProfileReplyCommentInput';
 import './ProfileCommentList.scss';
 
 interface GuestbookReply {
@@ -47,60 +48,81 @@ interface GuestbookResponse {
   };
 }
 
+const PAGE_SIZE = 20;
+
 const ProfileCommentList = () => {
   const { callApi } = useFetch();
   const accessToken = useGetAccessToken();
   const { otherUserInfo } = useOtherUserInfoStore();
   const userId = otherUserInfo.userId;
   const existAccess = useCheckAccess(accessToken);
-  const queryClient = useQueryClient();
 
   const [deleteTargetId, setDeleteTargetId] = useState<number | null>(null);
   const [openMenuId, setOpenMenuId] = useState<number | null>(null);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [editingContent, setEditingContent] = useState<string>('');
+  const [replyingToId, setReplyingToId] = useState<number | null>(null);
+  const [replyTopId, setReplyTopId] = useState<number | null>(null);
+
   const refs = useRef<Record<number, HTMLDivElement | null>>({});
-  
+  const observerRef = useRef<IntersectionObserver | null>(null);
+  const loadMoreRef = useRef<HTMLDivElement | null>(null);
 
-  useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
-      if (openMenuId !== null) {
-        const dropdown = refs.current[openMenuId];
-        if (dropdown && !dropdown.contains(e.target as Node)) {
-          setOpenMenuId(null);
-        }
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [openMenuId]);
-
-  const { data } = useQuery<GuestbookResponse>({
+  const {
+    data,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useInfiniteQuery({
     queryKey: ['guestbooks-list', userId],
-    queryFn: async () => {
+    queryFn: async ({ pageParam = 0 }) => {
       return await callApi<GuestbookResponse>({
         method: 'GET',
-        endpoint: `/users/${userId}/guestbooks?page=0&offset=20`,
+        endpoint: `/users/${userId}/guestbooks?page=${pageParam}&offset=${PAGE_SIZE}`,
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
         credentials: 'include',
       });
     },
+    getNextPageParam: (lastPage) => {
+      const { currentPage, totalCount, pageSize } = lastPage.data;
+      const maxPage = Math.ceil(totalCount / pageSize) - 1;
+      return currentPage < maxPage ? currentPage + 1 : undefined;
+    },
+    initialPageParam: 0,
     enabled: !!userId && existAccess,
     staleTime: 300000,
     gcTime: 300000,
   });
 
+  useEffect(() => {
+    if (!loadMoreRef.current || !hasNextPage) return;
+
+    observerRef.current = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) fetchNextPage();
+      },
+      { threshold: 1.0 }
+    );
+
+    observerRef.current.observe(loadMoreRef.current);
+
+    return () => {
+      if (observerRef.current && loadMoreRef.current) {
+        observerRef.current.unobserve(loadMoreRef.current);
+      }
+    };
+  }, [fetchNextPage, hasNextPage]);
+
   const handleToggleEdit = (targetId: number, content: string) => {
-    if (editingId === targetId) {
-      setEditingId(null);
-      setEditingContent('');
-    } else {
-      setEditingId(targetId);
-      setEditingContent(content);
-    }
+    setEditingId(prev => (prev === targetId ? null : targetId));
+    setEditingContent(prev => (editingId === targetId ? '' : content));
+  };
+
+  const handleReply = (commentId: number, topId: number) => {
+    setReplyingToId(prev => (prev === commentId ? null : commentId));
+    setReplyTopId(prev => (replyingToId === commentId ? null : topId));
   };
 
   const formatDate = (iso: string) => new Date(iso).toLocaleString();
@@ -108,6 +130,8 @@ const ProfileCommentList = () => {
   const renderItem = (item: GuestbookItem | GuestbookReply, isReply = false) => {
     const isMenuOpen = openMenuId === item.id;
     const isEditing = editingId === item.id;
+    const isReplying = replyingToId === item.id;
+
     return (
       <div
         key={`comment-${item.id}-${isReply ? 'reply' : 'parent'}`}
@@ -154,13 +178,15 @@ const ProfileCommentList = () => {
                   </button>
                   {isMenuOpen && (
                     <ProfileCommentUtils
-                    guestId={item.guestId}
-                    guestbookId={item.id}
-                    originalContent={item.content}
-                    onCloseDropdown={() => setOpenMenuId(null)}
-                    onRequestDelete={(id) => setDeleteTargetId(id)}
-                    onRequestEditToggle={handleToggleEdit}
-                  />
+                      guestId={item.guestId}
+                      guestbookId={item.id}
+                      topGuestbookId={item.topGuestbookId ?? null}
+                      originalContent={item.content}
+                      onCloseDropdown={() => setOpenMenuId(null)}
+                      onRequestDelete={(id) => setDeleteTargetId(id)}
+                      onRequestEditToggle={handleToggleEdit}
+                      onRequestReply={(resolvedId) => handleReply(item.id, resolvedId)}
+                    />
                   )}
                 </div>
               </div>
@@ -173,7 +199,7 @@ const ProfileCommentList = () => {
                   originalContent={editingContent}
                   userId={item.guestId}
                   guestbookId={item.id}
-                  onComplete={async () => {
+                  onComplete={() => {
                     setEditingId(null);
                     setEditingContent('');
                   }}
@@ -182,6 +208,16 @@ const ProfileCommentList = () => {
                 item.content
               )}
             </div>
+            {isReplying && replyTopId !== null && (
+              <ProfileReplyCommentInput
+                topGuestbookId={replyTopId}
+                userId={userId}
+                onComplete={() => {
+                  setReplyingToId(null);
+                  setReplyTopId(null);
+                }}
+              />
+            )}
           </div>
         </div>
       </div>
@@ -190,12 +226,14 @@ const ProfileCommentList = () => {
 
   return (
     <div className="comment-list">
-      {data?.data.guestbooks.map((comment) => (
-        <div key={`group-${comment.id}`}>
-          {renderItem(comment)}
-          {comment.replies?.map((reply) => renderItem(reply, true))}
-        </div>
-      ))}
+      {data?.pages.flatMap((page) =>
+        page.data.guestbooks.map((comment) => (
+          <div key={`group-${comment.id}`}>
+            {renderItem(comment)}
+            {comment.replies?.map((reply) => renderItem(reply, true))}
+          </div>
+        ))
+      )}
 
       {deleteTargetId !== null && (
         <CheckDeleteCommentModal
@@ -204,6 +242,9 @@ const ProfileCommentList = () => {
           onDeleteComplete={() => setDeleteTargetId(null)}
         />
       )}
+
+      <div ref={loadMoreRef} style={{ height: '1px' }} />
+      {isFetchingNextPage && <p className="comment-list__loading">로딩 중...</p>}
     </div>
   );
 };
