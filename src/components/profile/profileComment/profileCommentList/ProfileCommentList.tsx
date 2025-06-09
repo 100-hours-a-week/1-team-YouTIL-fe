@@ -1,6 +1,6 @@
 'use client';
 
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useFetch } from '@/hooks/useFetch';
 import { useState, useEffect, useRef } from 'react';
 import useOtherUserInfoStore from '@/store/useOtherUserInfoStore';
@@ -9,6 +9,7 @@ import useCheckAccess from '@/hooks/useCheckExistAccess';
 import Image from 'next/image';
 import ProfileCommentUtils from '../profileCommentUtils/ProfileCommentUtils';
 import CheckDeleteCommentModal from '../checkDeleteCommentModal/CheckDeleteCommentModal';
+import ProfileEditCommentInput from '../profileEditCommentInput/ProfileEditCommentInput';
 import './ProfileCommentList.scss';
 
 interface GuestbookReply {
@@ -52,10 +53,14 @@ const ProfileCommentList = () => {
   const { otherUserInfo } = useOtherUserInfoStore();
   const userId = otherUserInfo.userId;
   const existAccess = useCheckAccess(accessToken);
-  const [deleteTargetId, setDeleteTargetId] = useState<number | null>(null);
+  const queryClient = useQueryClient();
 
+  const [deleteTargetId, setDeleteTargetId] = useState<number | null>(null);
   const [openMenuId, setOpenMenuId] = useState<number | null>(null);
+  const [editingId, setEditingId] = useState<number | null>(null);
+  const [editingContent, setEditingContent] = useState<string>('');
   const refs = useRef<Record<number, HTMLDivElement | null>>({});
+  
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -68,15 +73,13 @@ const ProfileCommentList = () => {
     };
 
     document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
+    return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [openMenuId]);
 
   const { data } = useQuery<GuestbookResponse>({
     queryKey: ['guestbooks-list', userId],
     queryFn: async () => {
-      const response = await callApi<GuestbookResponse>({
+      return await callApi<GuestbookResponse>({
         method: 'GET',
         endpoint: `/users/${userId}/guestbooks?page=0&offset=20`,
         headers: {
@@ -84,18 +87,27 @@ const ProfileCommentList = () => {
         },
         credentials: 'include',
       });
-      return response;
     },
     enabled: !!userId && existAccess,
     staleTime: 300000,
     gcTime: 300000,
   });
 
+  const handleToggleEdit = (targetId: number, content: string) => {
+    if (editingId === targetId) {
+      setEditingId(null);
+      setEditingContent('');
+    } else {
+      setEditingId(targetId);
+      setEditingContent(content);
+    }
+  };
+
   const formatDate = (iso: string) => new Date(iso).toLocaleString();
 
   const renderItem = (item: GuestbookItem | GuestbookReply, isReply = false) => {
     const isMenuOpen = openMenuId === item.id;
-
+    const isEditing = editingId === item.id;
     return (
       <div
         key={`comment-${item.id}-${isReply ? 'reply' : 'parent'}`}
@@ -142,17 +154,33 @@ const ProfileCommentList = () => {
                   </button>
                   {isMenuOpen && (
                     <ProfileCommentUtils
-                      guestId={item.guestId}
-                      guestbookId={item.id}
-                      onCloseDropdown={() => setOpenMenuId(null)}
-                      onRequestDelete={(id) => setDeleteTargetId(id)}
-                    />
+                    guestId={item.guestId}
+                    guestbookId={item.id}
+                    originalContent={item.content}
+                    onCloseDropdown={() => setOpenMenuId(null)}
+                    onRequestDelete={(id) => setDeleteTargetId(id)}
+                    onRequestEditToggle={handleToggleEdit}
+                  />
                   )}
                 </div>
               </div>
             </div>
             <div className="comment-list__text">
-              {item.deleted ? '삭제된 댓글입니다.' : item.content}
+              {item.deleted ? (
+                '삭제된 댓글입니다.'
+              ) : isEditing ? (
+                <ProfileEditCommentInput
+                  originalContent={editingContent}
+                  userId={item.guestId}
+                  guestbookId={item.id}
+                  onComplete={async () => {
+                    setEditingId(null);
+                    setEditingContent('');
+                  }}
+                />
+              ) : (
+                item.content
+              )}
             </div>
           </div>
         </div>
