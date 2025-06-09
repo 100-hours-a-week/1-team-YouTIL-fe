@@ -48,8 +48,6 @@ interface GuestbookResponse {
   };
 }
 
-const PAGE_SIZE = 20;
-
 const ProfileCommentList = () => {
   const { callApi } = useFetch();
   const accessToken = useGetAccessToken();
@@ -90,14 +88,15 @@ const ProfileCommentList = () => {
   } = useInfiniteQuery({
     queryKey: ['guestbooks-list', userId],
     queryFn: async ({ pageParam = 0 }: { pageParam?: number }) => {
-      return await callApi<GuestbookResponse>({
+      const response = await callApi<GuestbookResponse>({
         method: 'GET',
-        endpoint: `/users/${userId}/guestbooks?page=${pageParam}&offset=${PAGE_SIZE}`,
+        endpoint: `/users/${userId}/guestbooks?page=${pageParam}&offset=20`,
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
         credentials: 'include',
       });
+      return response;
     },
     getNextPageParam: (lastPage) => {
       const { currentPage, totalCount, pageSize } = lastPage.data;
