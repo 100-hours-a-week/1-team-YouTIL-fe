@@ -1,0 +1,75 @@
+'use client';
+
+import { useState } from 'react';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useFetch } from '@/hooks/useFetch';
+import useGetAccessToken from '@/hooks/useGetAccessToken';
+import './ProfileReplyCommentInput.scss';
+
+interface Props {
+  topGuestbookId: number;
+  userId: number | null;
+  onComplete: () => void;
+}
+
+const ProfileReplyCommentInput = ({ topGuestbookId, userId, onComplete }: Props) => {
+  const [replyContent, setReplyContent] = useState('');
+  const { callApi } = useFetch();
+  const accessToken = useGetAccessToken();
+  const queryClient = useQueryClient();
+
+  const mutation = useMutation({
+    mutationFn: async (content: string) => {
+      return await callApi({
+        method: 'POST',
+        endpoint: `/users/${userId}/guestbooks`,
+        body: {
+          topGuestbookId,
+          content,
+        },
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+      });
+    },
+    onSuccess: () => {
+      setReplyContent('');
+      queryClient.invalidateQueries({ queryKey: ['guestbooks-list', userId] });
+      onComplete();
+    },
+    onError: (error) => {
+      console.error('대댓글 등록 실패:', error);
+    },
+  });
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.value.length <= 50) {
+      setReplyContent(e.target.value);
+    }
+  };
+
+  const handleSubmit = () => {
+    if (replyContent.trim()) {
+      mutation.mutate(replyContent.trim());
+    }
+  };
+
+  return (
+    <div className="reply-comment-input">
+      <input
+        className="reply-comment-input__field"
+        type="text"
+        placeholder="대댓글을 입력하세요 (최대 50자)"
+        value={replyContent}
+        onChange={handleChange}
+      />
+      <button className="reply-comment-input__button" onClick={handleSubmit}>
+        등록
+      </button>
+    </div>
+  );
+};
+
+export default ProfileReplyCommentInput;

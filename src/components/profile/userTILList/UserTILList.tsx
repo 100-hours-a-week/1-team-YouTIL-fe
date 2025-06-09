@@ -32,7 +32,7 @@ const UserTILList = () => {
   const { userId } = useParams<{ userId: string }>();
   const observer = useRef<IntersectionObserver | null>(null);
 
-  const { data, isError, isFetchingNextPage, hasNextPage, fetchNextPage } = useInfiniteQuery<TILResponse, Error>({
+  const { data, isFetchingNextPage, hasNextPage, fetchNextPage } = useInfiniteQuery<TILResponse, Error>({
     queryKey: ['user-tils', userId],
     queryFn: async ({ pageParam }: QueryFunctionContext) => {
         const page = (pageParam as number) ?? 0;
@@ -72,11 +72,10 @@ const UserTILList = () => {
     [isFetchingNextPage, hasNextPage, fetchNextPage]
   );
 
-  if (isError || !data) return <div>에러가 발생했습니다.</div>;
 
   return (
     <div className="usertil-list">
-      {data.pages.map((page, pageIndex) =>
+      {data?.pages.map((page, pageIndex) =>
         page.data.tils.map((til, tilIndex) => {
           const isLastItem =
             pageIndex === data.pages.length - 1 &&
