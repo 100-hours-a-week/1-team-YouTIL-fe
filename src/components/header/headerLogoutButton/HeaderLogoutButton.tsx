@@ -1,6 +1,5 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
 import useAuthStore from '@/store/useAuthStore';
 import { useFetch } from '@/hooks/useFetch';
 import './HeaderLogoutButton.scss';
