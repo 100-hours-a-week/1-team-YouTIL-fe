@@ -8,12 +8,12 @@ import { useQueryClient } from '@tanstack/react-query';
 
 interface Props {
   originalContent: string;
-  userId: number;
+  profileUserId: number | null;
   guestbookId: number;
   onComplete: () => void;
 }
 
-const ProfileEditCommentInput = ({ originalContent,userId,guestbookId,onComplete }: Props) => {
+const ProfileEditCommentInput = ({ originalContent,profileUserId,guestbookId,onComplete }: Props) => {
   const [editContent, setEditContent] = useState('');
   const { callApi } = useFetch();
   const accessToken = useGetAccessToken();
@@ -35,7 +35,7 @@ const ProfileEditCommentInput = ({ originalContent,userId,guestbookId,onComplete
     try {
       await callApi({
         method: 'PUT',
-        endpoint: `/users/${userId}/guestbooks/${guestbookId}`,
+        endpoint: `/users/${profileUserId}/guestbooks/${guestbookId}`,
         body: { content: editContent.trim() },
         headers: {
           Authorization: `Bearer ${accessToken}`,

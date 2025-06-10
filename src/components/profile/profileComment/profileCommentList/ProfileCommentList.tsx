@@ -211,7 +211,7 @@ const ProfileCommentList = () => {
               ) : isEditing ? (
                 <ProfileEditCommentInput
                   originalContent={editingContent}
-                  userId={item.guestId}
+                  profileUserId={userId}
                   guestbookId={item.id}
                   onComplete={() => {
                     setEditingId(null);
