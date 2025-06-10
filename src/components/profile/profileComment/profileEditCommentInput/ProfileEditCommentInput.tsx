@@ -13,7 +13,7 @@ interface Props {
   onComplete: () => void;
 }
 
-const ProfileEditCommentInput = ({ originalContent,profileUserId,guestbookId,onComplete }: Props) => {
+const ProfileEditCommentInput = ({ originalContent, profileUserId, guestbookId, onComplete }: Props) => {
   const [editContent, setEditContent] = useState('');
   const { callApi } = useFetch();
   const accessToken = useGetAccessToken();
@@ -26,6 +26,12 @@ const ProfileEditCommentInput = ({ originalContent,profileUserId,guestbookId,onC
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.value.length <= 50) {
       setEditContent(e.target.value);
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      handleSubmit();
     }
   };
 
@@ -59,6 +65,7 @@ const ProfileEditCommentInput = ({ originalContent,profileUserId,guestbookId,onC
         placeholder="댓글을 수정하세요 (최대 50자)"
         value={editContent}
         onChange={handleChange}
+        onKeyDown={handleKeyDown}
       />
       <button className="edit-comment-input__button" onClick={handleSubmit}>
         수정

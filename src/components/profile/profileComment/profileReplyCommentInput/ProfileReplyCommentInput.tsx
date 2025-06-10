@@ -55,6 +55,12 @@ const ProfileReplyCommentInput = ({ topGuestbookId, userId, onComplete }: Props)
       mutation.mutate(replyContent.trim());
     }
   };
+  
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      handleSubmit();
+    }
+  };
 
   return (
     <div className="reply-comment-input">
@@ -64,6 +70,7 @@ const ProfileReplyCommentInput = ({ topGuestbookId, userId, onComplete }: Props)
         placeholder="대댓글을 입력하세요 (최대 50자)"
         value={replyContent}
         onChange={handleChange}
+        onKeyDown={handleKeyDown}
       />
       <button className="reply-comment-input__button" onClick={handleSubmit}>
         등록

@@ -47,6 +47,13 @@ const ProfileCommentInput = () => {
     }
   };
 
+  
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      handleSubmit();
+    }
+  };
+
   const handleSubmit = () => {
     if (comment.trim()) {
       mutation.mutate(comment.trim());
@@ -61,6 +68,7 @@ const ProfileCommentInput = () => {
         placeholder="방명록을 남겨보세요 (최대 50자)"
         value={comment}
         onChange={handleChange}
+        onKeyDown={handleKeyDown}
       />
       <button className="comment-input__button" onClick={handleSubmit}>
         등록
