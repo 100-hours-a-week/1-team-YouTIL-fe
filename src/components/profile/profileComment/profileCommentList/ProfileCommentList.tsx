@@ -7,6 +7,7 @@ import useOtherUserInfoStore from '@/store/useOtherUserInfoStore';
 import useGetAccessToken from '@/hooks/useGetAccessToken';
 import useCheckAccess from '@/hooks/useCheckExistAccess';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import ProfileCommentUtils from '../profileCommentUtils/ProfileCommentUtils';
 import CheckDeleteCommentModal from '../checkDeleteCommentModal/CheckDeleteCommentModal';
 import ProfileEditCommentInput from '../profileEditCommentInput/ProfileEditCommentInput';
@@ -54,6 +55,7 @@ const ProfileCommentList = () => {
   const { otherUserInfo } = useOtherUserInfoStore();
   const userId = otherUserInfo.userId;
   const existAccess = useCheckAccess(accessToken);
+  const router = useRouter();
 
   const [deleteTargetId, setDeleteTargetId] = useState<number | null>(null);
   const [openMenuId, setOpenMenuId] = useState<number | null>(null);
@@ -69,12 +71,10 @@ const ProfileCommentList = () => {
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       const currentMenu = openMenuId !== null ? refs.current[openMenuId] : null;
-  
       if (currentMenu && !currentMenu.contains(event.target as Node)) {
         setOpenMenuId(null);
       }
     };
-  
     document.addEventListener('mousedown', handleClickOutside);
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
@@ -112,16 +112,16 @@ const ProfileCommentList = () => {
   useEffect(() => {
     const target = loadMoreRef.current;
     if (!target || !hasNextPage) return;
-  
+
     observerRef.current = new IntersectionObserver(
       (entries) => {
         if (entries[0].isIntersecting) fetchNextPage();
       },
       { threshold: 1.0 }
     );
-  
+
     observerRef.current.observe(target);
-  
+
     return () => {
       if (observerRef.current && target) {
         observerRef.current.unobserve(target);
@@ -140,6 +140,10 @@ const ProfileCommentList = () => {
   };
 
   const formatDate = (iso: string) => new Date(iso).toLocaleString();
+
+  const handleMoveToProfile = (guestId: number) => {
+    router.push(`/profile/${guestId}`);
+  };
 
   const renderItem = (item: GuestbookItem | GuestbookReply, isReply = false) => {
     const isMenuOpen = openMenuId === item.id;
@@ -167,10 +171,16 @@ const ProfileCommentList = () => {
             width={32}
             height={32}
             className="comment-list__profile-image"
+            onClick={() => handleMoveToProfile(item.guestId)}
           />
           <div className="comment-list__info">
             <div className="comment-list__meta">
-              <span className="comment-list__nickname">{item.guestNickname}</span>
+              <span
+                className="comment-list__nickname"
+                onClick={() => handleMoveToProfile(item.guestId)}
+              >
+                {item.guestNickname}
+              </span>
               <div className="comment-list__meta-right">
                 <span className="comment-list__date">{formatDate(item.createdAt)}</span>
                 <div

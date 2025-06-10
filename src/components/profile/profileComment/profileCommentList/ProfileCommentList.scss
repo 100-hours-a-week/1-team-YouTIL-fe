@@ -3,6 +3,7 @@
   margin-top: 16px;
   min-height: 710px;
   margin-bottom: 110px;
+
   &__item {
     display: flex;
     flex-direction: column;
@@ -21,6 +22,7 @@
     align-items: flex-start;
     gap: 0.5rem;
     margin-bottom: 8px;
+    margin-left: 8px;
   }
 
   &__reply-icon {
@@ -35,45 +37,20 @@
     height: 32px;
     border-radius: 50%;
     object-fit: cover;
+    cursor: pointer;
+    transition: transform 0.2s ease-in-out;
+
+    &:hover {
+      transform: scale(1.1);
+    }
   }
 
   &__info {
     margin-top: 8px;
+    margin-left: 4px;
     display: flex;
     flex-direction: column;
     flex: 1;
-  }
-
-  &__meta {
-    display: flex;
-    justify-content: space-between;
-    font-size: 0.85rem;
-    margin-bottom: 0.2rem;
-  }
-
-  &__nickname {
-    font-weight: bold;
-    font-size: 0.9rem;
-  }
-
-  &__date {
-    font-size: 0.8rem;
-    color: #888;
-    margin-right: 24px;
-  }
-
-  &__text {
-    font-size: 1rem;
-    margin-top: 6px;
-    color: #333;
-    white-space: pre-wrap;
-  }
-
-  &__loading,
-  &__error {
-    text-align: center;
-    padding: 1rem;
-    color: #666;
   }
 
   &__meta {
@@ -88,6 +65,37 @@
       align-items: center;
       gap: 8px;
     }
+  }
+
+  &__nickname {
+    font-weight: bold;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: transform 0.2s ease-in-out;
+
+    &:hover {
+      transform: scale(1.1);
+    }
+  }
+
+  &__date {
+    font-size: 0.8rem;
+    color: #888;
+    margin-right: 16px;
+  }
+
+  &__text {
+    font-size: 1rem;
+    margin-top: 6px;
+    color: #333;
+    white-space: pre-wrap;
+  }
+
+  &__loading,
+  &__error {
+    text-align: center;
+    padding: 1rem;
+    color: #666;
   }
 
   &__menu-button {
