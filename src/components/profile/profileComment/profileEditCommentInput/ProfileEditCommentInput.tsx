@@ -15,6 +15,8 @@ interface Props {
 
 const ProfileEditCommentInput = ({ originalContent, profileUserId, guestbookId, onComplete }: Props) => {
   const [editContent, setEditContent] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const { callApi } = useFetch();
   const accessToken = useGetAccessToken();
   const queryClient = useQueryClient();
@@ -32,14 +34,17 @@ const ProfileEditCommentInput = ({ originalContent, profileUserId, guestbookId, 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
       e.preventDefault();
-      handleSubmit();
+      if (!isSubmitting) {
+        handleSubmit();
+      }
     }
   };
 
   const handleSubmit = async () => {
-    if (!editContent.trim()) return;
+    if (!editContent.trim() || isSubmitting) return;
 
     try {
+      setIsSubmitting(true);
       await callApi({
         method: 'PUT',
         endpoint: `/users/${profileUserId}/guestbooks/${guestbookId}`,
@@ -55,6 +60,8 @@ const ProfileEditCommentInput = ({ originalContent, profileUserId, guestbookId, 
       onComplete();
     } catch (err) {
       console.error('댓글 수정 실패:', err);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -67,9 +74,14 @@ const ProfileEditCommentInput = ({ originalContent, profileUserId, guestbookId, 
         value={editContent}
         onChange={handleChange}
         onKeyDown={handleKeyDown}
+        disabled={isSubmitting}
       />
-      <button className="edit-comment-input__button" onClick={handleSubmit}>
-        수정
+      <button
+        className="edit-comment-input__button"
+        onClick={handleSubmit}
+        disabled={isSubmitting}
+      >
+        {isSubmitting ? '수정 중...' : '수정'}
       </button>
     </div>
   );

@@ -14,12 +14,15 @@ interface Props {
 
 const ProfileReplyCommentInput = ({ topGuestbookId, userId, onComplete }: Props) => {
   const [replyContent, setReplyContent] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const { callApi } = useFetch();
   const accessToken = useGetAccessToken();
   const queryClient = useQueryClient();
 
   const mutation = useMutation({
     mutationFn: async (content: string) => {
+      setIsSubmitting(true);
       return await callApi({
         method: 'POST',
         endpoint: `/users/${userId}/guestbooks`,
@@ -42,6 +45,9 @@ const ProfileReplyCommentInput = ({ topGuestbookId, userId, onComplete }: Props)
     onError: (error) => {
       console.error('대댓글 등록 실패:', error);
     },
+    onSettled: () => {
+      setIsSubmitting(false);
+    },
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -51,15 +57,16 @@ const ProfileReplyCommentInput = ({ topGuestbookId, userId, onComplete }: Props)
   };
 
   const handleSubmit = () => {
-    if (replyContent.trim()) {
-      mutation.mutate(replyContent.trim());
-    }
+    if (!replyContent.trim() || isSubmitting) return;
+    mutation.mutate(replyContent.trim());
   };
-  
+
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
       e.preventDefault();
-      handleSubmit();
+      if (!isSubmitting) {
+        handleSubmit();
+      }
     }
   };
 
@@ -72,9 +79,14 @@ const ProfileReplyCommentInput = ({ topGuestbookId, userId, onComplete }: Props)
         value={replyContent}
         onChange={handleChange}
         onKeyDown={handleKeyDown}
+        disabled={isSubmitting}
       />
-      <button className="reply-comment-input__button" onClick={handleSubmit}>
-        등록
+      <button
+        className="reply-comment-input__button"
+        onClick={handleSubmit}
+        disabled={isSubmitting}
+      >
+        {isSubmitting ? '등록 중...' : '등록'}
       </button>
     </div>
   );

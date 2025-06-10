@@ -10,6 +10,7 @@ import useGetAccessToken from '@/hooks/useGetAccessToken';
 
 const ProfileCommentInput = () => {
   const [comment, setComment] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false); // ✅ 요청 중 상태
   const queryClient = useQueryClient();
 
   const accessToken = useGetAccessToken();
@@ -18,6 +19,7 @@ const ProfileCommentInput = () => {
 
   const mutation = useMutation({
     mutationFn: async (content: string) => {
+      setIsSubmitting(true); // ✅ 요청 시작
       return await callApi({
         method: 'POST',
         endpoint: `/users/${otherUserId}/guestbooks`,
@@ -39,6 +41,9 @@ const ProfileCommentInput = () => {
     onError: (error) => {
       console.error('댓글 등록 실패:', error);
     },
+    onSettled: () => {
+      setIsSubmitting(false); // ✅ 요청 끝
+    },
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -47,18 +52,18 @@ const ProfileCommentInput = () => {
     }
   };
 
-  
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
       e.preventDefault();
-      handleSubmit();
+      if (!isSubmitting) {
+        handleSubmit();
+      }
     }
   };
 
   const handleSubmit = () => {
-    if (comment.trim()) {
-      mutation.mutate(comment.trim());
-    }
+    if (!comment.trim() || isSubmitting) return;
+    mutation.mutate(comment.trim());
   };
 
   return (
@@ -70,9 +75,14 @@ const ProfileCommentInput = () => {
         value={comment}
         onChange={handleChange}
         onKeyDown={handleKeyDown}
+        disabled={isSubmitting}
       />
-      <button className="comment-input__button" onClick={handleSubmit}>
-        등록
+      <button
+        className="comment-input__button"
+        onClick={handleSubmit}
+        disabled={isSubmitting}
+      >
+        {isSubmitting ? '등록 중...' : '등록'}
       </button>
     </div>
   );

@@ -20,26 +20,26 @@ export function middleware(request: NextRequest) {
     (path) => pathname === path || pathname.startsWith(`${path}/`)
   );
 
-  // ✅ 1. 로그인 페이지는 항상 접근 허용
+  // 1. 로그인 페이지는 항상 허용 (isLoggedIn 여부 상관없이)
   if (pathname === '/login') {
     return NextResponse.next();
   }
 
-  // ✅ 2. 로그인 안 됐는데 보호된 페이지 접근 → 로그인으로
+  // 2. 로그인 안 됐는데 보호된 페이지 접근 → 로그인으로
   if (!isLoggedIn && isProtected) {
     return NextResponse.redirect(new URL('/login', request.url));
   }
 
-  // ✅ 3. 로그인 안 된 상태에서 정의되지 않은 경로 접근 → 로그인으로
+  // 3. 로그인 안 됐는데 유효하지 않은 경로 접근 → 로그인으로
   if (!isLoggedIn && !isValidPath) {
     return NextResponse.redirect(new URL('/login', request.url));
   }
 
-  // ✅ 4. 로그인 된 상태에서 정의되지 않은 경로 접근 → 홈으로
+  // 4. 로그인 된 상태인데 유효하지 않은 경로 접근 → 홈으로
   if (isLoggedIn && !isValidPath) {
     return NextResponse.redirect(new URL('/', request.url));
   }
 
-  // ✅ 5. 정상 접근
+  // 5. 정상 접근 허용
   return NextResponse.next();
 }
