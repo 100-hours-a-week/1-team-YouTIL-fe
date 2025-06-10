@@ -11,7 +11,6 @@ const HeaderLogoutButton = () => {
   const { callApi } = useFetch();
 
   const handleLogout = async () => {
-    router.replace('/login');
     try {
       await callApi({
         method: 'POST',
@@ -19,11 +18,10 @@ const HeaderLogoutButton = () => {
         credentials: 'include',
       });
     } catch (error) {
-      router.replace('/login');
       console.error('로그아웃 요청 실패:', error);
     } finally {
-      router.replace('/login');
       clearAuth();
+      window.location.href = '/login';
     }
   };
   
