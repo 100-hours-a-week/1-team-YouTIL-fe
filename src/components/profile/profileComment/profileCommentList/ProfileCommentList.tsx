@@ -74,7 +74,18 @@ const ProfileCommentList = () => {
       if (currentMenu && !currentMenu.contains(event.target as Node)) {
         setOpenMenuId(null);
       }
+
+      const clickedElement = event.target as HTMLElement;
+      if (!clickedElement.closest('.edit-comment-input')) {
+        setEditingId(null);
+        setEditingContent('');
+      }
+      if (!clickedElement.closest('.reply-comment-input')) {
+        setReplyingToId(null);
+        setReplyTopId(null);
+      }
     };
+
     document.addEventListener('mousedown', handleClickOutside);
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);

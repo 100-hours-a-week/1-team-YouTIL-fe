@@ -10,7 +10,7 @@ import useGetAccessToken from '@/hooks/useGetAccessToken';
 
 const ProfileCommentInput = () => {
   const [comment, setComment] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false); // ✅ 요청 중 상태
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const queryClient = useQueryClient();
 
   const accessToken = useGetAccessToken();
@@ -19,7 +19,7 @@ const ProfileCommentInput = () => {
 
   const mutation = useMutation({
     mutationFn: async (content: string) => {
-      setIsSubmitting(true); // ✅ 요청 시작
+      setIsSubmitting(true);
       return await callApi({
         method: 'POST',
         endpoint: `/users/${otherUserId}/guestbooks`,
@@ -42,7 +42,7 @@ const ProfileCommentInput = () => {
       console.error('댓글 등록 실패:', error);
     },
     onSettled: () => {
-      setIsSubmitting(false); // ✅ 요청 끝
+      setIsSubmitting(false);
     },
   });
 
@@ -82,7 +82,7 @@ const ProfileCommentInput = () => {
         onClick={handleSubmit}
         disabled={isSubmitting}
       >
-        {isSubmitting ? '등록 중...' : '등록'}
+        등록
       </button>
     </div>
   );

@@ -42,8 +42,13 @@ const ProfileReplyCommentInput = ({ topGuestbookId, userId, onComplete }: Props)
       queryClient.invalidateQueries({ queryKey: ['guestbooks-list', userId] });
       onComplete();
     },
-    onError: (error) => {
-      console.error('대댓글 등록 실패:', error);
+    onError: (error: any) => {
+      if (error?.status === 404) {
+        alert('해당 대댓글은 이미 삭제되었습니다');
+        location.reload();
+      } else {
+        console.error('대댓글 등록 실패:', error);
+      }
     },
     onSettled: () => {
       setIsSubmitting(false);
@@ -86,7 +91,7 @@ const ProfileReplyCommentInput = ({ topGuestbookId, userId, onComplete }: Props)
         onClick={handleSubmit}
         disabled={isSubmitting}
       >
-        {isSubmitting ? '등록 중...' : '등록'}
+        등록
       </button>
     </div>
   );

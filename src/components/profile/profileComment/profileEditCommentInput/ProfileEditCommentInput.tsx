@@ -81,7 +81,7 @@ const ProfileEditCommentInput = ({ originalContent, profileUserId, guestbookId, 
         onClick={handleSubmit}
         disabled={isSubmitting}
       >
-        {isSubmitting ? '수정 중...' : '수정'}
+        등록
       </button>
     </div>
   );
