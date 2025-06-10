@@ -6,7 +6,6 @@ import { useFetch } from '@/hooks/useFetch';
 import './HeaderLogoutButton.scss';
 
 const HeaderLogoutButton = () => {
-  const router = useRouter();
   const clearAuth = useAuthStore((state) => state.clearAuth);
   const { callApi } = useFetch();
 
