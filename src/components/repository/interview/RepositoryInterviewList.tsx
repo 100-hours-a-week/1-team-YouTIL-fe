@@ -154,9 +154,9 @@ const RepositoryInterviewList = () => {
                   onClick={() => handleClickInterview(interview.id)}
                 >
                   <div className="repository-interview-list__item-header-top">
-                    <h3 className={`repository-interview-list__item-title${ isExpanded ? ' repository-interview-list__item-title--expanded' : ''}`}>
-                      {interview.title} ({mapLevelToLabel(interview.level)})
-                    </h3>
+                  <h3 className={`repository-interview-list__item-title${ isExpanded ? ' repository-interview-list__item-title--expanded' : ''}`}>
+                    ({mapLevelToLabel(interview.level)}) {interview.title}
+                  </h3>
                   </div>
                   <p className="repository-interview-list__item-date">{formattedDate}</p>
                 </div>
