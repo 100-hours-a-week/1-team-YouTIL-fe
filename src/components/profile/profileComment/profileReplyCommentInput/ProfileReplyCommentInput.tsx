@@ -42,8 +42,13 @@ const ProfileReplyCommentInput = ({ topGuestbookId, userId, onComplete }: Props)
       queryClient.invalidateQueries({ queryKey: ['guestbooks-list', userId] });
       onComplete();
     },
-    onError: (error: any) => {
-      if (error?.status === 404) {
+    onError: (error: unknown) => {
+      if (
+        typeof error === 'object' &&
+        error !== null &&
+        'status' in error &&
+        (error as { status?: number }).status === 404
+      ) {
         alert('해당 대댓글은 이미 삭제되었습니다');
         location.reload();
       } else {
