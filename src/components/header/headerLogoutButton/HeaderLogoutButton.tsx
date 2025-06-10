@@ -11,6 +11,7 @@ const HeaderLogoutButton = () => {
   const { callApi } = useFetch();
 
   const handleLogout = async () => {
+    router.replace('/login');
     try {
       await callApi({
         method: 'POST',
@@ -18,13 +19,14 @@ const HeaderLogoutButton = () => {
         credentials: 'include',
       });
     } catch (error) {
+      router.replace('/login');
       console.error('로그아웃 요청 실패:', error);
     } finally {
-      clearAuth();
       router.replace('/login');
+      clearAuth();
     }
   };
-
+  
   return (
     <div className="header__logout-button" onClick={handleLogout}>
       로그아웃

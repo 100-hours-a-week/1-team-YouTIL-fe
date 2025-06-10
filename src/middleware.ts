@@ -12,12 +12,12 @@ export function middleware(request: NextRequest) {
   const refreshToken = request.cookies.get('RefreshToken')?.value;
   const isLoggedIn = !!refreshToken;
 
-  // ✅ 동적 경로 포함해서 보호된 경로인지 판단
+  // 동적 경로 포함해서 보호된 경로인지 판단
   const isProtected = PROTECTED_PATHS.some(
     (path) => pathname === path || pathname.startsWith(`${path}/`)
   );
 
-  // ✅ 동적 경로 포함해서 유효한 경로인지 판단
+  // 동적 경로 포함해서 유효한 경로인지 판단
   const isValidPath = [...PUBLIC_PATHS, ...PROTECTED_PATHS].some(
     (path) => pathname === path || pathname.startsWith(`${path}/`)
   );
