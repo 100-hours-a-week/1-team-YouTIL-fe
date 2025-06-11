@@ -1,14 +1,16 @@
 'use client';
 
-import { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useState, useEffect, useRef } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useFetch } from '@/hooks/useFetch';
 import useGetAccessToken from '@/hooks/useGetAccessToken';
 import useCheckAccess from '@/hooks/useCheckExistAccess';
+import CheckDeleteTILModal from '../checkDeleteModal/checkDeleteTILModal/CheckDeleteTILModal';
 import { useRepositoryDateStore } from '@/store/useRepositoryDateStore';
 import { parseISO, format } from 'date-fns';
 import './RepositoryTILList.scss';
 import SelectInterviewLevelModal from '../selectInterviewLevelModal/SelectInterviewLevelModal';
+import Image from 'next/image';
 
 interface TILItem {
   tilId: number;
@@ -43,14 +45,30 @@ const RepositoryTILList = () => {
   const [selectedTilIds, setSelectedTilIds] = useState<number[]>([]);
   const [shakeDelete, setShakeDelete] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [editingTilId, setEditingTilId] = useState<number | null>(null);
+  const [editedTitle, setEditedTitle] = useState('');
   const accessToken = useGetAccessToken();
   const existAccess = useCheckAccess(accessToken);
+  const refs = useRef<Record<number, HTMLDivElement | null>>({});
+  const queryClient = useQueryClient();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    const handleMouseDown = (event: MouseEvent) => {
+      const currentMenu = editingTilId !== null ? refs.current[editingTilId] : null;
+      if (currentMenu && !currentMenu.contains(event.target as Node)) {
+        setEditingTilId(null);
+        setEditedTitle('');
+      }
+    };
+    document.addEventListener('mousedown', handleMouseDown);
+    return () => {
+      document.removeEventListener('mousedown', handleMouseDown);
+    };
+  }, [editingTilId]);
 
   const today = new Date();
-  const yyyy = today.getFullYear();
-  const mm = String(today.getMonth() + 1).padStart(2, '0');
-  const dd = String(today.getDate()).padStart(2, '0');
-  const formattedToday = `${yyyy}-${mm}-${dd}`;
+  const formattedToday = format(today, 'yyyy-MM-dd');
 
   const { data: tilData } = useQuery<TILItem[]>({
     queryKey: ['tilList', tilDate],
@@ -59,12 +77,9 @@ const RepositoryTILList = () => {
       const response = await callApi<TILResponse>({
         method: 'GET',
         endpoint: `/tils?page=0&size=10&date=${targetDate}`,
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
+        headers: { Authorization: `Bearer ${accessToken}` },
         credentials: 'include',
       });
-
       return response.data.tils;
     },
     enabled: existAccess,
@@ -82,22 +97,16 @@ const RepositoryTILList = () => {
   };
 
   const handleClickTIL = (tilId: number) => {
-    if (expandedTilId === tilId) {
-      setExpandedTilId(null);
-    } else {
-      setExpandedTilId(tilId);
-    }
+    setEditingTilId(null);
+    setExpandedTilId(prev => (prev === tilId ? null : tilId));
   };
 
   const toggleTILSelection = (tilId: number) => {
-    setSelectedTilIds(prev =>
-      prev.includes(tilId)
-        ? prev.filter(id => id !== tilId)
-        : [...prev, tilId]
+    setEditingTilId(null);
+    setSelectedTilIds((prev) =>
+      prev.includes(tilId) ? prev.filter(id => id !== tilId) : [...prev, tilId]
     );
-    if (expandedTilId === tilId) {
-      setExpandedTilId(null);
-    }
+    if (expandedTilId === tilId) setExpandedTilId(null);
   };
 
   const handleOpenInterviewModal = (e: React.MouseEvent) => {
@@ -109,20 +118,62 @@ const RepositoryTILList = () => {
     setShowInterviewModal(false);
   };
 
+  const handleDeleteComplete = () => {
+    setSelectedTilIds([]);
+    setShowDeleteModal(false);
+  };
+
+  const handleStartEdit = (e: React.MouseEvent, tilId: number, currentTitle: string) => {
+    e.stopPropagation();
+    setEditingTilId(tilId);
+    setEditedTitle(currentTitle);
+  };
+
+  const handleConfirmEdit = async (
+    e?: React.MouseEvent | React.KeyboardEvent,
+    tilId?: number
+  ) => {
+    if (!tilId || isSubmitting || !editedTitle.trim()) return;
+    e?.stopPropagation();
+    setIsSubmitting(true);
+    queryClient.setQueryData<TILItem[]>(['tilList', tilDate], (prev) =>
+      prev
+        ? prev.map((til) =>
+            til.tilId === tilId ? { ...til, title: editedTitle.trim() } : til
+          )
+        : prev
+    );
+
+    try {
+      await callApi({
+        method: 'PUT',
+        endpoint: '/tils',
+        body: { tilId, title: editedTitle.trim() },
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+      });
+      setEditingTilId(null);
+      queryClient.invalidateQueries({ queryKey: ['tilList', tilDate] });
+    } catch (err) {
+      console.error('TIL 수정 실패:', err);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   const { data: tilDetailData, isLoading: isDetailLoading } = useQuery<TILDetailItem | null>({
     queryKey: ['tilDetail', expandedTilId],
     queryFn: async () => {
       if (expandedTilId === null) return null;
-
       const response = await callApi<{ data: TILDetailItem }>({
         method: 'GET',
         endpoint: `/tils/${expandedTilId}`,
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
+        headers: { Authorization: `Bearer ${accessToken}` },
         credentials: 'include',
       });
-
       return response.data;
     },
     enabled: expandedTilId !== null && existAccess,
@@ -135,10 +186,12 @@ const RepositoryTILList = () => {
       <div className="repository-til-list__header">
         <h2 className="repository-til-list__title">TIL 목록</h2>
         {tilData && tilData.length > 0 && (
-          <button 
-          className={`repository-til-list__button${shakeDelete ? ' error shake' : ''}`}
-          onClick={handleDeleteClick}
-          >삭제</button>
+          <button
+            className={`repository-til-list__button${shakeDelete ? ' error shake' : ''}`}
+            onClick={handleDeleteClick}
+          >
+            삭제
+          </button>
         )}
       </div>
       <ul className="repository-til-list__items">
@@ -148,14 +201,55 @@ const RepositoryTILList = () => {
           const isSelected = selectedTilIds.includes(til.tilId);
 
           return (
-            <li key={til.tilId} className={`repository-til-list__item${isSelected ? ' selected' : ''}`}>
+            <li
+              key={til.tilId}
+              className={`repository-til-list__item${isSelected ? ' selected' : ''}`}
+            >
               <div className="repository-til-list__item-header-wrapper">
                 <div
                   className="repository-til-list__item-header"
                   onClick={() => handleClickTIL(til.tilId)}
                 >
                   <div className="repository-til-list__item-header-top">
-                    <h3 className="repository-til-list__item-title">{til.title}</h3>
+                    {editingTilId === til.tilId ? (
+                      <div
+                        className="repository-til-list__item-edit-wrapper"
+                        ref={(el) => {
+                          refs.current[til.tilId] = el;
+                        }}
+                      >
+                        <input
+                          value={editedTitle}
+                          onClick={(e) => e.stopPropagation()}
+                          onChange={(e) => setEditedTitle(e.target.value)}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter') handleConfirmEdit(e, til.tilId);
+                          }}
+                          className="repository-til-list__item-edit-input"
+                        />
+                        <button
+                          className="repository-til-list__item-edit-confirm"
+                          onClick={(e) => handleConfirmEdit(e, til.tilId)}
+                        >
+                          확인
+                        </button>
+                      </div>
+                    ) : (
+                      <>
+                        <h3 className="repository-til-list__item-title">{til.title}</h3>
+                        <Image
+                          src="/images/pencilEdit.png"
+                          alt="edit icon"
+                          width={16}
+                          height={16}
+                          className="repository-til-list__item-edit-icon"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleStartEdit(e, til.tilId, til.title);
+                          }}
+                        />
+                      </>
+                    )}
                     {expandedTilId === til.tilId && (
                       <button
                         className="repository-til-list__item-generate-button"
@@ -193,7 +287,8 @@ const RepositoryTILList = () => {
                         ))}
                       </p>
                       <p className="repository-til-list__item-meta">
-                        조회수 {tilDetailData.visitedCount} · 추천 {tilDetailData.recommendCount} · 댓글 {tilDetailData.commentsCount}
+                        조회수 {tilDetailData.visitedCount} · 추천 {tilDetailData.recommendCount} · 댓글{' '}
+                        {tilDetailData.commentsCount}
                       </p>
                     </>
                   )}
@@ -203,10 +298,16 @@ const RepositoryTILList = () => {
           );
         })}
       </ul>
+
       {showInterviewModal && expandedTilId !== null && (
-        <SelectInterviewLevelModal
-          tilId={expandedTilId}
-          onClose={handleCloseInterviewModal}
+        <SelectInterviewLevelModal tilId={expandedTilId} onClose={handleCloseInterviewModal} />
+      )}
+
+      {showDeleteModal && (
+        <CheckDeleteTILModal
+          tilIds={selectedTilIds}
+          onClose={() => setShowDeleteModal(false)}
+          onDeleteComplete={handleDeleteComplete}
         />
       )}
     </div>

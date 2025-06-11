@@ -70,7 +70,6 @@ const ProfileEditCommentInput = ({ originalContent, profileUserId, guestbookId, 
       <input
         className="edit-comment-input__field"
         type="text"
-        placeholder="댓글을 수정하세요 (최대 50자)"
         value={editContent}
         onChange={handleChange}
         onKeyDown={handleKeyDown}

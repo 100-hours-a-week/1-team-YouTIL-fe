@@ -5,7 +5,7 @@ import { useFetch } from '@/hooks/useFetch';
 import { useRepositoryDateStore } from '@/store/useRepositoryDateStore';
 import useGetAccessToken from '@/hooks/useGetAccessToken';
 import useCheckAccess from '@/hooks/useCheckExistAccess';
-import CheckDeleteInterviewModal from '../checkDeleteInterviewModal/CheckDeleteInterviewModal';
+import CheckDeleteInterviewModal from '../checkDeleteModal/checkDeleteInterviewModal/CheckDeleteInterviewModal';
 import { parseISO, format } from 'date-fns';
 import { useState } from 'react';
 import './RepositoryInterviewList.scss';

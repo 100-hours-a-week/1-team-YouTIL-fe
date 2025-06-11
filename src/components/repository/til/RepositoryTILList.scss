@@ -92,14 +92,24 @@
 
       &-top {
         display: flex;
-        justify-content: space-between;
+        justify-content: flex-start;
         align-items: center;
+        gap: 0.5rem;
         white-space: nowrap;
+        height:25px;
+        flex-wrap: wrap;
       }
     }
 
+    &-title-wrapper {
+      display: flex;
+      gap: 0.5rem;
+      overflow: hidden;
+      max-width: 100%;
+    }
+
     &-title {
-      margin: 0 0 0.4rem 0;
+      margin: 0 0 0 0;
       font-size: 1rem;
       font-weight: 600;
       white-space: nowrap;
@@ -114,6 +124,47 @@
       }
     }
 
+    &-edit-icon {
+      width: 24px;
+      height: 24px;
+      cursor: pointer;
+      flex-shrink: 0;
+      margin-left: 0;
+      &:hover {
+        filter: brightness(0.8);
+      }
+    }
+
+    &-edit-input {
+      font-size: 1rem;
+      padding: 2px 4px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      flex: 1;
+      max-width: 300px;
+      margin-right: 0.5rem;
+    
+      &:focus {
+        border: 1px solid #ccc;
+        outline: none;
+      }
+    }
+    &-edit-confirm {
+      font-size: 0.85rem;
+      padding: 4px 10px;
+      background-color: #00b6fa;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: background-color 0.2s ease;
+
+      &:hover {
+        background-color: #0095cc;
+      }
+    }
+
     &-generate-button {
       font-size: 0.8rem;
       padding: 4px 8px;
@@ -121,9 +172,9 @@
       color: #fff;
       border: none;
       border-radius: 6px;
+      margin-left: auto;
       cursor: pointer;
       transition: background-color 0.2s ease;
-
       &:hover {
         background-color: #0095cc;
       }
