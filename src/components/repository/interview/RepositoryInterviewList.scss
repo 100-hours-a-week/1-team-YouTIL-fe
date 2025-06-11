@@ -5,10 +5,10 @@
   width: 80%;
 
   &__header {
+    position: relative;
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
-    margin-left: 57px;
   }
 
   &__title {
@@ -19,6 +19,8 @@
   }
 
   &__button {
+    position: absolute;
+    right:  0;
     background-color: #00b6fa;
     color: white;
     font-weight: bold;
