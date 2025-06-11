@@ -77,7 +77,7 @@ const GenerateTILForm = () => {
       });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['tilList'] });
+      queryClient.invalidateQueries({ queryKey: ['til-list'] });
       queryClient.refetchQueries({ queryKey: ['recent-tils'], exact: true });
       router.push('/repository');
     },

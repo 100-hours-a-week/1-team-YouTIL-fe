@@ -71,7 +71,7 @@ const RepositoryTILList = () => {
   const formattedToday = format(today, 'yyyy-MM-dd');
 
   const { data: tilData } = useQuery<TILItem[]>({
-    queryKey: ['tilList', tilDate],
+    queryKey: ['til-list', tilDate],
     queryFn: async () => {
       const targetDate = tilDate || formattedToday;
       const response = await callApi<TILResponse>({
@@ -136,7 +136,7 @@ const RepositoryTILList = () => {
     if (!tilId || isSubmitting || !editedTitle.trim()) return;
     e?.stopPropagation();
     setIsSubmitting(true);
-    queryClient.setQueryData<TILItem[]>(['tilList', tilDate], (prev) =>
+    queryClient.setQueryData<TILItem[]>(['til-list', tilDate], (prev) =>
       prev
         ? prev.map((til) =>
             til.tilId === tilId ? { ...til, title: editedTitle.trim() } : til
@@ -156,7 +156,9 @@ const RepositoryTILList = () => {
         credentials: 'include',
       });
       setEditingTilId(null);
-      queryClient.invalidateQueries({ queryKey: ['tilList', tilDate] });
+      queryClient.invalidateQueries({ queryKey: ['til-list', tilDate] });
+      queryClient.invalidateQueries({ queryKey: ['recent-tils'] });
+      queryClient.invalidateQueries({ queryKey: ['user-tils'] });
     } catch (err) {
       console.error('TIL 수정 실패:', err);
     } finally {
@@ -165,7 +167,7 @@ const RepositoryTILList = () => {
   };
 
   const { data: tilDetailData, isLoading: isDetailLoading } = useQuery<TILDetailItem | null>({
-    queryKey: ['tilDetail', expandedTilId],
+    queryKey: ['til-detail', expandedTilId],
     queryFn: async () => {
       if (expandedTilId === null) return null;
       const response = await callApi<{ data: TILDetailItem }>({
