@@ -40,6 +40,9 @@ const RepositoryTILList = () => {
   const { tilDate } = useRepositoryDateStore();
   const [expandedTilId, setExpandedTilId] = useState<number | null>(null);
   const [showInterviewModal, setShowInterviewModal] = useState(false);
+  const [selectedTilIds, setSelectedTilIds] = useState<number[]>([]);
+  const [shakeDelete, setShakeDelete] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
   const accessToken = useGetAccessToken();
   const existAccess = useCheckAccess(accessToken);
 
@@ -69,11 +72,31 @@ const RepositoryTILList = () => {
     gcTime: 3600000,
   });
 
+  const handleDeleteClick = () => {
+    if (selectedTilIds.length === 0) {
+      setShakeDelete(true);
+      setTimeout(() => setShakeDelete(false), 500);
+    } else {
+      setShowDeleteModal(true);
+    }
+  };
+
   const handleClickTIL = (tilId: number) => {
     if (expandedTilId === tilId) {
       setExpandedTilId(null);
     } else {
       setExpandedTilId(tilId);
+    }
+  };
+
+  const toggleTILSelection = (tilId: number) => {
+    setSelectedTilIds(prev =>
+      prev.includes(tilId)
+        ? prev.filter(id => id !== tilId)
+        : [...prev, tilId]
+    );
+    if (expandedTilId === tilId) {
+      setExpandedTilId(null);
     }
   };
 
@@ -109,30 +132,50 @@ const RepositoryTILList = () => {
 
   return (
     <div className="repository-til-list">
-      <h2 className="repository-til-list__title">TIL 목록</h2>
+      <div className="repository-til-list__header">
+        <h2 className="repository-til-list__title">TIL 목록</h2>
+        {tilData && tilData.length > 0 && (
+          <button 
+          className={`repository-til-list__button${shakeDelete ? ' error shake' : ''}`}
+          onClick={handleDeleteClick}
+          >삭제</button>
+        )}
+      </div>
       <ul className="repository-til-list__items">
         {tilData?.map((til) => {
           const parsedDate = parseISO(til.createdAt);
           const formattedDate = format(parsedDate, 'yyyy-MM-dd : HH:mm:ss');
+          const isSelected = selectedTilIds.includes(til.tilId);
 
           return (
-            <li key={til.tilId} className="repository-til-list__item">
-              <div
-                className="repository-til-list__item-header"
-                onClick={() => handleClickTIL(til.tilId)}
-              >
-                <div className="repository-til-list__item-header-top">
-                  <h3 className="repository-til-list__item-title">{til.title}</h3>
-                  {expandedTilId === til.tilId && (
-                    <button
-                      className="repository-til-list__item-generate-button"
-                      onClick={handleOpenInterviewModal}
-                    >
-                      면접질문생성
-                    </button>
-                  )}
+            <li key={til.tilId} className={`repository-til-list__item${isSelected ? ' selected' : ''}`}>
+              <div className="repository-til-list__item-header-wrapper">
+                <div
+                  className="repository-til-list__item-header"
+                  onClick={() => handleClickTIL(til.tilId)}
+                >
+                  <div className="repository-til-list__item-header-top">
+                    <h3 className="repository-til-list__item-title">{til.title}</h3>
+                    {expandedTilId === til.tilId && (
+                      <button
+                        className="repository-til-list__item-generate-button"
+                        onClick={handleOpenInterviewModal}
+                      >
+                        면접질문생성
+                      </button>
+                    )}
+                  </div>
+                  <p className="repository-til-list__item-date">{formattedDate}</p>
                 </div>
-                <p className="repository-til-list__item-date">{formattedDate}</p>
+
+                {expandedTilId !== til.tilId && (
+                  <input
+                    type="checkbox"
+                    className="repository-til-list__item-checkbox"
+                    checked={isSelected}
+                    onChange={() => toggleTILSelection(til.tilId)}
+                  />
+                )}
               </div>
 
               {expandedTilId === til.tilId && tilDetailData && (
@@ -160,7 +203,6 @@ const RepositoryTILList = () => {
           );
         })}
       </ul>
-
       {showInterviewModal && expandedTilId !== null && (
         <SelectInterviewLevelModal
           tilId={expandedTilId}

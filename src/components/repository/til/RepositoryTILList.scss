@@ -4,11 +4,51 @@
   background-color: #fff;
   width: 80%;
 
+  &__header {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
   &__title {
     font-size: 1.25rem;
     font-weight: bold;
-    margin-bottom: 1rem;
     text-align: center;
+    flex: 1;
+  }
+
+  &__button {
+    position: absolute;
+    right: 0;
+    background-color: #00b6fa;
+    color: white;
+    font-weight: bold;
+    padding: 0.4rem 1rem;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.2s ease;
+
+    &:hover {
+      background-color: #009fd6;
+    }
+
+    &.error {
+      background-color: #ff4d4f;
+    }
+
+    &.shake {
+      animation: shake 0.3s;
+    }
+  }
+
+  @keyframes shake {
+    0% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    50% { transform: translateX(5px); }
+    75% { transform: translateX(-5px); }
+    100% { transform: translateX(0); }
   }
 
   &__items {
@@ -24,14 +64,53 @@
     border-radius: 12px;
     background-color: #fff;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+    display: flex;
+    flex-direction: column;
+    transition: background-color 0.2s ease;
+
+    &.selected {
+      background-color: #ff4d4f;
+      color: white;
+
+      .repository-til-list__item-title,
+      .repository-til-list__item-date {
+        color: white;
+      }
+    }
+
+    &-header-wrapper {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 0.5rem;
+      overflow: hidden;
+    }
 
     &-header {
+      flex: 1;
       cursor: pointer;
 
       &-top {
         display: flex;
         justify-content: space-between;
         align-items: center;
+        white-space: nowrap;
+      }
+    }
+
+    &-title {
+      margin: 0 0 0.4rem 0;
+      font-size: 1rem;
+      font-weight: 600;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 100%;
+
+      &--expanded {
+        white-space: normal;
+        overflow: visible;
+        text-overflow: unset;
       }
     }
 
@@ -48,6 +127,18 @@
       &:hover {
         background-color: #0095cc;
       }
+    }
+
+    &-date {
+      margin: 0.2rem 0;
+      font-size: 0.85rem;
+      color: #555;
+    }
+
+    &-checkbox {
+      margin-left: 1rem;
+      transform: scale(1.2);
+      cursor: pointer;
     }
 
     &-detail {
@@ -86,17 +177,6 @@
     &-meta {
       font-size: 0.75rem;
       color: #888;
-    }
-
-    &-title {
-      margin: 0 0 0.4rem 0;
-      font-size: 1rem;
-    }
-
-    &-date {
-      margin: 0.2rem 0;
-      font-size: 0.85rem;
-      color: #555;
     }
 
     &-loading {
