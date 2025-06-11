@@ -40,6 +40,7 @@ const CheckDeleteCommentModal = ({ guestbookId, onClose, onDeleteComplete }: Pro
       <div className="comment-delete-modal__overlay" onClick={onClose} />
       <div className="comment-delete-modal__content">
         <p className="comment-delete-modal__text">선택한 댓글을 삭제하시겠습니까?</p>
+        <p className="comment-delete-modal__subtext">한 번 삭제한 댓글은 복구가 불가능합니다!</p>
         <div className="comment-delete-modal__buttons">
           <button className="comment-delete-modal__button comment-delete-modal__button--cancel" onClick={onClose}>
             취소

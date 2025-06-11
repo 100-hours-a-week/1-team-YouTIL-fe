@@ -12,14 +12,15 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 4px 0;
+    padding: 2px 0;
   
     &__item {
       padding: 8px 12px;
       background: none;
       border: none;
-      text-align: left;
+      text-align: center;
       font-size: 0.9rem;
+      width: 62px;
       color: #333;
       cursor: pointer;
   

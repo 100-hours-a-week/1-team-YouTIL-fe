@@ -36,15 +36,16 @@ const CheckDeleteInterviewModal = ({ interviewIds, onClose, onDeleteComplete }: 
   });
 
   return (
-    <div className="delete-modal">
-      <div className="delete-modal__overlay" onClick={onClose} />
-      <div className="delete-modal__content">
-        <p className="delete-modal__text">선택한 면접 질문을 삭제하시겠습니까?</p>
-        <div className="delete-modal__buttons">
-          <button className="delete-modal__button delete-modal__button--cancel" onClick={onClose}>
+    <div className="interview-delete-modal">
+      <div className="interview-delete-modal__overlay" onClick={onClose} />
+      <div className="interview-delete-modal__content">
+        <p className="interview-delete-modal__text">선택한 면접 질문을 삭제하시겠습니까?</p>
+        <p className="interview-delete-modal__subtext">한 번 삭제한 댓글은 복구가 불가능합니다!</p>
+        <div className="interview-delete-modal__buttons">
+          <button className="interview-delete-modal__button interview-delete-modal__button--cancel" onClick={onClose}>
             취소
           </button>
-          <button className="delete-modal__button delete-modal__button--confirm" onClick={() => mutate()}>
+          <button className="interview-delete-modal__button interview-delete-modal__button--confirm" onClick={() => mutate()}>
             삭제
           </button>
         </div>
