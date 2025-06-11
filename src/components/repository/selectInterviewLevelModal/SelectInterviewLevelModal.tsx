@@ -6,6 +6,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import './SelectInterviewLevelModal.scss';
 import Image from 'next/image';
 import { useFetch } from '@/hooks/useFetch';
+import { useRepositoryDateStore } from '@/store/useRepositoryDateStore';
 import useGetAccessToken from '@/hooks/useGetAccessToken';
 import SuccessIcon from '@/components/icon/SuccessIcon';
 import FailedIcon from '@/components/icon/FailedIcon';
@@ -27,6 +28,7 @@ const difficultyOptions: {
 
 const SelectInterviewLevelModal = ({ onClose, tilId }: Props) => {
   const [selectedLevel, setSelectedLevel] = useState<null | 1 | 2 | 3>(null);
+  const {setActiveTab} = useRepositoryDateStore();
   const [errorShake, setErrorShake] = useState(false);
   const [resultMessage, setResultMessage] = useState<'success' | 'error' | null>(null);
   const { callApi } = useFetch();
@@ -61,6 +63,7 @@ const SelectInterviewLevelModal = ({ onClose, tilId }: Props) => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['interviewList'] });
       setResultMessage('success');
+      setActiveTab('interview'); 
       setTimeout(onClose, 1500);
     },
     onError: () => {

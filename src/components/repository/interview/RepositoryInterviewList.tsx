@@ -131,6 +131,7 @@ const RepositoryInterviewList = () => {
           <button
             className={`repository-interview-list__button${shakeDelete ? ' error shake' : ''}`}
             onClick={handleDeleteClick}
+            style={{ visibility: interviewData && interviewData.length > 0 ? 'visible' : 'hidden' }}
           >
             삭제
           </button>
