@@ -29,7 +29,8 @@ const CheckDeleteInterviewModal = ({ interviewIds, onClose, onDeleteComplete }: 
       });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['interviewList'] });
+      queryClient.invalidateQueries({ queryKey: ['interview-list'] });
+      queryClient.invalidateQueries({ queryKey: ['interview-date'] });
       onDeleteComplete();
       onClose();
     },

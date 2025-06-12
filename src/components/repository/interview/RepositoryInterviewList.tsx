@@ -57,7 +57,7 @@ const RepositoryInterviewList = () => {
   const formattedToday = `${yyyy}-${mm}-${dd}`;
 
   const { data: interviewData } = useQuery<InterviewItem[]>({
-    queryKey: ['interviewList', interviewDate],
+    queryKey: ['interview-list', interviewDate],
     queryFn: async () => {
       const targetDate = interviewDate || formattedToday;
       const response = await callApi<InterviewResponse>({
@@ -74,7 +74,7 @@ const RepositoryInterviewList = () => {
   });
 
   const { data: interviewDetailData } = useQuery<InterviewDetail | null>({
-    queryKey: ['interviewDetail', expandedInterviewId],
+    queryKey: ['interview-detail', expandedInterviewId],
     queryFn: async () => {
       if (expandedInterviewId === null) return null;
       const response = await callApi<InterviewDetailResponse>({

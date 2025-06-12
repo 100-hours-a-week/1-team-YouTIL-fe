@@ -84,7 +84,6 @@ const RepositoryDateCalendar = () => {
         },
         credentials: 'include',
       });
-      console.log('[TIL 기록 데이터]', response);
       return response;
     },
     enabled: activeTab === 'til',
@@ -103,7 +102,6 @@ const RepositoryDateCalendar = () => {
         },
         credentials: 'include',
       });
-      console.log('[INTERVIEW 기록 데이터]', response);
       return response;
     },
     enabled: activeTab === 'interview',

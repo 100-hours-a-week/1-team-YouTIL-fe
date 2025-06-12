@@ -159,7 +159,7 @@
       cursor: pointer;
       flex-shrink: 0;
       transition: background-color 0.2s ease;
-
+      height: 25px;
       &:hover {
         background-color: #0095cc;
       }
@@ -167,13 +167,14 @@
 
     &-generate-button {
       font-size: 0.8rem;
-      padding: 4px 8px;
+      padding: 4px 10px;
       background-color: #00b6fa;
       color: #fff;
       border: none;
       border-radius: 6px;
       margin-left: auto;
       cursor: pointer;
+      height: 25px;
       transition: background-color 0.2s ease;
       &:hover {
         background-color: #0095cc;

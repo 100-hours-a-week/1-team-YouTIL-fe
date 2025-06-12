@@ -61,7 +61,8 @@ const SelectInterviewLevelModal = ({ onClose, tilId }: Props) => {
       setResultMessage(null);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['interviewList'] });
+      queryClient.invalidateQueries({ queryKey: ['interview-list'] });
+      queryClient.invalidateQueries({ queryKey: ['interview-date'] });
       setResultMessage('success');
       setActiveTab('interview'); 
       setTimeout(onClose, 1500);
