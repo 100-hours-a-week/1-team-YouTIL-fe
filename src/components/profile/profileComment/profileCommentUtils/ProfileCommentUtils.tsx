@@ -8,6 +8,7 @@ interface Props {
   guestbookId: number;
   topGuestbookId: number | null;
   originalContent: string;
+  profileOwnerId: number | null;
   onCloseDropdown: () => void;
   onRequestDelete: (guestbookId: number) => void;
   onRequestEditToggle: (guestbookId: number, originalContent: string) => void;
@@ -19,13 +20,15 @@ const ProfileCommentUtils = ({
   guestbookId,
   topGuestbookId,
   originalContent,
+  profileOwnerId,
   onCloseDropdown,
   onRequestDelete,
   onRequestEditToggle,
   onRequestReply,
 }: Props) => {
   const myUserId = useUserInfoStore((state) => state.userInfo.userId);
-  const isOwner = myUserId === guestId;
+  const isMyComment = myUserId === guestId;
+  const isMyProfile = myUserId === profileOwnerId;
 
   const handleEditClick = () => {
     onRequestEditToggle(guestbookId, originalContent);
@@ -45,16 +48,18 @@ const ProfileCommentUtils = ({
 
   return (
     <div className="comment-utils-dropdown">
-      {isOwner && (
-        <>
-          <button className="comment-utils-dropdown__item" onClick={handleEditClick}>
-            수정
-          </button>
-          <button className="comment-utils-dropdown__item" onClick={handleDeleteClick}>
-            삭제
-          </button>
-        </>
+      {(isMyProfile || isMyComment) && (
+        <button className="comment-utils-dropdown__item" onClick={handleDeleteClick}>
+          삭제
+        </button>
       )}
+
+      {isMyComment && (
+        <button className="comment-utils-dropdown__item" onClick={handleEditClick}>
+          수정
+        </button>
+      )}
+
       <button className="comment-utils-dropdown__item" onClick={handleReplyClick}>
         대댓글
       </button>

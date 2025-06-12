@@ -31,7 +31,7 @@ const CheckDeleteTILModal = ({ tilIds, onClose, onDeleteComplete }: Props) => {
       });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['tilList'] });
+      queryClient.invalidateQueries({ queryKey: ['til-list'] });
       onDeleteComplete();
       onClose();
     },

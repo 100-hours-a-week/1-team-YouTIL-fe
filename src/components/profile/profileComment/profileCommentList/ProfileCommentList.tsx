@@ -217,6 +217,7 @@ const ProfileCommentList = () => {
                       guestbookId={item.id}
                       topGuestbookId={item.topGuestbookId ?? null}
                       originalContent={item.content}
+                      profileOwnerId={userId}
                       onCloseDropdown={() => setOpenMenuId(null)}
                       onRequestDelete={(id) => setDeleteTargetId(id)}
                       onRequestEditToggle={handleToggleEdit}
@@ -227,8 +228,8 @@ const ProfileCommentList = () => {
               </div>
             </div>
             <div className="comment-list__text">
-              {item.deleted ? (
-                <del>삭제된 댓글입니다.</del>
+              {item.deleted || item.content === '페이지 소유자가 삭제한 댓글입니다.' ? (
+                <del>{item.content}</del>
               ) : isEditing ? (
                 <ProfileEditCommentInput
                   originalContent={editingContent}
