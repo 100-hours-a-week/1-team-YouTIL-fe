@@ -1,12 +1,10 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
 import useAuthStore from '@/store/useAuthStore';
 import { useFetch } from '@/hooks/useFetch';
 import './HeaderLogoutButton.scss';
 
 const HeaderLogoutButton = () => {
-  const router = useRouter();
   const clearAuth = useAuthStore((state) => state.clearAuth);
   const { callApi } = useFetch();
 
@@ -21,10 +19,10 @@ const HeaderLogoutButton = () => {
       console.error('로그아웃 요청 실패:', error);
     } finally {
       clearAuth();
-      router.replace('/login');
+      window.location.href = '/login';
     }
   };
-
+  
   return (
     <div className="header__logout-button" onClick={handleLogout}>
       로그아웃

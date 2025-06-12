@@ -1,11 +1,17 @@
 'use client';
 
+import Link from 'next/link';
 import './NewTILList.scss';
 import { useQuery } from '@tanstack/react-query';
 import { useFetch } from '@/hooks/useFetch';
 import useGetAccessToken from '@/hooks/useGetAccessToken';
-import { parseISO, format } from 'date-fns';
 import useCheckAccess from '@/hooks/useCheckExistAccess';
+import { parseISO, format } from 'date-fns';
+import Image from 'next/image';
+
+interface TILResponse {
+  data: TILItem[];
+}
 
 interface TILItem {
   id: number;
@@ -21,16 +27,12 @@ interface TILItem {
   createdAt: string;
 }
 
-interface TILResponse {
-  data: TILItem[];
-}
-
 const NewTILList = () => {
   const { callApi } = useFetch();
   const accessToken = useGetAccessToken();
   const existAccess = useCheckAccess(accessToken);
 
-  const { data: tils, isError, } = useQuery<TILItem[]>({
+  const { data: tils, isError } = useQuery<TILItem[]>({
     queryKey: ['recent-tils'] as const,
     queryFn: async () => {
       const response = await callApi<TILResponse>({
@@ -65,7 +67,19 @@ const NewTILList = () => {
             ))}
           </div>
           <div className="til-list__footer">
-            <span className="til-list__nickname">{til.nickname}</span>
+            <Link href={`/profile/${til.userId}`}>
+              <Image
+                src={til.profileImageUrl}
+                alt={`${til.nickname}의 프로필 이미지`}
+                width={32}
+                height={32}
+                className="til-list__profile-image"
+              />
+            </Link>
+            <Link href={`/profile/${til.userId}`} className="til-list__nickname">
+              {til.nickname}
+            </Link>
+
             <span className="til-list__views">조회수 {til.visitedCount}</span>
             <span className="til-list__likes">추천 {til.recommendCount}</span>
             <span className="til-list__date">

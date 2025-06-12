@@ -6,13 +6,14 @@
     width: 500px;
     z-index: 20;
     box-shadow: 0 -1px 5px rgba(0, 0, 0, 0.05);
+    padding-left: 4px;
+    padding-right: 4px;
   }
 
   &__nav {
     display: flex;
     justify-content: space-around;
     align-items: center;
-
-    height: 30px;
+    height: 60px;
   }
 }

@@ -1,15 +1,54 @@
 .repository-til-list {
   padding: 0.5rem;
-  margin-bottom: 45px;
+  margin: 0 auto 45px auto;
   background-color: #fff;
-  margin: 0 auto;
   width: 80%;
-  margin-bottom: 45px;
+
+  &__header {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
   &__title {
     font-size: 1.25rem;
     font-weight: bold;
-    margin-bottom: 1rem;
     text-align: center;
+    flex: 1;
+  }
+
+  &__button {
+    position: absolute;
+    right: 0;
+    background-color: #00b6fa;
+    color: white;
+    font-weight: bold;
+    padding: 0.4rem 1rem;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.2s ease;
+
+    &:hover {
+      background-color: #009fd6;
+    }
+
+    &.error {
+      background-color: #ff4d4f;
+    }
+
+    &.shake {
+      animation: shake 0.3s;
+    }
+  }
+
+  @keyframes shake {
+    0% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    50% { transform: translateX(5px); }
+    75% { transform: translateX(-5px); }
+    100% { transform: translateX(0); }
   }
 
   &__items {
@@ -25,8 +64,132 @@
     border-radius: 12px;
     background-color: #fff;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+    display: flex;
+    flex-direction: column;
+    transition: background-color 0.2s ease;
+
+    &.selected {
+      background-color: #ff4d4f;
+      color: white;
+
+      .repository-til-list__item-title,
+      .repository-til-list__item-date {
+        color: white;
+      }
+    }
+
+    &-header-wrapper {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 0.5rem;
+      overflow: hidden;
+    }
 
     &-header {
+      flex: 1;
+      cursor: pointer;
+
+      &-top {
+        display: flex;
+        justify-content: flex-start;
+        align-items: center;
+        gap: 0.5rem;
+        white-space: nowrap;
+        height:25px;
+        flex-wrap: wrap;
+      }
+    }
+
+    &-title-wrapper {
+      display: flex;
+      gap: 0.5rem;
+      overflow: hidden;
+      max-width: 100%;
+    }
+
+    &-title {
+      margin: 0 0 0 0;
+      font-size: 1rem;
+      font-weight: 600;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 100%;
+
+      &--expanded {
+        white-space: normal;
+        overflow: visible;
+        text-overflow: unset;
+      }
+    }
+
+    &-edit-icon {
+      width: 24px;
+      height: 24px;
+      cursor: pointer;
+      flex-shrink: 0;
+      margin-left: 0;
+      &:hover {
+        filter: brightness(0.8);
+      }
+    }
+
+    &-edit-input {
+      font-size: 1rem;
+      padding: 2px 4px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      flex: 1;
+      max-width: 300px;
+      margin-right: 0.5rem;
+    
+      &:focus {
+        border: 1px solid #ccc;
+        outline: none;
+      }
+    }
+    &-edit-confirm {
+      font-size: 0.85rem;
+      padding: 4px 10px;
+      background-color: #00b6fa;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: background-color 0.2s ease;
+      height: 25px;
+      &:hover {
+        background-color: #0095cc;
+      }
+    }
+
+    &-generate-button {
+      font-size: 0.8rem;
+      padding: 4px 10px;
+      background-color: #00b6fa;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      margin-left: auto;
+      cursor: pointer;
+      height: 25px;
+      transition: background-color 0.2s ease;
+      &:hover {
+        background-color: #0095cc;
+      }
+    }
+
+    &-date {
+      margin: 0.2rem 0;
+      font-size: 0.85rem;
+      color: #555;
+    }
+
+    &-checkbox {
+      margin-left: 1rem;
+      transform: scale(1.2);
       cursor: pointer;
     }
 
@@ -42,6 +205,10 @@
       font-size: 0.9rem;
       margin-bottom: 0.5rem;
       color: #333;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+      max-width: 100%;
     }
 
     &-tags {
@@ -51,69 +218,24 @@
 
     &-tag {
       display: inline-block;
-      margin-right: 4px;
+      margin-right: 6px;
       background: #e0f7ff;
       color: #007b9e;
       padding: 2px 6px;
       border-radius: 4px;
+      font-size: 0.8rem;
     }
 
-    &-views {
-      font-size: 0.8rem;
+    &-meta {
+      font-size: 0.75rem;
       color: #888;
     }
-  
 
-    &-title {
-      margin: 0 0 0.4rem 0;
-      font-size: 1rem;
+    &-loading {
+      text-align: center;
+      font-size: 0.95rem;
+      color: #777;
     }
-
-    &-date {
-      margin: 0.2rem 0;
-      font-size: 0.85rem;
-      color: #555;
-    }
-    .repository-til-list__item-header {
-  cursor: pointer;
-}
-
-.repository-til-list__item-detail {
-  margin-top: 0.5rem;
-  background: #f9f9f9;
-  padding: 0.75rem;
-  border-left: 3px solid #00b6fa;
-  border-radius: 8px;
-}
-
-.repository-til-list__item-content {
-  font-size: 0.9rem;
-  margin-bottom: 0.5rem;
-  color: #333;
-  white-space: pre-wrap;
-  word-wrap: break-word;
-  overflow-wrap: break-word;
-  max-width: 100%;
-}
-
-.repository-til-list__item-tags {
-  margin-bottom: 0.5rem;
-}
-
-.repository-til-list__item-tag {
-  display: inline-block;
-  margin-right: 6px;
-  background: #e0f7ff;
-  color: #007b9e;
-  padding: 2px 6px;
-  border-radius: 4px;
-  font-size: 0.8rem;
-}
-
-.repository-til-list__item-meta {
-  font-size: 0.75rem;
-  color: #888;
-}
   }
 
   &__loading {

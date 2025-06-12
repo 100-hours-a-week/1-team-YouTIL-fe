@@ -1,5 +1,5 @@
 import RepositoryDateCalendar from '@/components/repository/repositoryDateCalendar/RepositoryDateCalendar';
-import RepositoryNavigator from '@/components/repository/RepositoryNavigator/RepositoryNavigator';
+import RepositoryNavigator from '@/components/repository/repositoryNavigator/RepositoryNavigator';
 
 const repository = () => {
 

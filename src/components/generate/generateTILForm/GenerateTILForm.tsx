@@ -9,7 +9,7 @@ import useGetAccessToken from '@/hooks/useGetAccessToken';
 import { useFetch } from '@/hooks/useFetch';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useQueryClient } from '@tanstack/react-query';
+import { useQueryClient, useMutation } from '@tanstack/react-query';
 import GenerateTILModal from '../generateTILModal/GenerateTILModal';
 // import DeadLineModal from '../deadLineModal/DeadLineModal';
 
@@ -41,6 +41,7 @@ const GenerateTILForm = () => {
   const [visibility, setVisibility] = useState<'public' | 'private'>('public');
   const [shake, setShake] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [submitResult, setSubmitResult] = useState<{ success: boolean } | null>(null);
   // const [isDeadlineError, setIsDeadlineError] = useState(false);
 
   const validateTitle = (title: string, setShake: (s: boolean) => void): boolean => {
@@ -62,10 +63,9 @@ const GenerateTILForm = () => {
     is_shared: visibility === 'public',
   });
   
-  const submitTIL = async (payload: TILPayload) => {
-    try {
-      console.log("submitTIL 시작")
-      await callApi({
+  const mutation = useMutation({
+    mutationFn: async (payload: TILPayload) => {
+      return await callApi({
         method: 'POST',
         endpoint: '/tils',
         body: payload,
@@ -75,40 +75,31 @@ const GenerateTILForm = () => {
         },
         credentials: 'include',
       });
-
-      await queryClient.invalidateQueries({
-        queryKey: ['tilList'],
-
-      });
-      await queryClient.refetchQueries({
-        queryKey: ['recent-tils'],
-        exact: true,
-      });
-      
-      return { success: true };
-    } catch (error) {
-      if (error instanceof Error && error.message.includes('503')) {
-        return { success: false, deadlineError: true };
-      }
-      console.error('TIL 생성 실패:', error);
-      return { success: false, deadlineError: false };
-    }
-  };
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['til-list'] });
+      queryClient.refetchQueries({ queryKey: ['recent-tils'], exact: true });
+      queryClient.invalidateQueries({ queryKey: ['til-date'] });
+      router.push('/repository');
+    },
+    onError: () => {
+      setSubmitResult({ success: false });
+    },
+    onMutate: () => {
+      setIsLoading(true);
+    },
+    onSettled: () => {
+      setIsLoading(false);
+    },
+  });
   
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validateTitle(title, setShake)) return;
   
     const payload = buildPayload();
-    setIsLoading(true);
+    mutation.mutate(payload);
   
-    const result = await submitTIL(payload);
-    setIsLoading(false);
-  
-    if (result.success) {
-      router.push('/repository');
-    }
-      
     //else if (result.deadlineError) { //데드라인 모달 트리거거(3시부터 12시 이외엔 CPU 서버를 사용하므로 현재 비활성화화)
     //   setIsDeadlineError(true);
     // }
@@ -116,7 +107,12 @@ const GenerateTILForm = () => {
 
   return (
     <>
-      {isLoading && <GenerateTILModal />}
+      {(isLoading || submitResult?.success === false) && (
+        <GenerateTILModal
+          isError={submitResult?.success === false}
+          onClose={() => setSubmitResult(null)}
+        />
+      )}
       {/* {isDeadlineError && <DeadLineModal onClose={() => setIsDeadlineError(false)} />} */}
 
       <div className="generate">

@@ -1,0 +1,17 @@
+.user-nickname {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 75px;
+  
+    &__box {
+      background-color: #ffffff;
+      padding: 12px 24px;
+      border-radius: 20px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      color: #00b6f9;
+      font-size: 1.25rem;
+      text-align: center;
+    }
+  }
+  
