@@ -1,6 +1,9 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { useFetch } from '@/hooks/useFetch';
+import useGetAccessToken from '@/hooks/useGetAccessToken';
 import {
   format,
   addMonths,
@@ -10,16 +13,46 @@ import {
   startOfMonth,
   endOfMonth,
   startOfWeek,
-  endOfWeek,  
+  endOfWeek,
   isSameMonth,
   isSameDay,
   addDays,
-  parseISO
+  parseISO,
 } from 'date-fns';
 import './RepositoryDateCalendar.scss';
 import { useRepositoryDateStore } from '@/store/useRepositoryDateStore';
 
+type MonthKey =
+  | 'jan' | 'feb' | 'mar' | 'apr'
+  | 'may' | 'jun' | 'jul' | 'aug'
+  | 'sep' | 'oct' | 'nov' | 'dec';
+
+type TILYearlyRecord = {
+  [key in MonthKey]?: number[];
+};
+
+interface TILYearlyRecordResponse {
+  data: {
+    year: number;
+    tils: TILYearlyRecord;
+  };
+}
+
+type InterviewYearlyRecord = {
+  [key in MonthKey]?: number[];
+};
+
+interface InterviewYearlyRecordResponse {
+  data: {
+    year: number;
+    interviews: InterviewYearlyRecord;
+  };
+}
+
 const RepositoryDateCalendar = () => {
+  const { callApi } = useFetch();
+  const accessToken = useGetAccessToken();
+
   const {
     activeTab,
     tilDate,
@@ -28,13 +61,55 @@ const RepositoryDateCalendar = () => {
     setInterviewDate,
   } = useRepositoryDateStore();
 
-  const rawDate = activeTab === 'interview' ? interviewDate : tilDate;
-  const initialSelected = rawDate && !isNaN(Date.parse(rawDate))
-    ? parseISO(rawDate)
-    : new Date();
+  const rawDate =
+    activeTab === 'interview' ? interviewDate : tilDate;
+  const initialSelected =
+    rawDate && !isNaN(Date.parse(rawDate))
+      ? parseISO(rawDate)
+      : new Date();
 
   const [currentDate, setCurrentDate] = useState(initialSelected);
   const [selectedDate, setSelectedDate] = useState(initialSelected);
+
+  const selectedYear = currentDate.getFullYear();
+
+  const { data: tilRecordData } = useQuery<TILYearlyRecordResponse>({
+    queryKey: ['til-date', selectedYear],
+    queryFn: async () => {
+      const response = await callApi<TILYearlyRecordResponse>({
+        method: 'GET',
+        endpoint: `/tils/records?year=${selectedYear}`,
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+        credentials: 'include',
+      });
+      console.log('[TIL 기록 데이터]', response);
+      return response;
+    },
+    enabled: activeTab === 'til',
+    staleTime: 300000,
+    gcTime: 300000,
+  });
+
+  const { data: interviewRecordData } = useQuery<InterviewYearlyRecordResponse>({
+    queryKey: ['interview-date', selectedYear],
+    queryFn: async () => {
+      const response = await callApi<InterviewYearlyRecordResponse>({
+        method: 'GET',
+        endpoint: `/interviews/records?year=${selectedYear}`,
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+        credentials: 'include',
+      });
+      console.log('[INTERVIEW 기록 데이터]', response);
+      return response;
+    },
+    enabled: activeTab === 'interview',
+    staleTime: 300000,
+    gcTime: 300000,
+  });
 
   useEffect(() => {
     const formatted = format(selectedDate, 'yyyy-MM-dd');
@@ -46,7 +121,10 @@ const RepositoryDateCalendar = () => {
   }, [selectedDate, activeTab, setInterviewDate, setTilDate]);
 
   useEffect(() => {
-    const newSelectedDate = rawDate && !isNaN(Date.parse(rawDate)) ? parseISO(rawDate) : new Date();
+    const newSelectedDate =
+      rawDate && !isNaN(Date.parse(rawDate))
+        ? parseISO(rawDate)
+        : new Date();
     setSelectedDate(newSelectedDate);
     setCurrentDate(newSelectedDate);
   }, [activeTab]);
@@ -79,34 +157,55 @@ const RepositoryDateCalendar = () => {
     const monthEnd = endOfMonth(monthStart);
     const startDate = startOfWeek(monthStart);
     const endDate = endOfWeek(monthEnd);
-
+  
     const rows = [];
     let days = [];
     let day = startDate;
-
+  
+    const monthKeys: MonthKey[] = [
+      'jan', 'feb', 'mar', 'apr', 'may', 'jun',
+      'jul', 'aug', 'sep', 'oct', 'nov', 'dec'
+    ];
+  
+    const recordData =
+      activeTab === 'til'
+        ? tilRecordData?.data?.tils
+        : interviewRecordData?.data?.interviews;
+  
     while (day <= endDate) {
       for (let i = 0; i < 7; i++) {
         const cloneDay = day;
         const isSelected = isSameDay(day, selectedDate);
         const isCurrentMonth = isSameMonth(day, monthStart);
-
+  
+        const dateIndex = day.getDate() - 1;
+        const monthKey = monthKeys[day.getMonth()];
+  
+        const isRecorded = recordData?.[monthKey]?.[dateIndex] === 1;
+  
         days.push(
           <div
             key={day.toISOString()}
-            className={`calendar__cell ${
-              isSelected ? 'calendar__cell--selected' : ''
-            } ${!isCurrentMonth ? 'calendar__cell--disabled' : ''}`}
+            className={`calendar__cell
+              ${isSelected ? 'calendar__cell--selected' : ''}
+              ${!isCurrentMonth ? 'calendar__cell--disabled' : ''}
+              ${isRecorded ? 'calendar__cell--recorded' : ''}
+            `}
             onClick={() => setSelectedDate(cloneDay)}
           >
-            {format(day, 'd')}
+            <span>{format(day, 'd')}</span>
           </div>
         );
         day = addDays(day, 1);
       }
-      rows.push(<div className="calendar__row" key={day.toISOString()}>{days}</div>);
+      rows.push(
+        <div className="calendar__row" key={day.toISOString()}>
+          {days}
+        </div>
+      );
       days = [];
     }
-
+  
     return <div className="calendar__body">{rows}</div>;
   };
 
