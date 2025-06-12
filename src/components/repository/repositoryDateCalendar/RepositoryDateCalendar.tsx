@@ -22,7 +22,6 @@ import {
 } from 'date-fns';
 import './RepositoryDateCalendar.scss';
 import { useRepositoryDateStore } from '@/store/useRepositoryDateStore';
-import { access } from 'fs';
 
 type MonthKey =
   | 'jan' | 'feb' | 'mar' | 'apr'
