@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useFetch } from '@/hooks/useFetch';
 import useGetAccessToken from '@/hooks/useGetAccessToken';
+import useCheckAccess from '@/hooks/useCheckExistAccess';
 import {
   format,
   addMonths,
@@ -21,6 +22,7 @@ import {
 } from 'date-fns';
 import './RepositoryDateCalendar.scss';
 import { useRepositoryDateStore } from '@/store/useRepositoryDateStore';
+import { access } from 'fs';
 
 type MonthKey =
   | 'jan' | 'feb' | 'mar' | 'apr'
@@ -52,7 +54,7 @@ interface InterviewYearlyRecordResponse {
 const RepositoryDateCalendar = () => {
   const { callApi } = useFetch();
   const accessToken = useGetAccessToken();
-
+  const existAccess = useCheckAccess(accessToken);
   const {
     activeTab,
     tilDate,
@@ -86,7 +88,7 @@ const RepositoryDateCalendar = () => {
       });
       return response;
     },
-    enabled: activeTab === 'til',
+    enabled: activeTab === 'til' && existAccess,
     staleTime: 300000,
     gcTime: 300000,
   });
@@ -104,7 +106,7 @@ const RepositoryDateCalendar = () => {
       });
       return response;
     },
-    enabled: activeTab === 'interview',
+    enabled: activeTab === 'interview' && existAccess,
     staleTime: 300000,
     gcTime: 300000,
   });
