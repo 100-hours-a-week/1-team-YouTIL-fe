@@ -1,17 +1,17 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { useFetch } from '@/hooks/useFetch';
 import { useSelectedCommitListStore } from '@/store/useSelectedCommitListStore';
 import { useOrganizationStore } from '@/store/useOrganizationStore';
 import { useRepositoryStore } from '@/store/useRepositoryStore';
 import { useBranchStore } from '@/store/useBranchStore';
 import { useSelectedDateStore } from '@/store/useDateStore';
-import { useFetch } from '@/hooks/useFetch';
-
-import useCheckAccess from '@/hooks/useCheckExistAccess';
 import useGetAccessToken from '@/hooks/useGetAccessToken';
+import { useCommitListLogic } from '@/hooks/commit/commitList/useCommitListLogic';
+import useCheckAccess from '@/hooks/useCheckExistAccess';
+import { useRouter } from 'next/navigation';
 import NoCommitDescription from '../noCommitDescription/NoCommitDescription';
 import './CommitList.scss';
 
@@ -27,27 +27,14 @@ interface CommitDetailResponse {
 }
 
 const CommitList = () => {
-  const router = useRouter();
-  const { setSelectedCommits } = useSelectedCommitListStore();
   const { callApi } = useFetch();
   const accessToken = useGetAccessToken();
   const existAccess = useCheckAccess(accessToken);
 
-  const MAX_SELECTABLE_COMMITS = 5;
   const selectedOrganizaion = useOrganizationStore((state) => state.selectedOrganization);
   const selectedRepository = useRepositoryStore((state) => state.selectedRepository);
   const selectedBranchName = useBranchStore((state) => state.selectedBranch);
   const selectedDate = useSelectedDateStore((state) => state.selectedDate);
-
-  const [selectedCommitIndexes, setSelectedCommitIndexes] = useState<number[]>([]);
-  const [selectedCommitsPreview, setSelectedCommitsPreview] = useState<Commit[]>([]);
-  const [shake, setShake] = useState(false);
-  const [shakeIndex, setShakeIndex] = useState<number | null>(null);
-
-  useEffect(() => {
-    setSelectedCommitIndexes([]);
-    setSelectedCommitsPreview([]);
-  }, [selectedDate]);
 
   const { data: commitData, isLoading } = useQuery({
     queryKey: ['commits', selectedOrganizaion?.organization_id ?? '', selectedRepository?.repositoryId, selectedBranchName?.branchName, selectedDate],
@@ -70,58 +57,13 @@ const CommitList = () => {
 
   const commits = commitData?.data?.commits ?? [];
 
-  const isCommitSelectable = (index: number) => {
-    return !!commits[index];
-  };
-
-  const isCommitAlreadySelected = (index: number, selectedIndexes: number[]) => {
-    return selectedIndexes.includes(index);
-  };
-
-  const getNextCommitIndexes = (index: number, selectedIndexes: number[]): number[] | null => {
-    if (isCommitAlreadySelected(index, selectedIndexes)) {
-      return selectedIndexes.filter((i) => i !== index);
-    }
-
-    if (selectedIndexes.length >= MAX_SELECTABLE_COMMITS) {
-      triggerShakeAt(index);
-      return null;
-    }
-
-    return [...selectedIndexes, index];
-  };
-
-  const triggerShakeAt = (index: number) => {
-    setShakeIndex(index);
-    setTimeout(() => setShakeIndex(null), 500);
-  };
-
-  const updateSelectedCommitsPreview = (indexes: number[]) => {
-    const selected = indexes.map((i) => commits[i]);
-    setSelectedCommitsPreview(selected);
-  };
-
-  const handleCommitClick = (index: number) => {
-    if (!isCommitSelectable(index)) return;
-
-    setSelectedCommitIndexes((prev) => {
-      const next = getNextCommitIndexes(index, prev);
-      if (!next) return prev;
-
-      updateSelectedCommitsPreview(next);
-      return next;
-    });
-  };
-
-  const handleGenerateClick = () => {
-    if (selectedCommitsPreview.length === 0) {
-      setShake(true);
-      setTimeout(() => setShake(false), 500);
-      return;
-    }
-    setSelectedCommits(selectedCommitsPreview);
-    router.push('/generate');
-  };
+  const {
+    selectedCommitIndexes,
+    shake,
+    shakeIndex,
+    handleCommitClick,
+    handleGenerateClick,
+  } = useCommitListLogic(commits);
 
   const canShowGenerateButton =
     commits.length > 0 && selectedRepository && selectedBranchName && selectedDate;
