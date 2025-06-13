@@ -1,14 +1,14 @@
 'use client';
 
-import { useRef, useEffect, useState, useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useFetch } from '@/hooks/useFetch';
 import useGetAccessToken from '@/hooks/useGetAccessToken';
+import useCheckAccess from '@/hooks/useCheckExistAccess';
+import { useTechNewsSlider } from '@/hooks/main/techNews/useTechNewsSlider';
 import Image from 'next/image';
 import './TechNews.scss';
-import useCheckAccess from '@/hooks/useCheckExistAccess';
 
-interface NewsItem {
+export interface NewsItem {
   title: string;
   link: string;
   thumbnail: string;
@@ -16,79 +16,38 @@ interface NewsItem {
   summary: string;
 }
 
+export interface NewsData {
+  news: NewsItem[];
+}
+
+export interface NewsApiResponse {
+  data: NewsData;
+}
+
 const TechNews = () => {
   const { callApi } = useFetch();
   const accessToken = useGetAccessToken();
   const existAccess = useCheckAccess(accessToken);
-  
-  const scrollRef = useRef<HTMLDivElement>(null);
-  const intervalRef = useRef<NodeJS.Timeout | null>(null);
-
-  const [autoSlideEnabled, setAutoSlideEnabled] = useState(true);
-  const [isSliding, setIsSliding] = useState(false);
 
   const { data } = useQuery({
     queryKey: ['tech-news'] as const,
     queryFn: async () => {
-      
-      const response = await callApi<{ data: { news: NewsItem[] } }>({
+      const response = await callApi<NewsApiResponse>({
         method: 'GET',
         endpoint: '/news',
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
-        credentials:'include',
+        credentials: 'include',
       });
       return response.data.news;
     },
     enabled: existAccess,
     staleTime: Infinity,
     gcTime: 3600000,
-    // 테크뉴스는 목록이 거의 바뀌지 않으므로 refetch 제거 및 갱신x
   });
 
-  const scrollToIndex = useCallback((index: number) => {
-    if (!scrollRef.current || !data) return;
-    const container = scrollRef.current;
-    const itemWidth = 300 + 96;
-    container.scrollTo({ left: index * itemWidth, behavior: 'smooth' });
-
-    setIsSliding(true);
-    setTimeout(() => setIsSliding(false), 500);
-  }, [data]);
-
-  const scrollByItem = useCallback(
-    (direction: 'left' | 'right', userTriggered = false) => {
-      if (!scrollRef.current || !data) return;
-
-      if (userTriggered) setAutoSlideEnabled(false);
-
-      const container = scrollRef.current;
-      const itemWidth = 300 + 96;
-      const currentScroll = container.scrollLeft;
-      const index = Math.round(currentScroll / itemWidth);
-
-      const nextIndex =
-        direction === 'right'
-          ? (index + 1) % data.length
-          : (index - 1 + data.length) % data.length;
-
-      scrollToIndex(nextIndex);
-    },
-    [data, scrollToIndex]
-  );
-
-  useEffect(() => {
-    if (!data || !autoSlideEnabled) return;
-
-    intervalRef.current = setInterval(() => {
-      scrollByItem('right');
-    }, 5000);
-
-    return () => {
-      if (intervalRef.current) clearInterval(intervalRef.current);
-    };
-  }, [data, autoSlideEnabled, scrollByItem]);
+  const { scrollRef, scrollByItem, isSliding } = useTechNewsSlider(data);
 
   return (
     <div className="technews">
@@ -112,7 +71,7 @@ const TechNews = () => {
               width={300}
               height={180}
               className="technews__thumbnail"
-              unoptimized  // 뉴스 썸네일을 받아오는 도네임이 랜덤이라 next.config.ts에 추가 못함
+              unoptimized
             />
             <div className="technews__gradient" />
             <div className="technews__headline">{news.title}</div>
