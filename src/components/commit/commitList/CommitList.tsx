@@ -1,17 +1,15 @@
 'use client';
 
-import { useState } from 'react';
+import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useFetch } from '@/hooks/useFetch';
-import { useSelectedCommitListStore } from '@/store/useSelectedCommitListStore';
+import useGetAccessToken from '@/hooks/useGetAccessToken';
+import useCheckAccess from '@/hooks/useCheckExistAccess';
 import { useOrganizationStore } from '@/store/useOrganizationStore';
 import { useRepositoryStore } from '@/store/useRepositoryStore';
 import { useBranchStore } from '@/store/useBranchStore';
 import { useSelectedDateStore } from '@/store/useDateStore';
-import useGetAccessToken from '@/hooks/useGetAccessToken';
 import { useCommitListLogic } from '@/hooks/commit/commitList/useCommitListLogic';
-import useCheckAccess from '@/hooks/useCheckExistAccess';
-import { useRouter } from 'next/navigation';
 import NoCommitDescription from '../noCommitDescription/NoCommitDescription';
 import './CommitList.scss';
 
@@ -36,8 +34,14 @@ const CommitList = () => {
   const selectedBranchName = useBranchStore((state) => state.selectedBranch);
   const selectedDate = useSelectedDateStore((state) => state.selectedDate);
 
-  const { data: commitData, isLoading } = useQuery({
-    queryKey: ['commits', selectedOrganizaion?.organization_id ?? '', selectedRepository?.repositoryId, selectedBranchName?.branchName, selectedDate],
+  const { data: commitData, isLoading } = useQuery<CommitDetailResponse>({
+    queryKey: [
+      'commits',
+      selectedOrganizaion?.organization_id ?? '',
+      selectedRepository?.repositoryId,
+      selectedBranchName?.branchName,
+      selectedDate,
+    ],
     queryFn: async () => {
       const response = await callApi<CommitDetailResponse>({
         method: 'GET',
@@ -55,7 +59,7 @@ const CommitList = () => {
     gcTime: 3600000,
   });
 
-  const commits = commitData?.data?.commits ?? [];
+  const commits = useMemo(() => commitData?.data?.commits ?? [], [commitData]);
 
   const {
     selectedCommitIndexes,
