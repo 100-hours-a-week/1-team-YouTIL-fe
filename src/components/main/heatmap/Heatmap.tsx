@@ -2,10 +2,13 @@
 
 import { useState } from 'react';
 import { useHeatmapController } from '@/hooks/main/heatmap/useHeatmapController';
-import { useHeatmapData } from '@/hooks/main/heatmap/useHeatmapData';
-import { useHeatmapYearDropdown } from '@/hooks/main/heatmap/useHeatmapYearDropdown';
 import { usePrevDomainStep } from '@/hooks/main/heatmap/usePrevDomainStep';
 import { useNextDomainStep } from '@/hooks/main/heatmap/useNextDomainStep';
+import { useHeatmapYearDropdown } from '@/hooks/main/heatmap/useHeatmapYearDropdown';
+import { useQuery } from '@tanstack/react-query';
+import { useFetch } from '@/hooks/useFetch';
+import useGetAccessToken from '@/hooks/useGetAccessToken';
+import useCheckAccess from '@/hooks/useCheckExistAccess';
 import './Heatmap.scss';
 import 'cal-heatmap/cal-heatmap.css';
 
@@ -14,16 +17,52 @@ const basicYear = currentDate.getFullYear();
 const rawCurrentMonth = currentDate.getMonth() + 1;
 const adjustedCurrentMonth = rawCurrentMonth >= 9 ? 9 : rawCurrentMonth;
 
+const monthMap: Record<string, string> = {
+  jan: '01', feb: '02', mar: '03', apr: '04',
+  may: '05', jun: '06', jul: '07', aug: '08',
+  sep: '09', oct: '10', nov: '11', dec: '12',
+};
+
 const Heatmap = () => {
   const [year, setYear] = useState(basicYear);
   const [currentMonth, setCurrentMonth] = useState(adjustedCurrentMonth);
+  const { callApi } = useFetch();
+  const accessToken = useGetAccessToken();
+  const existAccess = useCheckAccess(accessToken);
 
-  const { data: tilData = [] } = useHeatmapData(year);
+  const { data: tilData = [] } = useQuery({
+    queryKey: ['til-data', year],
+    queryFn: async () => {
+      const res = await callApi<{
+        data: {
+          year: number;
+          tils: Record<string, number[]>;
+        };
+      }>({
+        method: 'GET',
+        endpoint: `/users/tils?year=${year}`,
+        headers: { Authorization: `Bearer ${accessToken}` },
+        credentials: 'include',
+      });
+
+      const raw = res.data?.tils ?? {};
+      return Object.entries(raw).flatMap(([month, counts]) =>
+        counts.map((count, index) => {
+          const day = String(index + 1).padStart(2, '0');
+          return {
+            date: `${year}-${monthMap[month]}-${day}`,
+            count,
+          };
+        })
+      );
+    },
+    enabled: existAccess,
+    staleTime: 600000,
+    gcTime: 3600000,
+  });
+
   const { cal } = useHeatmapController(tilData, year, currentMonth);
-  const { isOpen, setIsOpen, handleNextClick } = useHeatmapYearDropdown(
-    setYear, setCurrentMonth, cal
-  );
-
+  const { isOpen, setIsOpen, handleNextClick } = useHeatmapYearDropdown(setYear, setCurrentMonth, cal);
   const prevStep = usePrevDomainStep(currentMonth);
   const nextStep = useNextDomainStep(currentMonth);
 
