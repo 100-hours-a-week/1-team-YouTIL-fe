@@ -6,6 +6,7 @@ import { useState, useEffect, useRef } from 'react';
 import useOtherUserInfoStore from '@/store/useOtherUserInfoStore';
 import useGetAccessToken from '@/hooks/useGetAccessToken';
 import useCheckAccess from '@/hooks/useCheckExistAccess';
+import { useInfiniteScrollObserver } from '@/hooks/useInfinityScrollObserver';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import ProfileCommentUtils from '../profileCommentUtils/ProfileCommentUtils';
@@ -65,8 +66,6 @@ const ProfileCommentList = () => {
   const [replyTopId, setReplyTopId] = useState<number | null>(null);
 
   const refs = useRef<Record<number, HTMLDivElement | null>>({});
-  const observerRef = useRef<IntersectionObserver | null>(null);
-  const loadMoreRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -96,6 +95,7 @@ const ProfileCommentList = () => {
     data,
     fetchNextPage,
     hasNextPage,
+    isFetchingNextPage,
   } = useInfiniteQuery({
     queryKey: ['guestbooks-list', userId],
     queryFn: async ({ pageParam = 0 }: { pageParam?: number }) => {
@@ -120,25 +120,11 @@ const ProfileCommentList = () => {
     gcTime: 300000,
   });
 
-  useEffect(() => {
-    const target = loadMoreRef.current;
-    if (!target || !hasNextPage) return;
-
-    observerRef.current = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting) fetchNextPage();
-      },
-      { threshold: 1.0 }
-    );
-
-    observerRef.current.observe(target);
-
-    return () => {
-      if (observerRef.current && target) {
-        observerRef.current.unobserve(target);
-      }
-    };
-  }, [fetchNextPage, hasNextPage]);
+  const loadMoreRef = useInfiniteScrollObserver({
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  });
 
   const handleToggleEdit = (targetId: number, content: string) => {
     setEditingId(prev => (prev === targetId ? null : targetId));

@@ -7,7 +7,7 @@ import { useFetch } from '@/hooks/useFetch';
 import useAuthStore from '@/store/useAuthStore';
 import { parseISO, format } from 'date-fns';
 import Image from 'next/image';
-import { useCallback, useRef } from 'react';
+import { useInfiniteScrollObserver } from '@/hooks/useInfinityScrollObserver';
 import './UserTILList.scss';
 
 interface TILItem {
@@ -30,22 +30,20 @@ const UserTILList = () => {
   const { callApi } = useFetch();
   const accessToken = useAuthStore((state) => state.accessToken);
   const { userId } = useParams<{ userId: string }>();
-  const observer = useRef<IntersectionObserver | null>(null);
 
   const { data, isFetchingNextPage, hasNextPage, fetchNextPage } = useInfiniteQuery<TILResponse, Error>({
     queryKey: ['user-tils', userId],
     queryFn: async ({ pageParam }: QueryFunctionContext) => {
-        const page = (pageParam as number) ?? 0;
-      
-        return await callApi<TILResponse>({
-          method: 'GET',
-          endpoint: `/users/${userId}/tils?page=${page}&offset=20`,
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-          credentials: 'include',
-        });
-      },
+      const page = (pageParam as number) ?? 0;
+      return await callApi<TILResponse>({
+        method: 'GET',
+        endpoint: `/users/${userId}/tils?page=${page}&offset=20`,
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+        credentials: 'include',
+      });
+    },
     initialPageParam: 0,
     getNextPageParam: (lastPage, allPages) => {
       if (lastPage.data.tils.length < 20) return undefined;
@@ -56,22 +54,11 @@ const UserTILList = () => {
     gcTime: 300000,
   });
 
-  const lastItemRef = useCallback(
-    (node: HTMLDivElement | null) => {
-      if (isFetchingNextPage || !hasNextPage) return;
-      if (observer.current) observer.current.disconnect();
-
-      observer.current = new IntersectionObserver((entries) => {
-        if (entries[0].isIntersecting) {
-          fetchNextPage();
-        }
-      });
-
-      if (node) observer.current.observe(node);
-    },
-    [isFetchingNextPage, hasNextPage, fetchNextPage]
-  );
-
+  const lastItemRef = useInfiniteScrollObserver({
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  });
 
   return (
     <div className="usertil-list">
