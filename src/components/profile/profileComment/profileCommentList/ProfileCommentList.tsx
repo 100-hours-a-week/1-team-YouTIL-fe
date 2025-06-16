@@ -109,10 +109,9 @@ const ProfileCommentList = () => {
       });
       return response;
     },
-    getNextPageParam: (lastPage) => {
-      const { currentPage, totalCount, pageSize } = lastPage.data;
-      const maxPage = Math.ceil(totalCount / pageSize) - 1;
-      return currentPage < maxPage ? currentPage + 1 : undefined;
+    getNextPageParam: (lastPage, allPages) => {
+      if (lastPage.data.guestbooks.length < 20) return undefined;
+      return allPages.length;
     },
     initialPageParam: 0,
     enabled: !!userId && existAccess,
