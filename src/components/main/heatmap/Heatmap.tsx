@@ -2,8 +2,6 @@
 
 import { useState } from 'react';
 import { useHeatmapController } from '@/hooks/main/heatmap/useHeatmapController';
-import { usePrevDomainStep } from '@/hooks/main/heatmap/usePrevDomainStep';
-import { useNextDomainStep } from '@/hooks/main/heatmap/useNextDomainStep';
 import { useHeatmapYearDropdown } from '@/hooks/main/heatmap/useHeatmapYearDropdown';
 import { useQuery } from '@tanstack/react-query';
 import { useFetch } from '@/hooks/useFetch';
@@ -37,6 +35,23 @@ const monthMap: Record<string, string> = {
   sep: '09', oct: '10', nov: '11', dec: '12',
 };
 
+const getPrevDomainStep = (currentMonth: number): number => {
+  const table: Record<number, number> = {
+    1: 0, 2: 1, 3: 2, 4: 3, 5: 4,
+    6: 4, 7: 4, 8: 4, 9: 4, 10: 4, 11: 4, 12: 4,
+  };
+  return table[currentMonth] ?? 0;
+};
+
+const getNextDomainStep = (currentMonth: number): number => {
+  const table: Record<number, number> = {
+    1: 4, 2: 4, 3: 4, 4: 4, 5: 4, 6: 4,
+    7: 3, 8: 2, 9: 1,
+    10: 0, 11: 0, 12: 0,
+  };
+  return table[currentMonth] ?? 0;
+};
+
 const Heatmap = () => {
   const [year, setYear] = useState(basicYear);
   const [currentMonth, setCurrentMonth] = useState(adjustedCurrentMonth);
@@ -53,7 +68,7 @@ const Heatmap = () => {
         headers: { Authorization: `Bearer ${accessToken}` },
         credentials: 'include',
       });
-  
+
       const raw = response.data?.tils ?? {};
       return Object.entries(raw).flatMap(([month, counts]) =>
         counts.map((count, index) => {
@@ -72,8 +87,8 @@ const Heatmap = () => {
 
   const { cal } = useHeatmapController(tilData, year, currentMonth);
   const { isOpen, setIsOpen, handleYearChange } = useHeatmapYearDropdown(setYear, setCurrentMonth, cal);
-  const prevStep = usePrevDomainStep(currentMonth);
-  const nextStep = useNextDomainStep(currentMonth);
+  const prevStep = getPrevDomainStep(currentMonth);
+  const nextStep = getNextDomainStep(currentMonth);
 
   const handlePrevDomain = () => {
     if (prevStep === 0) return;
