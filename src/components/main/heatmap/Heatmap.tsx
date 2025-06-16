@@ -71,7 +71,7 @@ const Heatmap = () => {
   });
 
   const { cal } = useHeatmapController(tilData, year, currentMonth);
-  const { isOpen, setIsOpen, handleNextClick } = useHeatmapYearDropdown(setYear, setCurrentMonth, cal);
+  const { isOpen, setIsOpen, handleYearChange } = useHeatmapYearDropdown(setYear, setCurrentMonth, cal);
   const prevStep = usePrevDomainStep(currentMonth);
   const nextStep = useNextDomainStep(currentMonth);
 
@@ -121,7 +121,7 @@ const Heatmap = () => {
         <div className={`heatmap-wrapper__dropdown-content ${isOpen ? 'show' : ''}`}>
           {[0, 1, 2, 3, 4].map(offset => (
             <li key={offset}>
-              <a onClick={() => handleNextClick(basicYear + offset)}>
+              <a onClick={() => handleYearChange(basicYear + offset)}>
                 {basicYear + offset}
               </a>
             </li>

@@ -8,12 +8,12 @@ export const useHeatmapYearDropdown = (
 ) => {
   const [isOpen, setIsOpen] = useState(false);
 
-  const handleNextClick = (targetYear: number) => {
+  const handleYearChange = (targetYear: number) => {
     cal?.jumpTo(`${targetYear}-01-30`, true);
     setYear(targetYear);
     setCurrentMonth(1);
     setIsOpen(false);
   };
 
-  return { isOpen, setIsOpen, handleNextClick };
+  return { isOpen, setIsOpen, handleYearChange };
 };

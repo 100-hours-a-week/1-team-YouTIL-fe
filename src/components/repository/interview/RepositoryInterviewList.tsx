@@ -55,17 +55,6 @@ const RepositoryInterviewList = () => {
     toggleInterviewSelection,
   } = useRepositoryInterviewList();
 
-  // const deleteModal = useModal();
-
-  // const handleDeleteClick = () => {
-  //   if (selectedInterviewIds.length === 0) {
-  //     setShakeDelete(true);
-  //     setTimeout(() => setShakeDelete(false), 500);
-  //   } else {
-  //     deleteModal.open();
-  //   }
-  // };
-
   const { data: interviewData } = useQuery<InterviewItem[]>({
     queryKey: ['interview-list', interviewDate],
     queryFn: async () => {
