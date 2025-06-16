@@ -29,7 +29,7 @@ const CommitList = () => {
   const accessToken = useGetAccessToken();
   const existAccess = useCheckAccess(accessToken);
 
-  const selectedOrganizaion = useOrganizationStore((state) => state.selectedOrganization);
+  const selectedOrganization = useOrganizationStore((state) => state.selectedOrganization);
   const selectedRepository = useRepositoryStore((state) => state.selectedRepository);
   const selectedBranchName = useBranchStore((state) => state.selectedBranch);
   const selectedDate = useSelectedDateStore((state) => state.selectedDate);
@@ -37,7 +37,7 @@ const CommitList = () => {
   const { data: commitData, isLoading } = useQuery<CommitDetailResponse>({
     queryKey: [
       'commits',
-      selectedOrganizaion?.organization_id ?? '',
+      selectedOrganization?.organization_id ?? '',
       selectedRepository?.repositoryId,
       selectedBranchName?.branchName,
       selectedDate,
@@ -45,7 +45,7 @@ const CommitList = () => {
     queryFn: async () => {
       const response = await callApi<CommitDetailResponse>({
         method: 'GET',
-        endpoint: `/github/commits?organizationId=${selectedOrganizaion?.organization_id ?? ''}&repositoryId=${selectedRepository?.repositoryId}&branchId=${selectedBranchName?.branchName}&date=${selectedDate}`,
+        endpoint: `/github/commits?organizationId=${selectedOrganization?.organization_id ?? ''}&repositoryId=${selectedRepository?.repositoryId}&branchId=${selectedBranchName?.branchName}&date=${selectedDate}`,
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
@@ -98,7 +98,7 @@ const CommitList = () => {
         <ul className="commit-list__ul">
           {commits.map((commit, idx) => (
             <li
-              key={idx}
+              key={commit.sha}
               className={`commit-list__item
                 ${selectedCommitIndexes.includes(idx) ? 'commit-list__item--selected' : ''}
                 ${shakeIndex === idx ? 'error shake' : ''}`}

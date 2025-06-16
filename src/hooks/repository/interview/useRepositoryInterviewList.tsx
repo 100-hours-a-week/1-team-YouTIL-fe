@@ -51,16 +51,13 @@ export const useRepositoryInterviewList = () => {
     deleteModal.close();
   };
 
-  
-
-
   return {
     expandedInterviewId,
     visibleAnswerMap,
     setVisibleAnswerMap,
     selectedInterviewIds,
-    setSelectedInterviewIds,
     shakeDelete,
+    selectedTilIds,
     setShakeDelete,
     mapLevelToLabel,
     handleDeleteClick,

@@ -8,7 +8,6 @@ import { useRepositoryTILList } from '@/hooks/repository/til/useRepositoryTILLis
 import { useFetch } from '@/hooks/useFetch';
 import SelectInterviewLevelModal from '../selectInterviewLevelModal/SelectInterviewLevelModal';
 import CheckDeleteTILModal from '../checkDeleteModal/checkDeleteTILModal/CheckDeleteTILModal';
-import { useModal } from '@/hooks/useModal';
 
 interface TILItem {
   tilId: number;

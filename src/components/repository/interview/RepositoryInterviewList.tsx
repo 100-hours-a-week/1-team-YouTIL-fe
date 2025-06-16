@@ -8,7 +8,6 @@ import useCheckAccess from '@/hooks/useCheckExistAccess';
 import CheckDeleteInterviewModal from '../checkDeleteModal/checkDeleteInterviewModal/CheckDeleteInterviewModal';
 import { parseISO, format } from 'date-fns';
 import { useRepositoryInterviewList } from '@/hooks/repository/interview/useRepositoryInterviewList';
-import { useModal } from '@/hooks/useModal';
 import './RepositoryInterviewList.scss';
 
 interface InterviewResponse {
@@ -47,11 +46,9 @@ const RepositoryInterviewList = () => {
     visibleAnswerMap,
     setVisibleAnswerMap,
     selectedInterviewIds,
-    setSelectedInterviewIds,
     shakeDelete,
     deleteModal,
     mapLevelToLabel,
-    setShakeDelete,
     handleDeleteClick,
     handleDeleteComplete,
     handleClickInterview,
