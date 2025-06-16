@@ -52,6 +52,8 @@ const RepositoryTILList = () => {
     handleClickTIL,
     toggleTILSelection,
     handleStartEdit,
+    handleDeleteClick,
+    handleDeleteComplete
   } = useRepositoryTILList();
 
   const { callApi } = useFetch();
@@ -138,7 +140,7 @@ const RepositoryTILList = () => {
         {tilData && tilData.length > 0 && (
           <button
             className={`repository-til-list__button${shakeDelete ? ' error shake' : ''}`}
-            onClick={deleteModal.open}
+            onClick={handleDeleteClick}
           >
             삭제
           </button>
@@ -253,10 +255,7 @@ const RepositoryTILList = () => {
         <CheckDeleteTILModal
           tilIds={selectedTilIds}
           onClose={deleteModal.close}
-          onDeleteComplete={() => {
-            setSelectedTilIds([]);
-            deleteModal.close();
-          }}
+          onDeleteComplete={handleDeleteComplete}
         />
       )}
     </div>

@@ -51,6 +51,11 @@ export const useRepositoryTILList = () => {
     }
   };
 
+  const handleDeleteComplete = () => {
+    setSelectedTilIds([]);
+    deleteModal.close();
+  };
+
   const handleClickTIL = (tilId: number) => {
     setEditingTilId(null);
     setExpandedTilId((prev) => (prev === tilId ? null : tilId));
@@ -72,8 +77,6 @@ export const useRepositoryTILList = () => {
     accessToken,
     existAccess,
     expandedTilId,
-    interviewModal,
-    deleteModal,
     selectedTilIds,
     shakeDelete,
     editingTilId,
@@ -85,7 +88,8 @@ export const useRepositoryTILList = () => {
     setIsSubmitting,
     handleClickTIL,
     toggleTILSelection,
-    handleDeleteClick,
     handleStartEdit,
+    handleDeleteClick,
+    handleDeleteComplete
   };
 };

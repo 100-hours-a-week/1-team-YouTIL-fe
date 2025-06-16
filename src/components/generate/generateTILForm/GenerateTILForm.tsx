@@ -40,6 +40,8 @@ const GenerateTILForm = () => {
   const [category, setCategory] = useState<Category>('FULLSTACK');
   const [visibility, setVisibility] = useState<'public' | 'private'>('public');
   const [shake, setShake] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isError, setIsError] = useState(false);
 
   const generateModal = useModal();
 
@@ -82,10 +84,14 @@ const GenerateTILForm = () => {
       router.push('/repository');
     },
     onError: () => {
+      setIsError(true);
       generateModal.open();
     },
+    onMutate: () => {
+      setIsLoading(true);
+    },
     onSettled: () => {
-      // modal은 여기선 자동 닫지 않음, 성공 시 router.push로 이동
+      setIsLoading(false);
     },
   });
 
@@ -99,10 +105,13 @@ const GenerateTILForm = () => {
 
   return (
     <>
-      {generateModal.isOpen && (
+      {(isLoading || generateModal.isOpen) && (
         <GenerateTILModal
-          isError={true}
-          onClose={generateModal.close}
+          isError={isError}
+          onClose={() => {
+            setIsError(false);
+            generateModal.close();
+          }}
         />
       )}
 
