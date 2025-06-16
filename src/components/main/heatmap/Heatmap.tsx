@@ -12,6 +12,20 @@ import useCheckAccess from '@/hooks/useCheckExistAccess';
 import './Heatmap.scss';
 import 'cal-heatmap/cal-heatmap.css';
 
+export interface TILDayCount {
+  date: string;
+  count: number;
+}
+
+export type TILYearlyRawRecord = Record<string, number[]>;
+
+export interface TILYearlyRecordResponse {
+  data: {
+    year: number;
+    tils: TILYearlyRawRecord;
+  };
+}
+
 const currentDate = new Date();
 const basicYear = currentDate.getFullYear();
 const rawCurrentMonth = currentDate.getMonth() + 1;
@@ -30,27 +44,22 @@ const Heatmap = () => {
   const accessToken = useGetAccessToken();
   const existAccess = useCheckAccess(accessToken);
 
-  const { data: tilData = [] } = useQuery({
+  const { data: tilData = [] } = useQuery<TILDayCount[]>({
     queryKey: ['til-data', year],
     queryFn: async () => {
-      const res = await callApi<{
-        data: {
-          year: number;
-          tils: Record<string, number[]>;
-        };
-      }>({
+      const response = await callApi<TILYearlyRecordResponse>({
         method: 'GET',
         endpoint: `/users/tils?year=${year}`,
         headers: { Authorization: `Bearer ${accessToken}` },
         credentials: 'include',
       });
-
-      const raw = res.data?.tils ?? {};
+  
+      const raw = response.data?.tils ?? {};
       return Object.entries(raw).flatMap(([month, counts]) =>
         counts.map((count, index) => {
           const day = String(index + 1).padStart(2, '0');
           return {
-            date: `${year}-${monthMap[month]}-${day}`,
+            date: `${year}-${monthMap[month as keyof typeof monthMap]}-${day}`,
             count,
           };
         })
