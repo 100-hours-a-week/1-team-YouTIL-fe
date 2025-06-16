@@ -45,22 +45,20 @@ const RepositoryTILList = () => {
     editingTilId,
     editedTitle,
     isSubmitting,
+    deleteModal,
+    interviewModal,
     setEditedTitle,
-    setSelectedTilIds,
     setEditingTilId,
     setIsSubmitting,
     handleClickTIL,
     toggleTILSelection,
     handleStartEdit,
+    handleDeleteComplete,
     handleDeleteClick,
-    handleDeleteComplete
   } = useRepositoryTILList();
 
   const { callApi } = useFetch();
   const queryClient = useQueryClient();
-
-  const interviewModal = useModal();
-  const deleteModal = useModal();
 
   const { data: tilData } = useQuery<TILItem[]>({
     queryKey: ['til-list', tilDate],
@@ -78,7 +76,6 @@ const RepositoryTILList = () => {
     staleTime: 1800000,
     gcTime: 3600000,
   });
-
 
   const { data: tilDetailData } = useQuery<TILDetailItem | null>({
     queryKey: ['til-detail', expandedTilId],
@@ -244,9 +241,9 @@ const RepositoryTILList = () => {
         })}
       </ul>
 
-      {interviewModal.isOpen && expandedTilId !== null && (
+      {interviewModal.isOpen && (
         <SelectInterviewLevelModal
-          tilId={expandedTilId}
+          tilId={expandedTilId!}
           onClose={interviewModal.close}
         />
       )}

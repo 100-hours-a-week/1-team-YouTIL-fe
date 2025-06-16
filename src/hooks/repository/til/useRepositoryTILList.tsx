@@ -82,6 +82,8 @@ export const useRepositoryTILList = () => {
     editingTilId,
     editedTitle,
     isSubmitting,
+    interviewModal,
+    deleteModal,
     setEditedTitle,
     setSelectedTilIds,
     setEditingTilId,
@@ -89,7 +91,7 @@ export const useRepositoryTILList = () => {
     handleClickTIL,
     toggleTILSelection,
     handleStartEdit,
+    handleDeleteComplete,
     handleDeleteClick,
-    handleDeleteComplete
   };
 };

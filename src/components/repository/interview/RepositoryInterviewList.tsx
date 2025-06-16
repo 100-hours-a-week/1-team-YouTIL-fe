@@ -49,21 +49,25 @@ const RepositoryInterviewList = () => {
     selectedInterviewIds,
     setSelectedInterviewIds,
     shakeDelete,
+    deleteModal,
     mapLevelToLabel,
+    setShakeDelete,
+    handleDeleteClick,
+    handleDeleteComplete,
     handleClickInterview,
     toggleInterviewSelection,
   } = useRepositoryInterviewList();
 
-  const deleteModal = useModal();
+  // const deleteModal = useModal();
 
-  const handleDeleteClick = () => {
-    if (selectedInterviewIds.length === 0) {
-      const event = new CustomEvent('shake-delete');
-      window.dispatchEvent(event);
-    } else {
-      deleteModal.open();
-    }
-  };
+  // const handleDeleteClick = () => {
+  //   if (selectedInterviewIds.length === 0) {
+  //     setShakeDelete(true);
+  //     setTimeout(() => setShakeDelete(false), 500);
+  //   } else {
+  //     deleteModal.open();
+  //   }
+  // };
 
   const { data: interviewData } = useQuery<InterviewItem[]>({
     queryKey: ['interview-list', interviewDate],
@@ -175,10 +179,7 @@ const RepositoryInterviewList = () => {
         <CheckDeleteInterviewModal
           interviewIds={selectedInterviewIds}
           onClose={deleteModal.close}
-          onDeleteComplete={() => {
-            setSelectedInterviewIds([]);
-            deleteModal.close();
-          }}
+          onDeleteComplete={handleDeleteComplete}
         />
       )}
     </div>
