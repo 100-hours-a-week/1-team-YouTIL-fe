@@ -40,7 +40,7 @@ const TechNews = () => {
         },
         credentials: 'include',
       });
-      return response.data.news;
+      return response.data?.news ?? [];
     },
     enabled: existAccess,
     staleTime: Infinity,
