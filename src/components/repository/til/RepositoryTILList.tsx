@@ -171,7 +171,12 @@ const RepositoryTILList = () => {
                         <input
                           value={editedTitle}
                           onClick={(e) => e.stopPropagation()}
-                          onChange={(e) => setEditedTitle(e.target.value)}
+                          onChange={(e) => {
+                            const input = e.target.value;
+                            if (input.length <= 40) {
+                              setEditedTitle(input);
+                            }
+                          }}
                           onKeyDown={(e) => e.key === 'Enter' && handleConfirmEdit(e, til.tilId)}
                           className="repository-til-list__item-edit-input"
                         />
