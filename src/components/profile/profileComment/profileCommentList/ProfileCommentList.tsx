@@ -6,7 +6,7 @@ import { useState, useEffect, useRef } from 'react';
 import useOtherUserInfoStore from '@/store/useOtherUserInfoStore';
 import useGetAccessToken from '@/hooks/useGetAccessToken';
 import useCheckAccess from '@/hooks/useCheckExistAccess';
-import { useInfiniteScrollObserver } from '@/hooks/useInfinityScrollObserver';
+import { useInfinityScrollObserver } from '@/hooks/useInfinityScrollObserver';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import ProfileCommentUtils from '../profileCommentUtils/ProfileCommentUtils';
@@ -120,7 +120,7 @@ const ProfileCommentList = () => {
     gcTime: 300000,
   });
 
-  const loadMoreRef = useInfiniteScrollObserver({
+  const loadMoreRef = useInfinityScrollObserver({
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,

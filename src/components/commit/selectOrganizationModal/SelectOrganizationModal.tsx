@@ -39,7 +39,7 @@ const SelectOrganizationModal = ({ onClose, onComplete }: Props) => {
     queryFn: async () => {
       const response = await callApi<OrganizationResponse>({
         method: 'GET',
-        endpoint: '/github/organization',
+        endpoint: '/github/organization?page=0&offset=20',
         headers: { Authorization: `Bearer ${accessToken}` },
         credentials: 'include',
       });

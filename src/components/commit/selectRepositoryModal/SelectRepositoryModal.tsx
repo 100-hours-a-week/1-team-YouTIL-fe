@@ -39,7 +39,7 @@ const SelectRepositoryModal = ({ onClose, onComplete }: Props) => {
     queryFn: async () => {
       const response = await callApi<RepositoryResponse>({
         method: 'GET',
-        endpoint: `/github/repositories?organizationId=${draftOrg ? draftOrg.organization_id : ''}`,
+        endpoint: `/github/repositories?organizationId=${draftOrg ? draftOrg.organization_id : ''}&page=0&offset=20`,
         headers: { Authorization: `Bearer ${accessToken}` },
         credentials: 'include',
       });

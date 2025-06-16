@@ -2,31 +2,36 @@
 
 import { useEffect, useRef } from 'react';
 
-interface UseInfiniteScrollObserverProps {
+interface UseInfinityScrollObserverProps {
   fetchNextPage: () => void;
   hasNextPage: boolean;
   isFetchingNextPage: boolean;
 }
 
-export const useInfiniteScrollObserver = ({
+export const useInfinityScrollObserver = <T extends HTMLElement = HTMLDivElement>({
   fetchNextPage,
   hasNextPage,
   isFetchingNextPage,
-}: UseInfiniteScrollObserverProps) => {
+}: UseInfinityScrollObserverProps) => {
   const observerRef = useRef<IntersectionObserver | null>(null);
-  const loadMoreRef = useRef<HTMLDivElement | null>(null);
+  const loadMoreRef = useRef<T | null>(null);
 
   useEffect(() => {
     const target = loadMoreRef.current;
-    if (!target || !hasNextPage || isFetchingNextPage) return;
+    if (!target || !hasNextPage || isFetchingNextPage) {
+      return;
+    }
 
     observerRef.current = new IntersectionObserver(
       (entries) => {
-        if (entries[0].isIntersecting) {
+        const [entry] = entries;
+        if (entry.isIntersecting) {
           fetchNextPage();
         }
       },
-      { threshold: 1.0 }
+      {
+        threshold: 0.5,
+      }
     );
 
     observerRef.current.observe(target);

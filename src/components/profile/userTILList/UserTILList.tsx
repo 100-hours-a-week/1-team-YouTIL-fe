@@ -7,7 +7,7 @@ import { useFetch } from '@/hooks/useFetch';
 import useAuthStore from '@/store/useAuthStore';
 import { parseISO, format } from 'date-fns';
 import Image from 'next/image';
-import { useInfiniteScrollObserver } from '@/hooks/useInfinityScrollObserver';
+import { useInfinityScrollObserver } from '@/hooks/useInfinityScrollObserver';
 import './UserTILList.scss';
 
 interface TILItem {
@@ -34,10 +34,9 @@ const UserTILList = () => {
   const { data, isFetchingNextPage, hasNextPage, fetchNextPage } = useInfiniteQuery<TILResponse, Error>({
     queryKey: ['user-tils', userId],
     queryFn: async ({ pageParam }: QueryFunctionContext) => {
-      const page = (pageParam as number) ?? 0;
       return await callApi<TILResponse>({
         method: 'GET',
-        endpoint: `/users/${userId}/tils?page=${page}&offset=20`,
+        endpoint: `/users/${userId}/tils?page=${pageParam}&offset=20`,
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
@@ -54,7 +53,7 @@ const UserTILList = () => {
     gcTime: 300000,
   });
 
-  const lastItemRef = useInfiniteScrollObserver({
+  const lastItemRef = useInfinityScrollObserver({
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
