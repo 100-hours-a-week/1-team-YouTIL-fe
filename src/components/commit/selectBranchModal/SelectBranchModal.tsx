@@ -68,7 +68,7 @@ const SelectBranchModal = ({ onClose }: Props) => {
       return allPages.length;
     },
     initialPageParam: 0,
-    enabled: !!draftRepo && existAccess,
+    enabled: existAccess,
     staleTime: 1800000,
     gcTime: 1800000,
   });
