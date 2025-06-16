@@ -8,6 +8,7 @@ import { useRepositoryTILList } from '@/hooks/repository/til/useRepositoryTILLis
 import { useFetch } from '@/hooks/useFetch';
 import SelectInterviewLevelModal from '../selectInterviewLevelModal/SelectInterviewLevelModal';
 import CheckDeleteTILModal from '../checkDeleteModal/checkDeleteTILModal/CheckDeleteTILModal';
+import { useModal } from '@/hooks/useModal';
 
 interface TILItem {
   tilId: number;
@@ -39,28 +40,26 @@ const RepositoryTILList = () => {
     accessToken,
     existAccess,
     expandedTilId,
-    showInterviewModal,
     selectedTilIds,
     shakeDelete,
-    showDeleteModal,
     editingTilId,
     editedTitle,
     isSubmitting,
     setEditedTitle,
-    setShowDeleteModal,
-    setShowInterviewModal,
     setSelectedTilIds,
     setEditingTilId,
     setIsSubmitting,
     handleClickTIL,
     toggleTILSelection,
-    handleDeleteClick,
     handleStartEdit,
   } = useRepositoryTILList();
-  
+
   const { callApi } = useFetch();
   const queryClient = useQueryClient();
-  
+
+  const interviewModal = useModal();
+  const deleteModal = useModal();
+
   const { data: tilData } = useQuery<TILItem[]>({
     queryKey: ['til-list', tilDate],
     queryFn: async () => {
@@ -77,6 +76,7 @@ const RepositoryTILList = () => {
     staleTime: 1800000,
     gcTime: 3600000,
   });
+
 
   const { data: tilDetailData } = useQuery<TILDetailItem | null>({
     queryKey: ['til-detail', expandedTilId],
@@ -102,13 +102,13 @@ const RepositoryTILList = () => {
     if (!tilId || isSubmitting || !editedTitle.trim()) return;
     e?.stopPropagation();
     setIsSubmitting(true);
-  
+
     queryClient.setQueryData<TILItem[]>(['til-list', tilDate], (prev) =>
       prev?.map((til) =>
         til.tilId === tilId ? { ...til, title: editedTitle.trim() } : til
       ) ?? prev
     );
-  
+
     try {
       await callApi({
         method: 'PUT',
@@ -135,10 +135,10 @@ const RepositoryTILList = () => {
     <div className="repository-til-list">
       <div className="repository-til-list__header">
         <h2 className="repository-til-list__title">TIL 목록</h2>
-        {tilData && tilData?.length > 0 && (
+        {tilData && tilData.length > 0 && (
           <button
             className={`repository-til-list__button${shakeDelete ? ' error shake' : ''}`}
-            onClick={handleDeleteClick}
+            onClick={deleteModal.open}
           >
             삭제
           </button>
@@ -200,7 +200,7 @@ const RepositoryTILList = () => {
                         className="repository-til-list__item-generate-button"
                         onClick={(e) => {
                           e.stopPropagation();
-                          setShowInterviewModal(true);
+                          interviewModal.open();
                         }}
                       >
                         면접질문생성
@@ -237,17 +237,20 @@ const RepositoryTILList = () => {
         })}
       </ul>
 
-      {showInterviewModal && expandedTilId !== null && (
-        <SelectInterviewLevelModal tilId={expandedTilId} onClose={() => setShowInterviewModal(false)} />
+      {interviewModal.isOpen && expandedTilId !== null && (
+        <SelectInterviewLevelModal
+          tilId={expandedTilId}
+          onClose={interviewModal.close}
+        />
       )}
 
-      {showDeleteModal && (
+      {deleteModal.isOpen && (
         <CheckDeleteTILModal
           tilIds={selectedTilIds}
-          onClose={() => setShowDeleteModal(false)}
+          onClose={deleteModal.close}
           onDeleteComplete={() => {
             setSelectedTilIds([]);
-            setShowDeleteModal(false);
+            deleteModal.close();
           }}
         />
       )}

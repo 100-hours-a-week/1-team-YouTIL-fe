@@ -4,17 +4,19 @@ import { useState, useEffect, useRef } from 'react';
 import { useRepositoryDateStore } from '@/store/useRepositoryDateStore';
 import useGetAccessToken from '@/hooks/useGetAccessToken';
 import useCheckAccess from '@/hooks/useCheckExistAccess';
+import { useModal } from '@/hooks/useModal';
 
 export const useRepositoryTILList = () => {
   const accessToken = useGetAccessToken();
   const existAccess = useCheckAccess(accessToken);
   const { tilDate } = useRepositoryDateStore();
 
+  const interviewModal = useModal();
+  const deleteModal = useModal();
+
   const [expandedTilId, setExpandedTilId] = useState<number | null>(null);
-  const [showInterviewModal, setShowInterviewModal] = useState(false);
   const [selectedTilIds, setSelectedTilIds] = useState<number[]>([]);
   const [shakeDelete, setShakeDelete] = useState(false);
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [editingTilId, setEditingTilId] = useState<number | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [editedTitle, setEditedTitle] = useState('');
@@ -45,7 +47,7 @@ export const useRepositoryTILList = () => {
       setShakeDelete(true);
       setTimeout(() => setShakeDelete(false), 500);
     } else {
-      setShowDeleteModal(true);
+      deleteModal.open();
     }
   };
 
@@ -64,23 +66,20 @@ export const useRepositoryTILList = () => {
     setEditedTitle(currentTitle);
   };
 
-
   return {
     refs,
     tilDate,
     accessToken,
     existAccess,
     expandedTilId,
-    showInterviewModal,
+    interviewModal,
+    deleteModal,
     selectedTilIds,
     shakeDelete,
-    showDeleteModal,
     editingTilId,
     editedTitle,
     isSubmitting,
     setEditedTitle,
-    setShowDeleteModal,
-    setShowInterviewModal,
     setSelectedTilIds,
     setEditingTilId,
     setIsSubmitting,
