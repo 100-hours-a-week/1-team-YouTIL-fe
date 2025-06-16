@@ -149,7 +149,7 @@ const RepositoryTILList = () => {
           const parsedDate = parseISO(til.createdAt);
           const formattedDate = format(parsedDate, 'yyyy-MM-dd : HH:mm:ss');
           const isSelected = selectedTilIds.includes(til.tilId);
-
+          const isExpanded = expandedTilId === til.tilId;
           return (
             <li
               key={til.tilId}
@@ -184,7 +184,7 @@ const RepositoryTILList = () => {
                       </div>
                     ) : (
                       <>
-                        <h3 className="repository-til-list__item-title">{til.title}</h3>
+                        <h3 className={`repository-til-list__item-title${isExpanded ? ' repository-til-list__item-title--expanded' : ''}`} >{til.title}</h3>
                         <Image
                           src="/images/pencilEdit.png"
                           alt="edit icon"
