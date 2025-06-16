@@ -8,6 +8,7 @@ import useCheckAccess from '@/hooks/useCheckExistAccess';
 import CheckDeleteInterviewModal from '../checkDeleteModal/checkDeleteInterviewModal/CheckDeleteInterviewModal';
 import { parseISO, format } from 'date-fns';
 import { useRepositoryInterviewList } from '@/hooks/repository/interview/useRepositoryInterviewList';
+import { useModal } from '@/hooks/useModal';
 import './RepositoryInterviewList.scss';
 
 interface InterviewResponse {
@@ -48,13 +49,21 @@ const RepositoryInterviewList = () => {
     selectedInterviewIds,
     setSelectedInterviewIds,
     shakeDelete,
-    showDeleteModal,
-    setShowDeleteModal,
     mapLevelToLabel,
     handleClickInterview,
     toggleInterviewSelection,
-    handleDeleteClick,
   } = useRepositoryInterviewList();
+
+  const deleteModal = useModal();
+
+  const handleDeleteClick = () => {
+    if (selectedInterviewIds.length === 0) {
+      const event = new CustomEvent('shake-delete');
+      window.dispatchEvent(event);
+    } else {
+      deleteModal.open();
+    }
+  };
 
   const { data: interviewData } = useQuery<InterviewItem[]>({
     queryKey: ['interview-list', interviewDate],
@@ -162,11 +171,14 @@ const RepositoryInterviewList = () => {
         })}
       </ul>
 
-      {showDeleteModal && (
+      {deleteModal.isOpen && (
         <CheckDeleteInterviewModal
           interviewIds={selectedInterviewIds}
-          onClose={() => setShowDeleteModal(false)}
-          onDeleteComplete={() => setSelectedInterviewIds([])}
+          onClose={deleteModal.close}
+          onDeleteComplete={() => {
+            setSelectedInterviewIds([]);
+            deleteModal.close();
+          }}
         />
       )}
     </div>

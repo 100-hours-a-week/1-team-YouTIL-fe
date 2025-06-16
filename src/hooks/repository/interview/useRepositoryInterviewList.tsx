@@ -1,13 +1,15 @@
 'use client';
 
 import { useState } from 'react';
+import { useModal } from '@/hooks/useModal';
 
 export const useRepositoryInterviewList = () => {
   const [expandedInterviewId, setExpandedInterviewId] = useState<number | null>(null);
   const [visibleAnswerMap, setVisibleAnswerMap] = useState<Record<number, boolean>>({});
   const [selectedInterviewIds, setSelectedInterviewIds] = useState<number[]>([]);
   const [shakeDelete, setShakeDelete] = useState(false);
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
+
+  const deleteModal = useModal();
 
   const mapLevelToLabel = (level: 'EASY' | 'NORMAL' | 'HARD'): string => {
     switch (level) {
@@ -39,7 +41,7 @@ export const useRepositoryInterviewList = () => {
       setShakeDelete(true);
       setTimeout(() => setShakeDelete(false), 500);
     } else {
-      setShowDeleteModal(true);
+      deleteModal.open();
     }
   };
 
@@ -50,8 +52,7 @@ export const useRepositoryInterviewList = () => {
     selectedInterviewIds,
     setSelectedInterviewIds,
     shakeDelete,
-    showDeleteModal,
-    setShowDeleteModal,
+    deleteModal,
     mapLevelToLabel,
     handleClickInterview,
     toggleInterviewSelection,
