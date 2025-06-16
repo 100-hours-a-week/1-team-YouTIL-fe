@@ -11,7 +11,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useQueryClient, useMutation } from '@tanstack/react-query';
 import GenerateTILModal from '../generateTILModal/GenerateTILModal';
-// import DeadLineModal from '../deadLineModal/DeadLineModal';
+import { useModal } from '@/hooks/useModal';
 
 interface TILPayload {
   organizationId: number | string;
@@ -40,9 +40,8 @@ const GenerateTILForm = () => {
   const [category, setCategory] = useState<Category>('FULLSTACK');
   const [visibility, setVisibility] = useState<'public' | 'private'>('public');
   const [shake, setShake] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [submitResult, setSubmitResult] = useState<{ success: boolean } | null>(null);
-  // const [isDeadlineError, setIsDeadlineError] = useState(false);
+
+  const generateModal = useModal();
 
   const validateTitle = (title: string, setShake: (s: boolean) => void): boolean => {
     if (title.trim() === '') {
@@ -52,17 +51,17 @@ const GenerateTILForm = () => {
     }
     return true;
   };
-  
+
   const buildPayload = (): TILPayload => ({
     organizationId: selectedOrganization?.organization_id ?? '',
     repositoryId: selectedRepository?.repositoryId ?? 0,
     branch: selectedBranch?.branchName ?? '',
     commits: selectedCommits,
     title,
-    category: category,
+    category,
     is_shared: visibility === 'public',
   });
-  
+
   const mutation = useMutation({
     mutationFn: async (payload: TILPayload) => {
       return await callApi({
@@ -83,37 +82,29 @@ const GenerateTILForm = () => {
       router.push('/repository');
     },
     onError: () => {
-      setSubmitResult({ success: false });
-    },
-    onMutate: () => {
-      setIsLoading(true);
+      generateModal.open();
     },
     onSettled: () => {
-      setIsLoading(false);
+      // modal은 여기선 자동 닫지 않음, 성공 시 router.push로 이동
     },
   });
-  
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validateTitle(title, setShake)) return;
-  
+
     const payload = buildPayload();
     mutation.mutate(payload);
-  
-    //else if (result.deadlineError) { //데드라인 모달 트리거거(3시부터 12시 이외엔 CPU 서버를 사용하므로 현재 비활성화화)
-    //   setIsDeadlineError(true);
-    // }
   };
 
   return (
     <>
-      {(isLoading || submitResult?.success === false) && (
+      {generateModal.isOpen && (
         <GenerateTILModal
-          isError={submitResult?.success === false}
-          onClose={() => setSubmitResult(null)}
+          isError={true}
+          onClose={generateModal.close}
         />
       )}
-      {/* {isDeadlineError && <DeadLineModal onClose={() => setIsDeadlineError(false)} />} */}
 
       <div className="generate">
         <form className="generate__form" onSubmit={handleSubmit}>
