@@ -80,9 +80,10 @@ const UserProfileInfo = () => {
         description: updatedDescription,
       });
 
-      await queryClient.invalidateQueries({ queryKey: ['otheruser-info', otherUserId] });
-      await queryClient.invalidateQueries({ queryKey: ['recent-tils'] });
-      await queryClient.invalidateQueries({ queryKey: ['user-tils'] });
+      queryClient.invalidateQueries({ queryKey: ['otheruser-info', otherUserId] });
+      queryClient.invalidateQueries({ queryKey: ['recent-tils'] });
+      queryClient.invalidateQueries({ queryKey: ['user-tils'] });
+      queryClient.invalidateQueries({ queryKey: ['guestbooks-list']})
       setEditMode(false);
     },
   });

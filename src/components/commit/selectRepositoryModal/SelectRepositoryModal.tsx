@@ -1,12 +1,13 @@
 'use client';
 
-import { useQuery } from '@tanstack/react-query';
-import { useState } from 'react';
+import { useState, useRef } from 'react';
+import { useInfiniteQuery } from '@tanstack/react-query';
 import { useFetch } from '@/hooks/useFetch';
 import useGetAccessToken from '@/hooks/useGetAccessToken';
 import useCheckAccess from '@/hooks/useCheckExistAccess';
-import './SelectRepositoryModal.scss';
 import { useDraftSelectionStore } from '@/store/useDraftSelectionStore';
+import { useInfinityScrollObserver } from '@/hooks/useInfinityScrollObserver';
+import './SelectRepositoryModal.scss';
 
 interface Repository {
   repositoryId: number;
@@ -33,21 +34,39 @@ const SelectRepositoryModal = ({ onClose, onComplete }: Props) => {
   const setDraftRepo = useDraftSelectionStore((state) => state.setDraftRepo);
 
   const [selectedRepositoryId, setSelectedRepositoryId] = useState<number | null>(null);
+  const scrollContainerRef = useRef<HTMLUListElement | null>(null);
 
-  const { data: repositories = [], isLoading } = useQuery<Repository[]>({
+  const {
+    data,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isLoading,
+  } = useInfiniteQuery({
     queryKey: ['repository', draftOrg?.organization_id ?? ''],
-    queryFn: async () => {
+    queryFn: async ({ pageParam = 0 }) => {
       const response = await callApi<RepositoryResponse>({
         method: 'GET',
-        endpoint: `/github/repositories?organizationId=${draftOrg ? draftOrg.organization_id : ''}`,
+        endpoint: `/github/repositories?organizationId=${draftOrg?.organization_id ?? ''}&page=${pageParam}&offset=20`,
         headers: { Authorization: `Bearer ${accessToken}` },
         credentials: 'include',
       });
-      return response.data.repositories;
+      return response;
     },
+    getNextPageParam: (lastPage, allPages) => {
+      if (lastPage.data.repositories.length < 20) return undefined;
+      return allPages.length;
+    },
+    initialPageParam: 0,
     enabled: existAccess,
     staleTime: 3600000,
     gcTime: 3600000,
+  });
+
+  const lastItemRef = useInfinityScrollObserver<HTMLDivElement>({
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
   });
 
   const handleSelect = (repo: Repository) => {
@@ -64,6 +83,7 @@ const SelectRepositoryModal = ({ onClose, onComplete }: Props) => {
   };
 
   const isCompleteEnabled = selectedRepositoryId !== null;
+  const repositories = data?.pages.flatMap((page) => page.data.repositories) ?? [];
 
   return (
     <div className="repository-modal">
@@ -75,18 +95,23 @@ const SelectRepositoryModal = ({ onClose, onComplete }: Props) => {
           <p className="repository-modal__loading">로딩 중...</p>
         ) : (
           <>
-            <ul className="repository-modal__list">
-              {repositories.map((repo) => (
-                <li
-                  key={repo.repositoryId}
-                  className={`repository-modal__item ${
-                    selectedRepositoryId === repo.repositoryId ? 'selected' : ''
-                  }`}
-                  onClick={() => handleSelect(repo)}
-                >
-                  {repo.repositoryName}
-                </li>
-              ))}
+            <ul className="repository-modal__list" ref={scrollContainerRef}>
+              {repositories.map((repo, index) => {
+                const isLastItem = index === repositories.length - 1;
+
+                return (
+                  <div
+                    key={repo.repositoryId}
+                    className={`repository-modal__item ${
+                      selectedRepositoryId === repo.repositoryId ? 'selected' : ''
+                    }`}
+                    onClick={() => handleSelect(repo)}
+                    ref={isLastItem ? lastItemRef : undefined}
+                  >
+                    {repo.repositoryName}
+                  </div>
+                );
+              })}
             </ul>
 
             <button

@@ -31,8 +31,6 @@ const SelectDateCalendar = () => {
   useEffect(() => {
     const formatted = format(selectedDate, 'yyyy-MM-dd');
     setSelectedDate(formatted);
-    console.log("선택날짜 = ", selectedDate)
-    console.log("formatted = ", formatted)
   }, [selectedDate, setSelectedDate]);
 
   const renderHeader = () => (

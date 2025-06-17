@@ -1,7 +1,7 @@
 'use client';
 
-import { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useState, useRef } from 'react';
+import { useInfiniteQuery } from '@tanstack/react-query';
 import { useOrganizationStore } from '@/store/useOrganizationStore';
 import { useRepositoryStore } from '@/store/useRepositoryStore';
 import { useBranchStore } from '@/store/useBranchStore';
@@ -9,6 +9,7 @@ import { useFetch } from '@/hooks/useFetch';
 import useCheckAccess from '@/hooks/useCheckExistAccess';
 import useGetAccessToken from '@/hooks/useGetAccessToken';
 import { useDraftSelectionStore } from '@/store/useDraftSelectionStore';
+import { useInfinityScrollObserver } from '@/hooks/useInfinityScrollObserver';
 import './SelectBranchModal.scss';
 
 interface Branch {
@@ -18,6 +19,9 @@ interface Branch {
 interface BranchResponse {
   data: {
     branches: Branch[];
+    totalCount: number;
+    currentPage: number;
+    pageSize: number;
   };
 }
 
@@ -40,23 +44,39 @@ const SelectBranchModal = ({ onClose }: Props) => {
   const existAccess = useCheckAccess(accessToken);
 
   const [selectedBranchName, setSelectedBranchName] = useState<string | null>(null);
+  const scrollContainerRef = useRef<HTMLDivElement | null>(null);
 
-  const { data: branches = [], isLoading } = useQuery<Branch[]>({
-    queryKey: ['branch', draftOrg?.organization_id ?? '', draftRepo?.repositoryId],
-    queryFn: async () => {
-      if (!draftRepo) return [];
+  const {
+    data,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isLoading,
+  } = useInfiniteQuery({
+    queryKey: ['branches', draftOrg?.organization_id ?? '', draftRepo?.repositoryId],
+    queryFn: async ({ pageParam = 0 }) => {
       const response = await callApi<BranchResponse>({
         method: 'GET',
-        endpoint: `/github/branches?organizationId=${draftOrg ? draftOrg.organization_id : ''}&repositoryId=${draftRepo.repositoryId}`,
+        endpoint: `/github/branches?organizationId=${draftOrg?.organization_id ?? ''}&repositoryId=${draftRepo?.repositoryId}&page=${pageParam}&offset=20`,
         headers: { Authorization: `Bearer ${accessToken}` },
         credentials: 'include',
       });
-      return response.data.branches;
+      return response;
     },
+    getNextPageParam: (lastPage, allPages) => {
+      if (lastPage.data.branches.length < 20) return undefined;
+      return allPages.length;
+    },
+    initialPageParam: 0,
     enabled: existAccess,
     staleTime: 1800000,
     gcTime: 1800000,
-    refetchOnWindowFocus: true,
+  });
+
+  const lastItemRef = useInfinityScrollObserver<HTMLDivElement>({
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
   });
 
   const handleSelect = (branch: Branch) => {
@@ -78,6 +98,7 @@ const SelectBranchModal = ({ onClose }: Props) => {
   };
 
   const isCompleteEnabled = selectedBranchName !== null;
+  const branches = data?.pages.flatMap((page) => page.data.branches) ?? [];
 
   return (
     <div className="branch-modal">
@@ -89,17 +110,22 @@ const SelectBranchModal = ({ onClose }: Props) => {
           <p className="branch-modal__loading">로딩 중...</p>
         ) : (
           <>
-            <ul className="branch-modal__list">
-              {branches.map((branch) => (
-                <li
-                  key={branch.name}
-                  className={`branch-modal__item ${selectedBranchName === branch.name ? 'selected' : ''}`}
-                  onClick={() => handleSelect(branch)}
-                >
-                  {branch.name}
-                </li>
-              ))}
-            </ul>
+            <div className="branch-modal__list" ref={scrollContainerRef}>
+              {branches.map((branch, index) => {
+                const isLastItem = index === branches.length - 1;
+
+                return (
+                  <div
+                    key={branch.name}
+                    className={`branch-modal__item ${selectedBranchName === branch.name ? 'selected' : ''}`}
+                    ref={isLastItem ? lastItemRef : undefined}
+                    onClick={() => handleSelect(branch)}
+                  >
+                    {branch.name}
+                  </div>
+                );
+              })}
+            </div>
 
             <button
               className="branch-modal__close"
