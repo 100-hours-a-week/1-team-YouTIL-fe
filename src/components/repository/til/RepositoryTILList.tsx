@@ -154,11 +154,8 @@ const RepositoryTILList = () => {
               className={`repository-til-list__item${isSelected ? ' selected' : ''}`}
             >
               <div className="repository-til-list__item-header-wrapper">
-                <div
-                  className="repository-til-list__item-header"
-                  onClick={() => handleClickTIL(til.tilId)}
-                >
-                  <div className="repository-til-list__item-header-top">
+              <div className="repository-til-list__item-header" onClick={() => handleClickTIL(til.tilId)}>
+                  <div className="repository-til-list__item-header-top"> 
                     {editingTilId === til.tilId ? (
                       <div
                         className="repository-til-list__item-edit-wrapper"
@@ -187,7 +184,13 @@ const RepositoryTILList = () => {
                       </div>
                     ) : (
                       <>
-                        <h3 className={`repository-til-list__item-title${isExpanded ? ' repository-til-list__item-title--expanded' : ''}`} >{til.title}</h3>
+                        <h3
+                          className={`repository-til-list__item-title${
+                            isExpanded ? ' repository-til-list__item-title--expanded' : ''
+                          }`}
+                        >
+                          {til.title}
+                        </h3>
                         <Image
                           src="/images/pencilEdit.png"
                           alt="edit icon"
@@ -198,7 +201,11 @@ const RepositoryTILList = () => {
                         />
                       </>
                     )}
-                    {expandedTilId === til.tilId && (
+                  </div>
+
+                  <div className="repository-til-list__item-subheader">
+                    <p className="repository-til-list__item-date">{formattedDate}</p>
+                    {isExpanded && (
                       <button
                         className="repository-til-list__item-generate-button"
                         onClick={(e) => {
@@ -210,7 +217,6 @@ const RepositoryTILList = () => {
                       </button>
                     )}
                   </div>
-                  <p className="repository-til-list__item-date">{formattedDate}</p>
                 </div>
                 {expandedTilId !== til.tilId && (
                   <input

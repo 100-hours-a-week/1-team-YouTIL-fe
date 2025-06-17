@@ -238,6 +238,14 @@
       font-size: 0.95rem;
       color: #777;
     }
+    &-subheader {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 0.25rem;
+      height: 25px;
+      gap: 0.5rem;
+    }
   }
 
   &__loading {
