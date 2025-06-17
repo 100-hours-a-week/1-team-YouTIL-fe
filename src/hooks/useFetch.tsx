@@ -40,7 +40,7 @@ export const useFetch = () => {
         ...(headers || {}),
       };
 
-      if (!isFormData) {
+      if (!('Content-Type' in mergedHeaders) && !isFormData) {
         mergedHeaders['Content-Type'] = 'application/json';
       }
 
