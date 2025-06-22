@@ -1,12 +1,13 @@
 'use client';
 
 import { useState } from 'react';
-import { useHeatmapInitializer } from '@/hooks/main/heatmap/useHeatmapInitializer';
-import { useHeatmapYearDropdown } from '@/hooks/main/heatmap/useHeatmapYearDropdown';
 import { useQuery } from '@tanstack/react-query';
 import { useFetch } from '@/hooks/useFetch';
 import useGetAccessToken from '@/hooks/useGetAccessToken';
 import useCheckAccess from '@/hooks/useCheckExistAccess';
+import { useHeatmapInitializer } from '@/hooks/main/heatmap/useHeatmapInitializer';
+import { useHeatmapYearDropdown } from '@/hooks/main/heatmap/useHeatmapYearDropdown';
+import { useHeatmapNavigation } from '@/hooks/main/heatmap/useHeatmapNavigation';
 import './Heatmap.scss';
 import 'cal-heatmap/cal-heatmap.css';
 
@@ -33,23 +34,6 @@ const monthMap: Record<string, string> = {
   jan: '01', feb: '02', mar: '03', apr: '04',
   may: '05', jun: '06', jul: '07', aug: '08',
   sep: '09', oct: '10', nov: '11', dec: '12',
-};
-
-const getPrevDomainStep = (currentMonth: number): number => {
-  const table: Record<number, number> = {
-    1: 0, 2: 1, 3: 2, 4: 3, 5: 4,
-    6: 4, 7: 4, 8: 4, 9: 4, 10: 4, 11: 4, 12: 4,
-  };
-  return table[currentMonth] ?? 0;
-};
-
-const getNextDomainStep = (currentMonth: number): number => {
-  const table: Record<number, number> = {
-    1: 4, 2: 4, 3: 4, 4: 4, 5: 4, 6: 4,
-    7: 3, 8: 2, 9: 1,
-    10: 0, 11: 0, 12: 0,
-  };
-  return table[currentMonth] ?? 0;
 };
 
 const Heatmap = () => {
@@ -86,34 +70,33 @@ const Heatmap = () => {
   });
 
   const { cal } = useHeatmapInitializer(tilData, year, currentMonth);
-  const { isOpen, setIsOpen, handleYearChange } = useHeatmapYearDropdown(setYear, setCurrentMonth, cal);
-  const prevStep = getPrevDomainStep(currentMonth);
-  const nextStep = getNextDomainStep(currentMonth);
 
-  const handlePrevDomain = () => {
-    if (prevStep === 0) return;
-    setCurrentMonth(prev => prev - prevStep);
-    cal?.previous(prevStep);
-  };
+  const {
+    prevStep,
+    nextStep,
+    handlePrevDomain,
+    handleNextDomain,
+    handleYearJump,
+  } = useHeatmapNavigation(cal, currentMonth, setCurrentMonth, setYear);
 
-  const handleNextDomain = () => {
-    if (nextStep === 0) return;
-    setCurrentMonth(prev => prev + nextStep);
-    cal?.next(nextStep);
-  };
+  const { isOpen, setIsOpen } = useHeatmapYearDropdown();
 
   return (
     <div className="heatmap-wrapper">
       <div className="heatmap-wrapper__container">
         <div className="heatmap-wrapper__content">
           <div className="heatmap-wrapper__controls-left">
-            <button className={prevStep === 0 ? 'disabled' : ''} onClick={handlePrevDomain}>&lt;</button>
+            <button className={prevStep === 0 ? 'disabled' : ''} onClick={handlePrevDomain}>
+              &lt;
+            </button>
           </div>
 
           <div id="ex-ghDay" className="heatmap-wrapper__calendar"></div>
 
           <div className="heatmap-wrapper__controls-right">
-            <button className={nextStep === 0 ? 'disabled' : ''} onClick={handleNextDomain}>&gt;</button>
+            <button className={nextStep === 0 ? 'disabled' : ''} onClick={handleNextDomain}>
+              &gt;
+            </button>
           </div>
         </div>
 
@@ -136,7 +119,7 @@ const Heatmap = () => {
         <div className={`heatmap-wrapper__dropdown-content ${isOpen ? 'show' : ''}`}>
           {[0, 1, 2, 3, 4].map(offset => (
             <li key={offset}>
-              <a onClick={() => handleYearChange(basicYear + offset)}>
+              <a onClick={() => handleYearJump(basicYear + offset)}>
                 {basicYear + offset}
               </a>
             </li>
