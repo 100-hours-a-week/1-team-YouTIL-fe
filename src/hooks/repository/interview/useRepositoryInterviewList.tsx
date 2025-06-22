@@ -8,7 +8,6 @@ export const useRepositoryInterviewList = () => {
   const [visibleAnswerMap, setVisibleAnswerMap] = useState<Record<number, boolean>>({});
   const [selectedInterviewIds, setSelectedInterviewIds] = useState<number[]>([]);
   const [shakeDelete, setShakeDelete] = useState(false);
-  const [selectedTilIds, setSelectedTilIds] = useState<number[]>([]);
 
   const deleteModal = useModal();
 
@@ -47,7 +46,7 @@ export const useRepositoryInterviewList = () => {
   };
 
   const handleDeleteComplete = () => {
-    setSelectedTilIds([]);
+    setSelectedInterviewIds([]);
     deleteModal.close();
   };
 
@@ -57,7 +56,6 @@ export const useRepositoryInterviewList = () => {
     setVisibleAnswerMap,
     selectedInterviewIds,
     shakeDelete,
-    selectedTilIds,
     setShakeDelete,
     mapLevelToLabel,
     handleDeleteClick,
