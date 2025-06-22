@@ -11,7 +11,7 @@ interface TilData {
   count: number;
 }
 
-export const useHeatmapController = (tilData: TilData[], year: number, currentMonth: number) => {
+export const useHeatmapInitializer = (tilData: TilData[], year: number, currentMonth: number) => {
   const heatmapRef = useRef<CalHeatmap | null>(null);
   const [cal, setCal] = useState<CalHeatmap | null>(null);
 

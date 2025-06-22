@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useHeatmapController } from '@/hooks/main/heatmap/useHeatmapController';
+import { useHeatmapInitializer } from '@/hooks/main/heatmap/useHeatmapInitializer';
 import { useHeatmapYearDropdown } from '@/hooks/main/heatmap/useHeatmapYearDropdown';
 import { useQuery } from '@tanstack/react-query';
 import { useFetch } from '@/hooks/useFetch';
@@ -85,7 +85,7 @@ const Heatmap = () => {
     gcTime: 3600000,
   });
 
-  const { cal } = useHeatmapController(tilData, year, currentMonth);
+  const { cal } = useHeatmapInitializer(tilData, year, currentMonth);
   const { isOpen, setIsOpen, handleYearChange } = useHeatmapYearDropdown(setYear, setCurrentMonth, cal);
   const prevStep = getPrevDomainStep(currentMonth);
   const nextStep = getNextDomainStep(currentMonth);
