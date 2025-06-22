@@ -1,5 +1,9 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 
+const THUMNAIL_WIDTH = 300;
+const THUMNAIL_GAP = 96; // = 6rem (16px * 6)
+const ITEM_WIDTH = THUMNAIL_WIDTH + THUMNAIL_GAP;
+
 interface NewsItem {
   title: string;
   link: string;
@@ -17,8 +21,7 @@ export const useTechNewsSlider = (data?: NewsItem[]) => {
   const scrollToIndex = useCallback((index: number) => {
     if (!scrollRef.current || !data) return;
     const container = scrollRef.current;
-    const itemWidth = 300 + 96;
-    container.scrollTo({ left: index * itemWidth, behavior: 'smooth' });
+    container.scrollTo({ left: index * ITEM_WIDTH, behavior: 'smooth' });
 
     setIsSliding(true);
     setTimeout(() => setIsSliding(false), 500);
