@@ -38,6 +38,7 @@ export const useInfinityScrollObserver = <T extends HTMLElement = HTMLDivElement
 
     return () => {
       observerRef.current?.disconnect();
+      observerRef.current = null; 
     };
     
   }, [fetchNextPage, hasNextPage, isFetchingNextPage]);
