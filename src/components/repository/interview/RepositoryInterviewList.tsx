@@ -124,7 +124,13 @@ const RepositoryInterviewList = () => {
                       [{mapLevelToLabel(interview.level)}] {interview.title}
                     </h3>
                   </div>
-                  <p className="repository-interview-list__item-date">{formattedDate}</p>
+                  <p
+                    className={`repository-interview-list__item-date${
+                      isExpanded ? ' repository-interview-list__item-date--expanded' : ''
+                    }`}
+                  >
+                    {formattedDate}
+                  </p>
                 </div>
                 <input
                   type="checkbox"

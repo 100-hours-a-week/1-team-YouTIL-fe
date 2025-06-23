@@ -204,7 +204,11 @@ const RepositoryTILList = () => {
                     )}
                   </div>
 
-                  <div className="repository-til-list__item-subheader">
+                  <div
+                    className={`repository-til-list__item-subheader${
+                      isExpanded ? ' repository-til-list__item-subheader--expanded' : ''
+                    }`}
+                  >
                     <p className="repository-til-list__item-date">{formattedDate}</p>
                     {isExpanded && (
                       <button

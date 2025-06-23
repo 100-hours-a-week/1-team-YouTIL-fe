@@ -93,9 +93,12 @@
 
     &-top {
       display: flex;
-      justify-content: space-between;
+      justify-content: flex-start;
       align-items: center;
+      gap: 0.5rem;
       white-space: nowrap;
+      height:25px;
+      flex-wrap: wrap;
     }
   }
 
@@ -103,7 +106,7 @@
     margin: 0 0 0.4rem 0;
     font-size: 1rem;
     font-weight: 600;
-    width: 334px;
+    width: 370px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -121,9 +124,16 @@
   }
 
   &__item-date {
-    margin: 0.2rem 0;
+    margin: 0 0 0 0;
     font-size: 0.85rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 25px;
     color: #555;
+    &--expanded {
+      margin-top: 0.6rem;
+    }
   }
 
   &__item-checkbox {
