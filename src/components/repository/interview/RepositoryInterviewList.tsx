@@ -137,7 +137,16 @@ const RepositoryInterviewList = () => {
               {isExpanded && interviewDetailData && (
                 <div className="repository-interview-list__item-detail">
                   {interviewDetailData.questions.map((q) => (
-                    <div key={q.questionId} className="repository-interview-list__item-question-block">
+                    <div
+                      key={q.questionId}
+                      className="repository-interview-list__item-question-block"
+                      onCopy={(e) => {
+                        if (visibleAnswerMap[q.questionId]) {
+                          e.preventDefault();
+                          navigator.clipboard.writeText(q.answer);
+                        }
+                      }}
+                    >
                       <p className="repository-interview-list__item-question">{q.question}</p>
                       <button
                         onClick={() =>

@@ -230,7 +230,13 @@ const RepositoryTILList = () => {
               </div>
 
               {expandedTilId === til.tilId && tilDetailData && (
-                <div className="repository-til-list__item-detail">
+                <div
+                  className="repository-til-list__item-detail"
+                  onCopy={(e) => {
+                    e.preventDefault();
+                    navigator.clipboard.writeText(tilDetailData.content);
+                  }}
+                >
                   {/* <p className="repository-til-list__item-content">{tilDetailData.content}</p> */}
                   <Markdown>{tilDetailData.content}</Markdown>
                   <p className="repository-til-list__item-tags">
