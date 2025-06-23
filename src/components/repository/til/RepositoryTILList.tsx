@@ -155,8 +155,14 @@ const RepositoryTILList = () => {
               className={`repository-til-list__item${isSelected ? ' selected' : ''}`}
             >
               <div className="repository-til-list__item-header-wrapper">
-              <div className="repository-til-list__item-header" onClick={() => handleClickTIL(til.tilId)}>
-                  <div className="repository-til-list__item-header-top"> 
+                <div
+                  className="repository-til-list__item-header"
+                  onClick={() => {
+                    if (isSelected) return;
+                    handleClickTIL(til.tilId);
+                  }}
+                >
+                  <div className="repository-til-list__item-header-top">
                     {editingTilId === til.tilId ? (
                       <div
                         className="repository-til-list__item-edit-wrapper"
@@ -241,7 +247,6 @@ const RepositoryTILList = () => {
                     navigator.clipboard.writeText(tilDetailData.content);
                   }}
                 >
-                  {/* <p className="repository-til-list__item-content">{tilDetailData.content}</p> */}
                   <Markdown>{tilDetailData.content}</Markdown>
                   <p className="repository-til-list__item-tags">
                     {tilDetailData.tag.map((tag, i) => (
