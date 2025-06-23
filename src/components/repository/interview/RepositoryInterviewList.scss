@@ -114,6 +114,8 @@
       white-space: normal;
       overflow: visible;
       text-overflow: unset;
+      word-wrap: break-word;
+      word-break: break-word;
       max-width: 100%;
     }
   }
@@ -140,6 +142,8 @@
 
   &__item-question-block {
     margin-bottom: 1rem;
+    word-wrap: break-word;
+    word-break: break-word;
   }
 
   &__item-question {
@@ -169,6 +173,8 @@
     padding: 0.5rem;
     border-radius: 6px;
     margin-top: 0.5rem;
+    word-wrap: break-word;
+    word-break: break-word;
   }
 
   &__loading {

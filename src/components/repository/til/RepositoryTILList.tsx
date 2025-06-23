@@ -8,6 +8,7 @@ import { useRepositoryTILList } from '@/hooks/repository/til/useRepositoryTILLis
 import { useFetch } from '@/hooks/useFetch';
 import SelectInterviewLevelModal from '../selectInterviewLevelModal/SelectInterviewLevelModal';
 import CheckDeleteTILModal from '../checkDeleteModal/checkDeleteTILModal/CheckDeleteTILModal';
+import Markdown from 'react-markdown';
 
 interface TILItem {
   tilId: number;
@@ -230,7 +231,8 @@ const RepositoryTILList = () => {
 
               {expandedTilId === til.tilId && tilDetailData && (
                 <div className="repository-til-list__item-detail">
-                  <p className="repository-til-list__item-content">{tilDetailData.content}</p>
+                  {/* <p className="repository-til-list__item-content">{tilDetailData.content}</p> */}
+                  <Markdown>{tilDetailData.content}</Markdown>
                   <p className="repository-til-list__item-tags">
                     {tilDetailData.tag.map((tag, i) => (
                       <span key={i} className="repository-til-list__item-tag">#{tag}</span>

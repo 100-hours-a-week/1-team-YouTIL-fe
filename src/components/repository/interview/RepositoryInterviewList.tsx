@@ -8,6 +8,7 @@ import useCheckAccess from '@/hooks/useCheckExistAccess';
 import CheckDeleteInterviewModal from '../checkDeleteModal/checkDeleteInterviewModal/CheckDeleteInterviewModal';
 import { parseISO, format } from 'date-fns';
 import { useRepositoryInterviewList } from '@/hooks/repository/interview/useRepositoryInterviewList';
+import Markdown from 'react-markdown';
 import './RepositoryInterviewList.scss';
 
 interface InterviewResponse {
@@ -150,7 +151,8 @@ const RepositoryInterviewList = () => {
                         정답 보기
                       </button>
                       {visibleAnswerMap[q.questionId] && (
-                        <p className="repository-interview-list__item-answer">{q.answer}</p>
+                        //<p className="repository-interview-list__item-answer">{q.answer}</p>
+                        <Markdown>{q.answer}</Markdown>
                       )}
                     </div>
                   ))}
