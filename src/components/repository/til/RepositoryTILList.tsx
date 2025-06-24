@@ -9,6 +9,7 @@ import { useFetch } from '@/hooks/useFetch';
 import SelectInterviewLevelModal from '../selectInterviewLevelModal/SelectInterviewLevelModal';
 import CheckDeleteTILModal from '../checkDeleteModal/checkDeleteTILModal/CheckDeleteTILModal';
 import Markdown from 'react-markdown';
+import { tilKeys } from '@/querykey/til.querykey';
 
 interface TILItem {
   tilId: number;
@@ -61,7 +62,7 @@ const RepositoryTILList = () => {
   const queryClient = useQueryClient();
 
   const { data: tilData } = useQuery<TILItem[]>({
-    queryKey: ['til-list', tilDate],
+    queryKey: tilKeys.listByDate(tilDate).queryKey,
     queryFn: async () => {
       const targetDate = tilDate || format(new Date(), 'yyyy-MM-dd');
       const response = await callApi<TILResponse>({
@@ -78,7 +79,7 @@ const RepositoryTILList = () => {
   });
 
   const { data: tilDetailData } = useQuery<TILDetailItem | null>({
-    queryKey: ['til-detail', expandedTilId],
+    queryKey: tilKeys.detail(expandedTilId ?? -1).queryKey,
     queryFn: async () => {
       if (expandedTilId === null) return null;
       const response = await callApi<{ data: TILDetailItem }>({

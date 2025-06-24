@@ -22,6 +22,7 @@ import {
 } from 'date-fns';
 import './RepositoryDateCalendar.scss';
 import { useRepositoryDateStore } from '@/store/useRepositoryDateStore';
+import { tilKeys } from '@/querykey/til.querykey';
 
 type MonthKey =
   | 'jan' | 'feb' | 'mar' | 'apr'
@@ -75,7 +76,7 @@ const RepositoryDateCalendar = () => {
   const selectedYear = currentDate.getFullYear();
 
   const { data: tilRecordData } = useQuery<TILYearlyRecordResponse>({
-    queryKey: ['til-date', selectedYear],
+    queryKey: tilKeys.calendarByYear(selectedYear).queryKey,
     queryFn: async () => {
       const response = await callApi<TILYearlyRecordResponse>({
         method: 'GET',

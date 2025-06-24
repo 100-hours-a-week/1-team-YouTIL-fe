@@ -12,6 +12,7 @@ import { useRouter } from 'next/navigation';
 import { useQueryClient, useMutation } from '@tanstack/react-query';
 import GenerateTILModal from '../generateTILModal/GenerateTILModal';
 import { useModal } from '@/hooks/useModal';
+import { tilKeys } from '@/querykey/til.querykey';
 
 interface TILPayload {
   organizationId: number | string;
@@ -78,9 +79,11 @@ const GenerateTILForm = () => {
       });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['til-list'] });
-      queryClient.refetchQueries({ queryKey: ['recent-tils'], exact: true });
-      queryClient.invalidateQueries({ queryKey: ['til-date'] });
+      queryClient.invalidateQueries({ queryKey: ['tils'] });
+      queryClient.refetchQueries({
+        queryKey: tilKeys.record().queryKey,
+        exact: true,
+      });
       router.push('/repository');
     },
     onError: () => {
