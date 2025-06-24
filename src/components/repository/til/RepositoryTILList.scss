@@ -109,27 +109,31 @@
     }
 
     &-title {
-      margin: 0 0 0 0;
+      margin: 0 0 0.4rem 0;
       font-size: 1rem;
       font-weight: 600;
+      width: 370px;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
       max-width: 100%;
+      flex-shrink: 1;
 
       &--expanded {
         white-space: normal;
         overflow: visible;
         text-overflow: unset;
+        max-width: 100%;
       }
     }
 
     &-edit-icon {
-      width: 24px;
-      height: 24px;
+      width: 22px;
+      height: 22px;
       cursor: pointer;
       flex-shrink: 0;
       margin-left: 0;
+      align-self: flex-start;
       &:hover {
         filter: brightness(0.8);
       }
@@ -141,7 +145,7 @@
       border: 1px solid #ccc;
       border-radius: 4px;
       flex: 1;
-      max-width: 300px;
+      width: 280px;
       margin-right: 0.5rem;
     
       &:focus {
@@ -182,13 +186,16 @@
     }
 
     &-date {
-      margin: 0.2rem 0;
+      margin: 0 0 0 0;
       font-size: 0.85rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      height: 25px;
       color: #555;
     }
 
     &-checkbox {
-      margin-left: 1rem;
       transform: scale(1.2);
       cursor: pointer;
     }
@@ -235,6 +242,14 @@
       text-align: center;
       font-size: 0.95rem;
       color: #777;
+    }
+    &-subheader {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      height: 25px;
+      gap: 0.5rem;
+      margin-top: 0.6rem;
     }
   }
 

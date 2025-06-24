@@ -6,12 +6,14 @@ import { useState, useEffect, useRef } from 'react';
 import useOtherUserInfoStore from '@/store/useOtherUserInfoStore';
 import useGetAccessToken from '@/hooks/useGetAccessToken';
 import useCheckAccess from '@/hooks/useCheckExistAccess';
+import { useInfinityScrollObserver } from '@/hooks/useInfinityScrollObserver';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import ProfileCommentUtils from '../profileCommentUtils/ProfileCommentUtils';
 import CheckDeleteCommentModal from '../checkDeleteCommentModal/CheckDeleteCommentModal';
 import ProfileEditCommentInput from '../profileEditCommentInput/ProfileEditCommentInput';
 import ProfileReplyCommentInput from '../profileReplyCommentInput/ProfileReplyCommentInput';
+import { useModal } from '@/hooks/useModal';
 import './ProfileCommentList.scss';
 
 interface GuestbookReply {
@@ -57,7 +59,9 @@ const ProfileCommentList = () => {
   const existAccess = useCheckAccess(accessToken);
   const router = useRouter();
 
+  const deleteModal = useModal();
   const [deleteTargetId, setDeleteTargetId] = useState<number | null>(null);
+
   const [openMenuId, setOpenMenuId] = useState<number | null>(null);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [editingContent, setEditingContent] = useState<string>('');
@@ -65,8 +69,6 @@ const ProfileCommentList = () => {
   const [replyTopId, setReplyTopId] = useState<number | null>(null);
 
   const refs = useRef<Record<number, HTMLDivElement | null>>({});
-  const observerRef = useRef<IntersectionObserver | null>(null);
-  const loadMoreRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -96,9 +98,10 @@ const ProfileCommentList = () => {
     data,
     fetchNextPage,
     hasNextPage,
+    isFetchingNextPage,
   } = useInfiniteQuery({
     queryKey: ['guestbooks-list', userId],
-    queryFn: async ({ pageParam = 0 }: { pageParam?: number }) => {
+    queryFn: async ({ pageParam = 0 }) => {
       const response = await callApi<GuestbookResponse>({
         method: 'GET',
         endpoint: `/users/${userId}/guestbooks?page=${pageParam}&offset=20`,
@@ -109,10 +112,9 @@ const ProfileCommentList = () => {
       });
       return response;
     },
-    getNextPageParam: (lastPage) => {
-      const { currentPage, totalCount, pageSize } = lastPage.data;
-      const maxPage = Math.ceil(totalCount / pageSize) - 1;
-      return currentPage < maxPage ? currentPage + 1 : undefined;
+    getNextPageParam: (lastPage, allPages) => {
+      if (lastPage.data.guestbooks.length < 20) return undefined;
+      return allPages.length;
     },
     initialPageParam: 0,
     enabled: !!userId && existAccess,
@@ -120,25 +122,11 @@ const ProfileCommentList = () => {
     gcTime: 300000,
   });
 
-  useEffect(() => {
-    const target = loadMoreRef.current;
-    if (!target || !hasNextPage) return;
-
-    observerRef.current = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting) fetchNextPage();
-      },
-      { threshold: 1.0 }
-    );
-
-    observerRef.current.observe(target);
-
-    return () => {
-      if (observerRef.current && target) {
-        observerRef.current.unobserve(target);
-      }
-    };
-  }, [fetchNextPage, hasNextPage]);
+  const loadMoreRef = useInfinityScrollObserver({
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  });
 
   const handleToggleEdit = (targetId: number, content: string) => {
     setEditingId(prev => (prev === targetId ? null : targetId));
@@ -150,11 +138,16 @@ const ProfileCommentList = () => {
     setReplyTopId((replyingToId === commentId ? null : topId));
   };
 
-  const formatDate = (iso: string) => new Date(iso).toLocaleString();
-
   const handleMoveToProfile = (guestId: number) => {
     router.push(`/profile/${guestId}`);
   };
+
+  const handleRequestDelete = (id: number) => {
+    setDeleteTargetId(id);
+    deleteModal.open();
+  };
+
+  const formatDate = (iso: string) => new Date(iso).toLocaleString();
 
   const renderItem = (item: GuestbookItem | GuestbookReply, isReply = false) => {
     const isMenuOpen = openMenuId === item.id;
@@ -219,7 +212,7 @@ const ProfileCommentList = () => {
                       originalContent={item.content}
                       profileOwnerId={userId}
                       onCloseDropdown={() => setOpenMenuId(null)}
-                      onRequestDelete={(id) => setDeleteTargetId(id)}
+                      onRequestDelete={handleRequestDelete}
                       onRequestEditToggle={handleToggleEdit}
                       onRequestReply={(resolvedId) => handleReply(item.id, resolvedId)}
                     />
@@ -271,11 +264,17 @@ const ProfileCommentList = () => {
         ))
       )}
 
-      {deleteTargetId !== null && (
+      {deleteModal.isOpen && deleteTargetId !== null && (
         <CheckDeleteCommentModal
           guestbookId={deleteTargetId}
-          onClose={() => setDeleteTargetId(null)}
-          onDeleteComplete={() => setDeleteTargetId(null)}
+          onClose={() => {
+            deleteModal.close();
+            setDeleteTargetId(null);
+          }}
+          onDeleteComplete={() => {
+            deleteModal.close();
+            setDeleteTargetId(null);
+          }}
         />
       )}
 
