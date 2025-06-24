@@ -8,6 +8,7 @@ import { useRepositoryTILList } from '@/hooks/repository/til/useRepositoryTILLis
 import { useFetch } from '@/hooks/useFetch';
 import SelectInterviewLevelModal from '../selectInterviewLevelModal/SelectInterviewLevelModal';
 import CheckDeleteTILModal from '../checkDeleteModal/checkDeleteTILModal/CheckDeleteTILModal';
+import Markdown from 'react-markdown';
 
 interface TILItem {
   tilId: number;
@@ -154,8 +155,14 @@ const RepositoryTILList = () => {
               className={`repository-til-list__item${isSelected ? ' selected' : ''}`}
             >
               <div className="repository-til-list__item-header-wrapper">
-              <div className="repository-til-list__item-header" onClick={() => handleClickTIL(til.tilId)}>
-                  <div className="repository-til-list__item-header-top"> 
+                <div
+                  className="repository-til-list__item-header"
+                  onClick={() => {
+                    if (isSelected) return;
+                    handleClickTIL(til.tilId);
+                  }}
+                >
+                  <div className="repository-til-list__item-header-top">
                     {editingTilId === til.tilId ? (
                       <div
                         className="repository-til-list__item-edit-wrapper"
@@ -203,7 +210,11 @@ const RepositoryTILList = () => {
                     )}
                   </div>
 
-                  <div className="repository-til-list__item-subheader">
+                  <div
+                    className={`repository-til-list__item-subheader${
+                      isExpanded ? ' repository-til-list__item-subheader--expanded' : ''
+                    }`}
+                  >
                     <p className="repository-til-list__item-date">{formattedDate}</p>
                     {isExpanded && (
                       <button
@@ -229,8 +240,14 @@ const RepositoryTILList = () => {
               </div>
 
               {expandedTilId === til.tilId && tilDetailData && (
-                <div className="repository-til-list__item-detail">
-                  <p className="repository-til-list__item-content">{tilDetailData.content}</p>
+                <div
+                  className="repository-til-list__item-detail"
+                  onCopy={(e) => {
+                    e.preventDefault();
+                    navigator.clipboard.writeText(tilDetailData.content);
+                  }}
+                >
+                  <Markdown>{tilDetailData.content}</Markdown>
                   <p className="repository-til-list__item-tags">
                     {tilDetailData.tag.map((tag, i) => (
                       <span key={i} className="repository-til-list__item-tag">#{tag}</span>
