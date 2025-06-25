@@ -62,7 +62,8 @@ const RepositoryTILList = () => {
   const queryClient = useQueryClient();
 
   const { data: tilData } = useQuery<TILItem[]>({
-    queryKey: tilKeys.listByDate(tilDate).queryKey,
+    // queryKey: ['til-list', tilDate],
+    queryKey: tilKeys.repositoryTIL(tilDate).queryKey,
     queryFn: async () => {
       const targetDate = tilDate || format(new Date(), 'yyyy-MM-dd');
       const response = await callApi<TILResponse>({
@@ -79,7 +80,7 @@ const RepositoryTILList = () => {
   });
 
   const { data: tilDetailData } = useQuery<TILDetailItem | null>({
-    queryKey: tilKeys.detail(expandedTilId ?? -1).queryKey,
+    queryKey: ['til-detail', expandedTilId],
     queryFn: async () => {
       if (expandedTilId === null) return null;
       const response = await callApi<{ data: TILDetailItem }>({
@@ -121,9 +122,10 @@ const RepositoryTILList = () => {
         credentials: 'include',
       });
       setEditingTilId(null);
-      queryClient.invalidateQueries({ queryKey: ['til-list', tilDate] });
-      queryClient.invalidateQueries({ queryKey: ['recent-tils'] });
-      queryClient.invalidateQueries({ queryKey: ['user-tils'] });
+      queryClient.invalidateQueries({ queryKey: tilKeys.newTILList().queryKey})
+      queryClient.invalidateQueries({ queryKey: tilKeys.repositoryTIL._def, exact: false})
+      queryClient.invalidateQueries({ queryKey: tilKeys.profileTIL._def, exact: false})
+
     } catch (err) {
       console.error('TIL 수정 실패:', err);
     } finally {

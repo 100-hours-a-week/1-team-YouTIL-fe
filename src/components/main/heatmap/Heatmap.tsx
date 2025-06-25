@@ -45,7 +45,8 @@ const Heatmap = () => {
   const existAccess = useCheckAccess(accessToken);
 
   const { data: tilData = [] } = useQuery<TILDayCount[]>({
-    queryKey: tilKeys.record().queryKey,
+    //queryKey: ['til-heatmap', year],
+    queryKey: tilKeys.heatmapCalendar(year).queryKey,
     queryFn: async () => {
       const response = await callApi<TILYearlyRecordResponse>({
         method: 'GET',

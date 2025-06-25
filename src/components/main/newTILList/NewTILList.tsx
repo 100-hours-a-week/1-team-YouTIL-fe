@@ -34,7 +34,8 @@ const NewTILList = () => {
   const existAccess = useCheckAccess(accessToken);
 
   const { data: tils, isError } = useQuery<TILItem[]>({
-    queryKey: tilKeys.recent().queryKey,
+    queryKey: tilKeys.newTILList().queryKey,
+    // queryKey: ['recent-tils'],
     queryFn: async () => {
       const response = await callApi<TILResponse>({
         method: 'GET',

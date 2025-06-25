@@ -79,11 +79,11 @@ const GenerateTILForm = () => {
       });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['tils'] });
-      queryClient.refetchQueries({
-        queryKey: tilKeys.record().queryKey,
-        exact: true,
-      });
+      queryClient.invalidateQueries({queryKey: tilKeys.newTILList().queryKey});
+      queryClient.refetchQueries({ queryKey: tilKeys.heatmapCalendar._def, exact: false })
+      queryClient.invalidateQueries({ queryKey: tilKeys.repositoryCalendar._def, exact: false })
+      queryClient.invalidateQueries({queryKey: tilKeys.repositoryTIL._def, exact: false})
+      queryClient.invalidateQueries({queryKey: tilKeys.profileTIL._def, exact:false})
       router.push('/repository');
     },
     onError: () => {
