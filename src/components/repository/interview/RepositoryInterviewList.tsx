@@ -1,6 +1,7 @@
 'use client';
 
-import { useQuery } from '@tanstack/react-query';
+import { useEffect, useRef } from 'react';
+import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
 import { useFetch } from '@/hooks/useFetch';
 import { useRepositoryDateStore } from '@/store/useRepositoryDateStore';
 import useGetAccessToken from '@/hooks/useGetAccessToken';
@@ -11,6 +12,7 @@ import { useRepositoryInterviewList } from '@/hooks/repository/interview/useRepo
 import Markdown from 'react-markdown';
 import './RepositoryInterviewList.scss';
 import { repositoryKeys } from '@/querykey/repository.querykey';
+import { useInfinityScrollObserver } from '@/hooks/useInfinityScrollObserver';
 
 interface InterviewResponse {
   data: { interviews: InterviewItem[] };
@@ -57,26 +59,40 @@ const RepositoryInterviewList = () => {
     toggleInterviewSelection,
   } = useRepositoryInterviewList();
 
-  const { data: interviewData } = useQuery<InterviewItem[]>({
-    // queryKey: ['interview-list', interviewDate],
+  const {
+    data: interviewPages,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useInfiniteQuery({
     queryKey: repositoryKeys.repositoryInterview(interviewDate).queryKey,
-    queryFn: async () => {
+    queryFn: async ({ pageParam = 0 }) => {
       const targetDate = interviewDate || format(new Date(), 'yyyy-MM-dd');
       const response = await callApi<InterviewResponse>({
         method: 'GET',
-        endpoint: `/interviews?page=0&size=10&date=${targetDate}`,
+        endpoint: `/interviews?page=${pageParam}&size=10&date=${targetDate}`,
         headers: { Authorization: `Bearer ${accessToken}` },
         credentials: 'include',
       });
-      return response.data.interviews;
+      return response;
     },
+    getNextPageParam: (lastPage, allPages) => {
+      const isLast = lastPage.data.interviews.length < 10;
+      return isLast ? undefined : allPages.length;
+    },
+    initialPageParam: 0,
     enabled: existAccess,
     staleTime: 1800000,
     gcTime: 3600000,
   });
 
+  const loadMoreRef = useInfinityScrollObserver({
+    fetchNextPage,
+    hasNextPage: !!hasNextPage,
+    isFetchingNextPage,
+  });
+
   const { data: interviewDetailData } = useQuery<InterviewDetail | null>({
-    // queryKey: ['interview-detail', expandedInterviewId],
     queryKey: repositoryKeys.repositoryInterviewDetail(expandedInterviewId ?? undefined).queryKey,
     queryFn: async () => {
       if (expandedInterviewId === null) return null;
@@ -93,11 +109,13 @@ const RepositoryInterviewList = () => {
     gcTime: 3600000,
   });
 
+  const allInterviews = interviewPages?.pages.flatMap((page) => page.data.interviews) ?? [];
+
   return (
     <div className="repository-interview-list">
       <div className="repository-interview-list__header">
         <h2 className="repository-interview-list__title">면접 질문 목록</h2>
-        {!!interviewData?.length && (
+        {!!allInterviews.length && (
           <button
             className={`repository-interview-list__button${shakeDelete ? ' error shake' : ''}`}
             onClick={handleDeleteClick}
@@ -107,15 +125,17 @@ const RepositoryInterviewList = () => {
         )}
       </div>
       <ul className="repository-interview-list__items">
-        {interviewData?.map((interview) => {
+        {allInterviews.map((interview, index) => {
           const formattedDate = format(parseISO(interview.createdAt), 'yyyy-MM-dd : HH:mm:ss');
           const isExpanded = expandedInterviewId === interview.id;
           const isSelected = selectedInterviewIds.includes(interview.id);
+          const isLastItem = index === allInterviews.length - 1;
 
           return (
-            <li
+            <div
               key={interview.id}
               className={`repository-interview-list__item ${isSelected ? 'selected' : ''}`}
+              ref={isLastItem ? loadMoreRef : null}
             >
               <div className="repository-interview-list__item-header-wrapper">
                 <div
@@ -170,14 +190,13 @@ const RepositoryInterviewList = () => {
                         정답 보기
                       </button>
                       {visibleAnswerMap[q.questionId] && (
-                        //<p className="repository-interview-list__item-answer">{q.answer}</p>
                         <Markdown>{q.answer}</Markdown>
                       )}
                     </div>
                   ))}
                 </div>
               )}
-            </li>
+            </div>
           );
         })}
       </ul>
