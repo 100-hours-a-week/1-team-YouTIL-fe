@@ -3,6 +3,9 @@
 import './CheckDeleteTILModal.scss';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useFetch } from '@/hooks/useFetch';
+import { mainKeys } from '@/querykey/main.querykey';
+import { repositoryKeys } from '@/querykey/repository.querykey';
+import { profileKeys } from '@/querykey/profile.querykey';
 import useGetAccessToken from '@/hooks/useGetAccessToken';
 
 interface Props {
@@ -31,8 +34,10 @@ const CheckDeleteTILModal = ({ tilIds, onClose, onDeleteComplete }: Props) => {
       });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['til-list'] });
-      queryClient.invalidateQueries({ queryKey: ['til-date'] });
+      queryClient.invalidateQueries({ queryKey: mainKeys.newTILList().queryKey});
+      queryClient.invalidateQueries({ queryKey: repositoryKeys.repositoryTILCalendar._def, exact:false})
+      queryClient.invalidateQueries({ queryKey: repositoryKeys.repositoryTIL._def, exact: false})
+      queryClient.invalidateQueries({ queryKey: profileKeys.profileTIL._def, exact: false})
       onDeleteComplete();
       onClose();
     },

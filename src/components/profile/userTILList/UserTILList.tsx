@@ -9,6 +9,7 @@ import { parseISO, format } from 'date-fns';
 import Image from 'next/image';
 import { useInfinityScrollObserver } from '@/hooks/useInfinityScrollObserver';
 import './UserTILList.scss';
+import { profileKeys } from '@/querykey/profile.querykey';
 
 interface TILItem {
   id: number;
@@ -32,7 +33,8 @@ const UserTILList = () => {
   const { userId } = useParams<{ userId: string }>();
 
   const { data, isFetchingNextPage, hasNextPage, fetchNextPage } = useInfiniteQuery<TILResponse, Error>({
-    queryKey: ['user-tils', userId],
+    // queryKey: ['user-tils', userId],
+    queryKey: profileKeys.profileTIL(userId).queryKey,
     queryFn: async ({ pageParam }: QueryFunctionContext) => {
       return await callApi<TILResponse>({
         method: 'GET',

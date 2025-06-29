@@ -7,6 +7,7 @@ import './ProfileCommentInput.scss';
 import { useFetch } from '@/hooks/useFetch';
 import useOtherUserInfoStore from '@/store/useOtherUserInfoStore';
 import useGetAccessToken from '@/hooks/useGetAccessToken';
+import { profileKeys } from '@/querykey/profile.querykey';
 
 const ProfileCommentInput = () => {
   const [comment, setComment] = useState('');
@@ -37,6 +38,7 @@ const ProfileCommentInput = () => {
     onSuccess: () => {
       setComment('');
       queryClient.invalidateQueries({ queryKey: ['guestbooks-list', otherUserId] });
+      queryClient.invalidateQueries({queryKey: profileKeys.profileCommentList(otherUserId ?? undefined).queryKey});
     },
     onError: (error) => {
       console.error('댓글 등록 실패:', error);

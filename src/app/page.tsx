@@ -14,6 +14,7 @@ import WelcomeDescription from '@/components/main/welcomeDescription/WelcomeDesc
 import TechNews from '@/components/main/techNews/TechNews';
 import NewTILDescription from '@/components/main/newTILDescription/NewTILDescription';
 import NewTILList from '@/components/main/newTILList/NewTILList';
+import { mainKeys } from '@/querykey/main.querykey';
 
 interface UserInfoResponse {
   data: {
@@ -31,7 +32,7 @@ const Main = () => {
   const { callApi } = useFetch();
 
   useQuery<UserInfoResponse>({
-    queryKey: ['userInfo'] as const,
+    queryKey: mainKeys.userInfo().queryKey,
     queryFn: async () => {
       const response = await callApi<UserInfoResponse>({
         method: 'GET',
