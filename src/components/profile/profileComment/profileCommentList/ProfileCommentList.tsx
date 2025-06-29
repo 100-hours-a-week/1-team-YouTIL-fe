@@ -14,6 +14,7 @@ import CheckDeleteCommentModal from '../checkDeleteCommentModal/CheckDeleteComme
 import ProfileEditCommentInput from '../profileEditCommentInput/ProfileEditCommentInput';
 import ProfileReplyCommentInput from '../profileReplyCommentInput/ProfileReplyCommentInput';
 import { useModal } from '@/hooks/useModal';
+import { profileKeys } from '@/querykey/profile.querykey';
 import './ProfileCommentList.scss';
 
 interface GuestbookReply {
@@ -100,7 +101,7 @@ const ProfileCommentList = () => {
     hasNextPage,
     isFetchingNextPage,
   } = useInfiniteQuery({
-    queryKey: ['guestbooks-list', userId],
+    queryKey: profileKeys.profileCommentList(userId ?? undefined).queryKey,
     queryFn: async ({ pageParam = 0 }) => {
       const response = await callApi<GuestbookResponse>({
         method: 'GET',

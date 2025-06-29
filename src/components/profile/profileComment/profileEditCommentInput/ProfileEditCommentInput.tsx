@@ -5,6 +5,7 @@ import './ProfileEditCommentInput.scss';
 import { useFetch } from '@/hooks/useFetch';
 import useGetAccessToken from '@/hooks/useGetAccessToken';
 import { useQueryClient } from '@tanstack/react-query';
+import { profileKeys } from '@/querykey/profile.querykey';
 
 interface Props {
   originalContent: string;
@@ -55,8 +56,7 @@ const ProfileEditCommentInput = ({ originalContent, profileUserId, guestbookId, 
         },
         credentials: 'include',
       });
-
-      await queryClient.invalidateQueries({ queryKey: ['guestbooks-list'] });
+      await queryClient.invalidateQueries({queryKey: profileKeys.profileCommentList._def, exact: false});
       onComplete();
     } catch (err) {
       console.error('댓글 수정 실패:', err);
