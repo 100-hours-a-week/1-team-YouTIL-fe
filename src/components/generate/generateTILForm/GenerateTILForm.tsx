@@ -12,7 +12,9 @@ import { useRouter } from 'next/navigation';
 import { useQueryClient, useMutation } from '@tanstack/react-query';
 import GenerateTILModal from '../generateTILModal/GenerateTILModal';
 import { useModal } from '@/hooks/useModal';
-import { tilKeys } from '@/querykey/til.querykey';
+import { mainKeys } from '@/querykey/main.querykey';
+import { profileKeys } from '@/querykey/profile.querykey';
+import { repositoryKeys } from '@/querykey/repository.querykey';
 
 interface TILPayload {
   organizationId: number | string;
@@ -79,11 +81,11 @@ const GenerateTILForm = () => {
       });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({queryKey: tilKeys.newTILList().queryKey});
-      queryClient.refetchQueries({ queryKey: tilKeys.heatmapCalendar._def, exact: false })
-      queryClient.invalidateQueries({ queryKey: tilKeys.repositoryCalendar._def, exact: false })
-      queryClient.invalidateQueries({queryKey: tilKeys.repositoryTIL._def, exact: false})
-      queryClient.invalidateQueries({queryKey: tilKeys.profileTIL._def, exact:false})
+      queryClient.invalidateQueries({queryKey: mainKeys.newTILList().queryKey});
+      queryClient.refetchQueries({ queryKey: mainKeys.heatmapCalendar._def, exact: false })
+      queryClient.invalidateQueries({ queryKey: repositoryKeys.repositoryTILCalendar._def, exact: false })
+      queryClient.invalidateQueries({queryKey: repositoryKeys.repositoryTIL._def, exact: false})
+      queryClient.invalidateQueries({queryKey: profileKeys.profileTIL._def, exact:false})
       router.push('/repository');
     },
     onError: () => {

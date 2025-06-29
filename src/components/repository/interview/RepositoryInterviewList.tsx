@@ -10,6 +10,7 @@ import { parseISO, format } from 'date-fns';
 import { useRepositoryInterviewList } from '@/hooks/repository/interview/useRepositoryInterviewList';
 import Markdown from 'react-markdown';
 import './RepositoryInterviewList.scss';
+import { repositoryKeys } from '@/querykey/repository.querykey';
 
 interface InterviewResponse {
   data: { interviews: InterviewItem[] };
@@ -57,7 +58,8 @@ const RepositoryInterviewList = () => {
   } = useRepositoryInterviewList();
 
   const { data: interviewData } = useQuery<InterviewItem[]>({
-    queryKey: ['interview-list', interviewDate],
+    // queryKey: ['interview-list', interviewDate],
+    queryKey: repositoryKeys.repositoryInterview(interviewDate).queryKey,
     queryFn: async () => {
       const targetDate = interviewDate || format(new Date(), 'yyyy-MM-dd');
       const response = await callApi<InterviewResponse>({
@@ -74,7 +76,8 @@ const RepositoryInterviewList = () => {
   });
 
   const { data: interviewDetailData } = useQuery<InterviewDetail | null>({
-    queryKey: ['interview-detail', expandedInterviewId],
+    // queryKey: ['interview-detail', expandedInterviewId],
+    queryKey: repositoryKeys.repositoryInterviewDetail(expandedInterviewId ?? undefined).queryKey,
     queryFn: async () => {
       if (expandedInterviewId === null) return null;
       const response = await callApi<InterviewDetailResponse>({

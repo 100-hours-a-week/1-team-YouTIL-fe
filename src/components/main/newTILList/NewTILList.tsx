@@ -7,7 +7,7 @@ import { useFetch } from '@/hooks/useFetch';
 import useGetAccessToken from '@/hooks/useGetAccessToken';
 import useCheckAccess from '@/hooks/useCheckExistAccess';
 import { parseISO, format } from 'date-fns';
-import { tilKeys } from '@/querykey/til.querykey';
+import { mainKeys } from '@/querykey/main.querykey';
 import Image from 'next/image';
 
 interface TILResponse {
@@ -34,7 +34,7 @@ const NewTILList = () => {
   const existAccess = useCheckAccess(accessToken);
 
   const { data: tils, isError } = useQuery<TILItem[]>({
-    queryKey: tilKeys.newTILList().queryKey,
+    queryKey: mainKeys.newTILList().queryKey,
     // queryKey: ['recent-tils'],
     queryFn: async () => {
       const response = await callApi<TILResponse>({

@@ -8,7 +8,7 @@ import useCheckAccess from '@/hooks/useCheckExistAccess';
 import { useHeatmapInitializer } from '@/hooks/main/heatmap/useHeatmapInitializer';
 import { useHeatmapYearDropdown } from '@/hooks/main/heatmap/useHeatmapYearDropdown';
 import { useHeatmapNavigation } from '@/hooks/main/heatmap/useHeatmapNavigation';
-import { tilKeys } from '@/querykey/til.querykey';
+import { mainKeys } from '@/querykey/main.querykey';
 import './Heatmap.scss';
 import 'cal-heatmap/cal-heatmap.css';
 
@@ -46,7 +46,7 @@ const Heatmap = () => {
 
   const { data: tilData = [] } = useQuery<TILDayCount[]>({
     //queryKey: ['til-heatmap', year],
-    queryKey: tilKeys.heatmapCalendar(year).queryKey,
+    queryKey: mainKeys.heatmapCalendar(year).queryKey,
     queryFn: async () => {
       const response = await callApi<TILYearlyRecordResponse>({
         method: 'GET',

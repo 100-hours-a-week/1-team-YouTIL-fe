@@ -9,7 +9,9 @@ import { useFetch } from '@/hooks/useFetch';
 import SelectInterviewLevelModal from '../selectInterviewLevelModal/SelectInterviewLevelModal';
 import CheckDeleteTILModal from '../checkDeleteModal/checkDeleteTILModal/CheckDeleteTILModal';
 import Markdown from 'react-markdown';
-import { tilKeys } from '@/querykey/til.querykey';
+import { mainKeys } from '@/querykey/main.querykey';
+import { repositoryKeys } from '@/querykey/repository.querykey';
+import { profileKeys } from '@/querykey/profile.querykey';
 
 interface TILItem {
   tilId: number;
@@ -63,7 +65,7 @@ const RepositoryTILList = () => {
 
   const { data: tilData } = useQuery<TILItem[]>({
     // queryKey: ['til-list', tilDate],
-    queryKey: tilKeys.repositoryTIL(tilDate).queryKey,
+    queryKey: repositoryKeys.repositoryTIL(tilDate).queryKey,
     queryFn: async () => {
       const targetDate = tilDate || format(new Date(), 'yyyy-MM-dd');
       const response = await callApi<TILResponse>({
@@ -80,7 +82,7 @@ const RepositoryTILList = () => {
   });
 
   const { data: tilDetailData } = useQuery<TILDetailItem | null>({
-    queryKey: ['til-detail', expandedTilId],
+    queryKey: repositoryKeys.repositoryTILDetail(expandedTilId ?? undefined).queryKey,
     queryFn: async () => {
       if (expandedTilId === null) return null;
       const response = await callApi<{ data: TILDetailItem }>({
@@ -122,9 +124,10 @@ const RepositoryTILList = () => {
         credentials: 'include',
       });
       setEditingTilId(null);
-      queryClient.invalidateQueries({ queryKey: tilKeys.newTILList().queryKey})
-      queryClient.invalidateQueries({ queryKey: tilKeys.repositoryTIL._def, exact: false})
-      queryClient.invalidateQueries({ queryKey: tilKeys.profileTIL._def, exact: false})
+      queryClient.invalidateQueries({ queryKey: mainKeys.newTILList().queryKey})
+      queryClient.invalidateQueries({ queryKey: profileKeys.profileTIL._def, exact: false})
+      queryClient.invalidateQueries({ queryKey: repositoryKeys.repositoryTIL._def, exact: false})
+      queryClient.invalidateQueries({ queryKey: repositoryKeys.repositoryTILDetail._def, exact: false})
 
     } catch (err) {
       console.error('TIL 수정 실패:', err);

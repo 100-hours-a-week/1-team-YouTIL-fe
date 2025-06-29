@@ -9,7 +9,7 @@ import { parseISO, format } from 'date-fns';
 import Image from 'next/image';
 import { useInfinityScrollObserver } from '@/hooks/useInfinityScrollObserver';
 import './UserTILList.scss';
-import { tilKeys } from '@/querykey/til.querykey';
+import { profileKeys } from '@/querykey/profile.querykey';
 
 interface TILItem {
   id: number;
@@ -34,7 +34,7 @@ const UserTILList = () => {
 
   const { data, isFetchingNextPage, hasNextPage, fetchNextPage } = useInfiniteQuery<TILResponse, Error>({
     // queryKey: ['user-tils', userId],
-    queryKey: tilKeys.profileTIL(userId).queryKey,
+    queryKey: profileKeys.profileTIL(userId).queryKey,
     queryFn: async ({ pageParam }: QueryFunctionContext) => {
       return await callApi<TILResponse>({
         method: 'GET',
