@@ -5,6 +5,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useFetch } from '@/hooks/useFetch';
 import useGetAccessToken from '@/hooks/useGetAccessToken';
 import './ProfileReplyCommentInput.scss';
+import { profileKeys } from '@/querykey/profile.querykey';
 
 interface Props {
   topGuestbookId: number;
@@ -40,6 +41,7 @@ const ProfileReplyCommentInput = ({ topGuestbookId, userId, onComplete }: Props)
     onSuccess: () => {
       setReplyContent('');
       queryClient.invalidateQueries({ queryKey: ['guestbooks-list', userId] });
+      queryClient.invalidateQueries({queryKey: profileKeys.profileCommentList(userId ?? undefined).queryKey});
       onComplete();
     },
     onError: (error: unknown) => {

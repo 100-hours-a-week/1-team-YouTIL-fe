@@ -5,6 +5,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useFetch } from '@/hooks/useFetch';
 import useOtherUserInfoStore from '@/store/useOtherUserInfoStore';
 import useGetAccessToken from '@/hooks/useGetAccessToken';
+import { profileKeys } from '@/querykey/profile.querykey';
 
 interface Props {
   guestbookId: number;
@@ -29,7 +30,7 @@ const CheckDeleteCommentModal = ({ guestbookId, onClose, onDeleteComplete }: Pro
       });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['guestbooks-list'] });
+      queryClient.invalidateQueries({queryKey: profileKeys.profileCommentList._def, exact: false})
       onDeleteComplete();
       onClose();
     },

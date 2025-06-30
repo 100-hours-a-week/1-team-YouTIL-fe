@@ -10,6 +10,7 @@ import { useRepositoryDateStore } from '@/store/useRepositoryDateStore';
 import useGetAccessToken from '@/hooks/useGetAccessToken';
 import SuccessIcon from '@/components/icon/SuccessIcon';
 import FailedIcon from '@/components/icon/FailedIcon';
+import { repositoryKeys } from '@/querykey/repository.querykey';
 
 interface Props {
   tilId: number;
@@ -61,8 +62,8 @@ const SelectInterviewLevelModal = ({ onClose, tilId }: Props) => {
       setResultMessage(null);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['interview-list'] });
-      queryClient.invalidateQueries({ queryKey: ['interview-date'] });
+      queryClient.invalidateQueries({queryKey: repositoryKeys.repositoryInterview._def, exact: false})
+      queryClient.invalidateQueries({queryKey : repositoryKeys.repositoryInterviewCalendar._def, exact: false})
       setResultMessage('success');
       setActiveTab('interview'); 
       setTimeout(onClose, 1500);

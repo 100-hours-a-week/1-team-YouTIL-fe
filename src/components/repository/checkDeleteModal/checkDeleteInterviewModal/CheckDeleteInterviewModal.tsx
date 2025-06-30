@@ -4,6 +4,7 @@ import './CheckDeleteInterviewModal.scss';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useFetch } from '@/hooks/useFetch';
 import useGetAccessToken from '@/hooks/useGetAccessToken';
+import { repositoryKeys } from '@/querykey/repository.querykey';
 
 interface Props {
   interviewIds: number[];
@@ -29,8 +30,9 @@ const CheckDeleteInterviewModal = ({ interviewIds, onClose, onDeleteComplete }: 
       });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['interview-list'] });
-      queryClient.invalidateQueries({ queryKey: ['interview-date'] });
+      queryClient.invalidateQueries({queryKey : repositoryKeys.repositoryInterviewCalendar._def, exact: false})
+      queryClient.invalidateQueries({ queryKey: repositoryKeys.repositoryInterview._def, exact: false})
+      queryClient.invalidateQueries({queryKey: repositoryKeys.repositoryInterviewDetail._def, exact: false})
       onDeleteComplete();
       onClose();
     },

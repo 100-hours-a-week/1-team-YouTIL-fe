@@ -20,6 +20,7 @@ import {
   addDays,
   parseISO,
 } from 'date-fns';
+import { repositoryKeys } from '@/querykey/repository.querykey';
 import './RepositoryDateCalendar.scss';
 import { useRepositoryDateStore } from '@/store/useRepositoryDateStore';
 
@@ -75,7 +76,8 @@ const RepositoryDateCalendar = () => {
   const selectedYear = currentDate.getFullYear();
 
   const { data: tilRecordData } = useQuery<TILYearlyRecordResponse>({
-    queryKey: ['til-date', selectedYear],
+    //queryKey: ['til-date', selectedYear],
+    queryKey: repositoryKeys.repositoryTILCalendar(selectedYear).queryKey,
     queryFn: async () => {
       const response = await callApi<TILYearlyRecordResponse>({
         method: 'GET',
@@ -93,7 +95,7 @@ const RepositoryDateCalendar = () => {
   });
 
   const { data: interviewRecordData } = useQuery<InterviewYearlyRecordResponse>({
-    queryKey: ['interview-date', selectedYear],
+    queryKey: repositoryKeys.repositoryInterviewCalendar(selectedYear).queryKey,
     queryFn: async () => {
       const response = await callApi<InterviewYearlyRecordResponse>({
         method: 'GET',

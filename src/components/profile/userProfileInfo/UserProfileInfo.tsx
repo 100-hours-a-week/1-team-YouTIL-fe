@@ -9,6 +9,9 @@ import useUserInfoStore from '@/store/useUserInfoStore';
 import { useFetch } from '@/hooks/useFetch';
 import useGetAccessToken from '@/hooks/useGetAccessToken';
 import Image from 'next/image';
+import { profileKeys } from '@/querykey/profile.querykey';
+import { mainKeys } from '@/querykey/main.querykey';
+import { repositoryKeys } from '@/querykey/repository.querykey';
 
 const UserProfileInfo = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -80,10 +83,11 @@ const UserProfileInfo = () => {
         description: updatedDescription,
       });
 
-      queryClient.invalidateQueries({ queryKey: ['otheruser-info', otherUserId] });
-      queryClient.invalidateQueries({ queryKey: ['recent-tils'] });
-      queryClient.invalidateQueries({ queryKey: ['user-tils'] });
-      queryClient.invalidateQueries({ queryKey: ['guestbooks-list']})
+      queryClient.invalidateQueries({queryKey: profileKeys.profileOtherUserInfo._def, exact: false});
+      queryClient.invalidateQueries({queryKey: mainKeys.newTILList().queryKey});
+      queryClient.invalidateQueries({queryKey: repositoryKeys.repositoryTIL._def, exact: false});
+      queryClient.invalidateQueries({queryKey: profileKeys.profileCommentList._def, exact: false});
+      queryClient.invalidateQueries({queryKey: profileKeys.profileTIL._def, exact:false})
       setEditMode(false);
     },
   });

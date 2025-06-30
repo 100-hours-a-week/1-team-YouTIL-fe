@@ -16,6 +16,7 @@ import UserProfileInfo from '@/components/profile/userProfileInfo/UserProfileInf
 import UserTILButton from '@/components/profile/userTILButton/UserTILButton';
 import UserTILList from '@/components/profile/userTILList/UserTILList';
 import ProfileComment from '@/components/profile/profileComment/ProfileComment';
+import { profileKeys } from '@/querykey/profile.querykey';
 
 interface UserInfo {
   userId: number;
@@ -44,12 +45,14 @@ const ProfilePage = () => {
   const otherUserInfo = useOtherUserInfoStore((state) => state.otherUserInfo);
   const [showTILList, setShowTILList] = useState(false);
 
+
   useEffect(() => {
     resetOtherUserInfo();
   }, [parsedUserId, resetOtherUserInfo]);
 
   const { isLoading: isUserInfoLoading, isError: isUserInfoError } = useQuery<UserInfoResponse>({
-    queryKey: ['userInfo'],
+    // queryKey: ['userInfo'],
+    queryKey: profileKeys.profileUserInfo().queryKey,
     queryFn: async () => {
       const response = await callApi<UserInfoResponse>({
         method: 'GET',
@@ -71,7 +74,8 @@ const ProfilePage = () => {
   });
 
   const { isLoading: isOtherUserInfoLoading, isError: isOtherUserInfoError } = useQuery<UserInfo>({
-    queryKey: ['otheruser-info', parsedUserId],
+    // queryKey: ['otheruser-info', parsedUserId],
+    queryKey: profileKeys.profileOtherUserInfo(parsedUserId).queryKey,
     queryFn: async () => {
       const response = await callApi<UserInfoResponse>({
         method: 'GET',
