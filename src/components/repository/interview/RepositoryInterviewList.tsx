@@ -1,6 +1,5 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
 import { useFetch } from '@/hooks/useFetch';
 import { useRepositoryDateStore } from '@/store/useRepositoryDateStore';
