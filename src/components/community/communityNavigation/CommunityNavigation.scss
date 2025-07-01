@@ -1,0 +1,24 @@
+.community-nav {
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-start;
+  
+    &__button {
+      padding: 4px 8px;
+      background-color: transparent;
+      color: black;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      width: 70px;
+      height: 35px;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+  
+      &--active {
+        background-color: #00b6f9;
+        color: white;
+        border-color: #00b6f9;
+      }
+    }
+  }
+  
