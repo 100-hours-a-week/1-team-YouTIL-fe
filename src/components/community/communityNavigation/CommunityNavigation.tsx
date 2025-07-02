@@ -20,19 +20,32 @@ const CommunityNavigation = () => {
     }
   }, [selectedCategory, setCategory]);
 
+  const getLabel = (value: string) =>
+    categories.find((c) => c.value === value)?.label ?? '';
+
   return (
     <div className="community-nav">
-      {categories.map((category) => (
-        <button
-          key={category.value}
-          className={`community-nav__button ${
-            selectedCategory === category.value ? 'community-nav__button--active' : ''
-          }`}
-          onClick={() => setCategory(category.value)}
-        >
-          {category.label}
-        </button>
-      ))}
+      <div className="community-nav__button-wrapper">
+        {categories.map((category) => (
+          <button
+            key={category.value}
+            className={`community-nav__button ${
+              selectedCategory === category.value ? 'community-nav__button--active' : ''
+            }`}
+            onClick={() => setCategory(category.value)}
+          >
+            {category.label}
+          </button>
+        ))}
+      </div>
+
+      {selectedCategory && (
+        <div className="community-nav__text-wrapper">
+          <p className="community-nav__description">
+            <span className="community-nav__category">{getLabel(selectedCategory)}</span> 게시판 입니다
+          </p>
+        </div>
+      )}
     </div>
   );
 };

@@ -1,7 +1,13 @@
 .community-nav {
     display: flex;
+    flex-direction: column;
     gap: 1rem;
-    justify-content: flex-start;
+  
+    &__button-wrapper {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+    }
   
     &__button {
       padding: 4px 8px;
@@ -19,6 +25,22 @@
         color: white;
         border-color: #00b6f9;
       }
+    }
+  
+    &__text-wrapper {
+      align-self: flex-start;
+      margin-left: 1rem;
+    }
+  
+    &__description {
+      font-size: 1.15rem;
+      color: #333;
+      text-align: left;
+    }
+  
+    &__category {
+      color: #00b6f9;
+      font-weight: bold;
     }
   }
   
