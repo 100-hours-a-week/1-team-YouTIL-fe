@@ -1,7 +1,7 @@
 'use client';
 
 import { useParams } from 'next/navigation';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useFetch } from '@/hooks/useFetch';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -20,6 +20,7 @@ interface TILDetail {
   recommend_count: number;
   userId: number;
   profileImageUrl: string;
+  liked: boolean;
 }
 
 const CommunityDetailPage = () => {
@@ -27,6 +28,7 @@ const CommunityDetailPage = () => {
   const { callApi } = useFetch();
   const accessToken = useGetAccessToken();
   const existAccess = useCheckAccess(accessToken);
+  const queryClient = useQueryClient();
 
   const { data: communityDetailData, isLoading } = useQuery({
     queryKey: ['community-detail', tilId],
@@ -42,6 +44,31 @@ const CommunityDetailPage = () => {
       return response?.data;
     },
     enabled: !!tilId && existAccess,
+  });
+
+  const { mutate: toggleLike } = useMutation({
+    mutationFn: async () => {
+      return await callApi({
+        method: 'POST',
+        endpoint: `/community/${tilId}/like`,
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+        credentials: 'include',
+      });
+    },
+    onSuccess: () => {
+      queryClient.setQueryData(['community-detail', tilId], (oldData: TILDetail | undefined) => {
+        if (!oldData) return oldData;
+        return {
+          ...oldData,
+          liked: !oldData.liked,
+          recommend_count: oldData.liked
+            ? oldData.recommend_count - 1
+            : oldData.recommend_count + 1,
+        };
+      });
+    },
   });
 
   if (isLoading || !communityDetailData) return <p>Loading...</p>;
@@ -87,6 +114,15 @@ const CommunityDetailPage = () => {
       >
         <Markdown>{communityDetailData.content}</Markdown>
       </div>
+
+      <button
+        className={`community-detail__like-button ${
+          communityDetailData.liked ? 'community-detail__like-button--active' : ''
+        }`}
+        onClick={() => toggleLike()}
+      >
+        추천 {communityDetailData.recommend_count}
+      </button>
     </div>
   );
 };
