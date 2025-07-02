@@ -3,6 +3,8 @@
 import { useParams } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
 import { useFetch } from '@/hooks/useFetch';
+import Link from 'next/link';
+import Image from 'next/image';
 import useGetAccessToken from '@/hooks/useGetAccessToken';
 import useCheckAccess from '@/hooks/useCheckExistAccess';
 import Markdown from 'react-markdown';
@@ -16,6 +18,8 @@ interface TILDetail {
   title: string;
   visited_count: number;
   recommend_count: number;
+  userId: number;
+  profileImageUrl: string;
 }
 
 const CommunityDetailPage = () => {
@@ -35,7 +39,6 @@ const CommunityDetailPage = () => {
         },
         credentials: 'include',
       });
-      console.log(response)
       return response?.data;
     },
     enabled: !!tilId && existAccess,
@@ -48,7 +51,18 @@ const CommunityDetailPage = () => {
       <h1 className="community-detail__title">{communityDetailData.title}</h1>
 
       <div className="community-detail__meta">
-        <span className="community-detail__author">{communityDetailData.author}</span>
+        <Link href={`/profile/${communityDetailData.userId}`}>
+          <Image
+            src={communityDetailData.profileImageUrl}
+            alt={`${communityDetailData.author}의 프로필 이미지`}
+            width={24}
+            height={24}
+            className="community-detail__profile-image"
+          />
+        </Link>
+        <Link href={`/profile/${communityDetailData.userId}`} className="community-detail__nickname">
+          {communityDetailData.author}
+        </Link>
         <span className="community-detail__count">조회수 {communityDetailData.visited_count}</span>
         <span className="community-detail__count">추천 {communityDetailData.recommend_count}</span>
         <span className="community-detail__date">
@@ -64,11 +78,13 @@ const CommunityDetailPage = () => {
         ))}
       </div>
 
-      <div className="community-detail__content"
+      <div
+        className="community-detail__content"
         onCopy={(e) => {
-            e.preventDefault();
-            navigator.clipboard.writeText(communityDetailData.content);
-            }}>
+          e.preventDefault();
+          navigator.clipboard.writeText(communityDetailData.content);
+        }}
+      >
         <Markdown>{communityDetailData.content}</Markdown>
       </div>
     </div>

@@ -3,7 +3,7 @@
     color: #000;
     word-break: break-word;
     margin-bottom: 60px;
-    
+
     &__title {
       font-size: 1.6rem;
       font-weight: bold;
@@ -11,18 +11,46 @@
     }
   
     &__meta {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.75rem;
-      font-size: 0.875rem;
-      color: #666;
-      margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 0.375rem;
+        font-size: 0.75rem;
+        color: #000;
+        margin-bottom: 8px;
     }
+
+    &__profile-image {
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        object-fit: cover;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+        transition: transform 0.2s ease;
+        cursor: pointer;
+        margin-right: 4px;
+    
+        &:hover {
+          transform: scale(1.15);
+        }
+      }
   
-    &__author {
-      font-weight: 600;
-    }
-  
+      &__nickname {
+        white-space: nowrap;
+        text-decoration: none;
+        color: inherit;
+        transition: transform 0.2s ease;
+        cursor: pointer;
+        margin-right: 6px;
+    
+        &:hover {
+          transform: scale(1.1);
+        }
+    
+        &:visited {
+          color: inherit;
+        }
+      }
     &__count {
       color: #555;
     }
