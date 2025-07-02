@@ -9,6 +9,7 @@ import { useFetch } from '@/hooks/useFetch';
 import useGetAccessToken from '@/hooks/useGetAccessToken';
 import useCheckAccess from '@/hooks/useCheckExistAccess';
 import { parseISO, format } from 'date-fns';
+import { useRouter } from 'next/navigation';
 import './CommunityList.scss';
 
 interface CommunityItem {
@@ -38,6 +39,7 @@ const CommunityList = () => {
   const accessToken = useGetAccessToken();
   const existAccess = useCheckAccess(accessToken);
   const floatingRef = useRef<HTMLDivElement>(null);
+  const router = useRouter();
 
   const {
     data: communityPages,
@@ -117,6 +119,7 @@ const CommunityList = () => {
               key={item.tilId}
               className="community-list__item"
               ref={isLastItem ? loadMoreRef : null}
+              onClick={() => router.push(`/community/${item.tilId}`)}
             >
               <div className="community-list__header">
                 <p className="community-list__title">{item.title}</p>
