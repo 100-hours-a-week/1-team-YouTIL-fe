@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { useEffect, useRef } from 'react';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { useCommunityNavigationStore } from '@/store/useCommunityNavigationStore';
@@ -134,17 +135,26 @@ const CommunityList = () => {
               </div>
 
               <div className="community-list__footer">
-                <Link href={`/profile/${item.userId}`}>
-                  <img
-                    src={item.profileImageUrl}
-                    alt={`${item.useName} 프로필 이미지`}
-                    className="community-list__profile-image"
-                  />
-                </Link>
+              <Link
+                href={`/profile/${item.userId}`}
+                onClick={(e) => e.stopPropagation()}
+              >
+                <Image
+                  src={item.profileImageUrl}
+                  alt={`${item.useName} 프로필 이미지`}
+                  className="community-list__profile-image"
+                  width={24}
+                  height={24}
+              />
+              </Link>
 
-                <Link href={`/profile/${item.userId}`} className="community-list__nickname">
-                  {item.useName}
-                </Link>
+              <Link
+                href={`/profile/${item.userId}`}
+                className="community-list__nickname"
+                onClick={(e) => e.stopPropagation()}
+              >
+                {item.useName}
+              </Link>
 
                 <span className="community-list__meta">조회수 {item.visited_count}</span>
                 <span className="community-list__meta">추천 {item.recommend_count}</span>
@@ -160,7 +170,7 @@ const CommunityList = () => {
       </div>
 
       <div className="community-list__floating-buttons" ref={floatingRef}>
-        <button className="community-list__button" onClick={() => refetch()}>
+        <button className="community-list__button" onClick={async () => {await refetch(); handleScrollTop();}}>
           🔄
         </button>
         <button className="community-list__button" onClick={handleScrollTop}>

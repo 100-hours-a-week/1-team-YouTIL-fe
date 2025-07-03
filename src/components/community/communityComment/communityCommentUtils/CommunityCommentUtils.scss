@@ -1,0 +1,32 @@
+.comment-utils-dropdown {
+    position: absolute;
+    top: 100%;
+    right: 12px;
+    top: 0px;
+    width: 66px;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    z-index: 20;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 2px 0;
+  
+    &__item {
+      padding: 8px 12px;
+      background: none;
+      border: none;
+      text-align: center;
+      font-size: 0.9rem;
+      width: 62px;
+      color: #333;
+      cursor: pointer;
+  
+      &:hover {
+        background-color: #f5f5f5;
+      }
+    }
+  }
+  
