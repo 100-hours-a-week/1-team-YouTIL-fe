@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
+import { useEffect } from 'react';
 import { useRef } from 'react';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { useCommunityNavigationStore } from '@/store/useCommunityNavigationStore';
@@ -71,6 +72,29 @@ const CommunityList = () => {
     staleTime: 300000,
     gcTime: 300000,
   });
+
+  useEffect(() => {
+    const updateFloatingPosition = () => {
+      const frame = document.querySelector('.layout__frame');
+      const buttons = floatingRef.current;
+
+      if (!frame || !buttons) return;
+
+      const rect = frame.getBoundingClientRect();
+      buttons.style.left = `${rect.right - 42}px`;
+      buttons.style.bottom = '70px';
+      buttons.style.opacity = '1';
+    };
+
+    updateFloatingPosition();
+    window.addEventListener('resize', updateFloatingPosition);
+    window.addEventListener('scroll', updateFloatingPosition);
+
+    return () => {
+      window.removeEventListener('resize', updateFloatingPosition);
+      window.removeEventListener('scroll', updateFloatingPosition);
+    };
+  }, []);
 
   const loadMoreRef = useInfinityScrollObserver<HTMLDivElement>({
     fetchNextPage,
@@ -151,7 +175,7 @@ const CommunityList = () => {
       </div>
 
       <div className="community-list__floating-buttons" ref={floatingRef}>
-        <button className="community-list__button" onClick={async () => {await refetch(); handleScrollTop();}}>
+      <button className="community-list__button" onClick={() => {window.location.reload();}}>
           🔄
         </button>
         <button className="community-list__button" onClick={handleScrollTop}>
