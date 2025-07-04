@@ -9,7 +9,9 @@ import useCheckAccess from '@/hooks/useCheckExistAccess';
 import { parseISO, format } from 'date-fns';
 import { mainKeys } from '@/querykey/main.querykey';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
+import useSaveScrollAndNavigate from '@/hooks/useSaveScrollAndNavigate';
+import useUserInfoStore from '@/store/useUserInfoStore';
+import useScrollRestoreOnReturn from '@/hooks/useScrollRestoreOnReturn';
 
 interface TILResponse {
   data: TILItem[];
@@ -33,11 +35,11 @@ const NewTILList = () => {
   const { callApi } = useFetch();
   const accessToken = useGetAccessToken();
   const existAccess = useCheckAccess(accessToken);
-  const router = useRouter();
-
+  const userId = useUserInfoStore((state) => state.userInfo.userId);
+  const saveAndPush = useSaveScrollAndNavigate(`user-til-${userId}`);
+  useScrollRestoreOnReturn(`user-til-${userId}`);
   const { data: tils, isError } = useQuery<TILItem[]>({
     queryKey: mainKeys.newTILList().queryKey,
-    // queryKey: ['recent-tils'],
     queryFn: async () => {
       const response = await callApi<TILResponse>({
         method: 'GET',
@@ -61,11 +63,11 @@ const NewTILList = () => {
   return (
     <div className="til-list">
       {tils?.map((til) => (
-        <div key={til.id} className="til-list__card"   
-          onClick={() => {
-          router.push(`/community/${til.id}`);
-          document.body.scrollTo({ top: 0, behavior: 'auto' })
-        }} >
+        <div
+          key={til.id}
+          className="til-list__card"
+          onClick={() => saveAndPush(`/community/${til.id}`)}
+        >
           <div className="til-list__header">
             <p className="til-list__title">{til.title}</p>
           </div>
@@ -75,8 +77,10 @@ const NewTILList = () => {
             ))}
           </div>
           <div className="til-list__footer">
-            <Link href={`/profile/${til.userId}`} 
-              onClick={(e) => e.stopPropagation()}>
+            <Link
+              href={`/profile/${til.userId}`}
+              onClick={(e) => e.stopPropagation()}
+            >
               <Image
                 src={til.profileImageUrl}
                 alt={`${til.nickname}의 프로필 이미지`}
@@ -85,8 +89,11 @@ const NewTILList = () => {
                 className="til-list__profile-image"
               />
             </Link>
-            <Link href={`/profile/${til.userId}`} className="til-list__nickname"
-              onClick={(e) => e.stopPropagation()}>
+            <Link
+              href={`/profile/${til.userId}`}
+              className="til-list__nickname"
+              onClick={(e) => e.stopPropagation()}
+            >
               {til.nickname}
             </Link>
 

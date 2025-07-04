@@ -8,6 +8,7 @@ import useAuthStore from '@/store/useAuthStore';
 import useCheckAccess from '@/hooks/useCheckExistAccess';
 import { useFetch } from '@/hooks/useFetch';
 import { profileKeys } from '@/querykey/profile.querykey';
+import { useLayoutEffect } from 'react';
 
 interface UserInfo {
   userId: number;
@@ -21,7 +22,10 @@ interface UserInfoResponse {
 }
 
 const CommunityDetailPage = () => {
-
+  useLayoutEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'auto' });
+  }, []);
+  
   const accessToken = useAuthStore((state) => state.accessToken);
   const { callApi } = useFetch();
   const existAccess = useCheckAccess(accessToken);

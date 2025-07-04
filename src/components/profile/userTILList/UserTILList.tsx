@@ -10,7 +10,8 @@ import Image from 'next/image';
 import { useInfinityScrollObserver } from '@/hooks/useInfinityScrollObserver';
 import './UserTILList.scss';
 import { profileKeys } from '@/querykey/profile.querykey';
-import { useRouter } from 'next/navigation';
+import useScrollRestoreOnReturn from '@/hooks/useScrollRestoreOnReturn';
+import useSaveScrollAndNavigate from '@/hooks/useSaveScrollAndNavigate';
 
 interface TILItem {
   id: number;
@@ -32,7 +33,10 @@ const UserTILList = () => {
   const { callApi } = useFetch();
   const accessToken = useAuthStore((state) => state.accessToken);
   const { userId } = useParams<{ userId: string }>();
-  const router = useRouter();
+
+  useScrollRestoreOnReturn(`user-til-${userId}`);
+  const saveAndNavigate = useSaveScrollAndNavigate(`user-til-${userId}`);
+
   const { data, isFetchingNextPage, hasNextPage, fetchNextPage } = useInfiniteQuery<TILResponse, Error>({
     queryKey: profileKeys.profileTIL(userId).queryKey,
     queryFn: async ({ pageParam }: QueryFunctionContext) => {
@@ -74,9 +78,7 @@ const UserTILList = () => {
               key={til.tilId}
               className="usertil-list__item"
               ref={isLastItem ? lastItemRef : undefined}
-              onClick={() => {router.push(`/community/${til.tilId}`);
-              window.scrollTo({ top: 0, behavior: 'auto' });
-            }}
+              onClick={() => saveAndNavigate(`/community/${til.tilId}`)}
             >
               <div className="usertil-list__header">
                 <p className="usertil-list__title">{til.title}</p>
@@ -91,8 +93,10 @@ const UserTILList = () => {
               </div>
 
               <div className="usertil-list__footer">
-                <Link href={`/profile/${userId}`}
-                onClick={(e) => e.stopPropagation()}>
+                <Link
+                  href={`/profile/${userId}`}
+                  onClick={(e) => e.stopPropagation()}
+                >
                   <Image
                     src={til.userProfileImageUrl}
                     alt={`${til.userName}의 프로필 이미지`}
@@ -101,8 +105,11 @@ const UserTILList = () => {
                     className="usertil-list__profile-image"
                   />
                 </Link>
-                <Link href={`/profile/${userId}`} className="usertil-list__nickname"
-                onClick={(e) => e.stopPropagation()}>
+                <Link
+                  href={`/profile/${userId}`}
+                  className="usertil-list__nickname"
+                  onClick={(e) => e.stopPropagation()}
+                >
                   {til.userName}
                 </Link>
 

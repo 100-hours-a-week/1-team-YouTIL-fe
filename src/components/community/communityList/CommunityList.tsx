@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { useEffect, useRef } from 'react';
+import { useRef } from 'react';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { useCommunityNavigationStore } from '@/store/useCommunityNavigationStore';
 import { useInfinityScrollObserver } from '@/hooks/useInfinityScrollObserver';
@@ -10,8 +10,9 @@ import { useFetch } from '@/hooks/useFetch';
 import useGetAccessToken from '@/hooks/useGetAccessToken';
 import useCheckAccess from '@/hooks/useCheckExistAccess';
 import { parseISO, format } from 'date-fns';
-import { useRouter } from 'next/navigation';
 import './CommunityList.scss';
+import useSaveScrollAndNavigate from '@/hooks/useSaveScrollAndNavigate';
+import useScrollRestoreOnReturn from '@/hooks/useScrollRestoreOnReturn';
 
 interface CommunityItem {
   tilId: number;
@@ -40,8 +41,8 @@ const CommunityList = () => {
   const accessToken = useGetAccessToken();
   const existAccess = useCheckAccess(accessToken);
   const floatingRef = useRef<HTMLDivElement>(null);
-  const router = useRouter();
-
+  const saveAndNavigate = useSaveScrollAndNavigate(`community-${selectedCategory}`);
+  useScrollRestoreOnReturn(`community-${selectedCategory}`);
   const {
     data: communityPages,
     fetchNextPage,
@@ -87,28 +88,6 @@ const CommunityList = () => {
     document.body.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  useEffect(() => {
-    const updateFloatingPosition = () => {
-      const frame = document.querySelector('.layout__frame');
-      const buttons = floatingRef.current;
-
-      if (!frame || !buttons) return;
-
-      const rect = frame.getBoundingClientRect();
-      buttons.style.left = `${rect.right - 42}px`;
-      buttons.style.bottom = '70px';
-    };
-
-    updateFloatingPosition();
-    window.addEventListener('resize', updateFloatingPosition);
-    window.addEventListener('scroll', updateFloatingPosition);
-
-    return () => {
-      window.removeEventListener('resize', updateFloatingPosition);
-      window.removeEventListener('scroll', updateFloatingPosition);
-    };
-  }, []);
-
   return (
     <>
       <div className="community-list">
@@ -120,9 +99,9 @@ const CommunityList = () => {
               key={item.tilId}
               className="community-list__item"
               ref={isLastItem ? loadMoreRef : null}
-              onClick={() => {router.push(`/community/${item.tilId}`);
-              document.body.scrollTo({ top: 0, behavior: 'auto' })
-            }}
+              onClick={() => {
+                saveAndNavigate(`/community/${item.tilId}`);
+              }}
             >
               <div className="community-list__header">
                 <p className="community-list__title">{item.title}</p>

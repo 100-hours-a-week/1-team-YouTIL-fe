@@ -1,3 +1,5 @@
+'use client';
+
 import CommunityNavigation from "@/components/community/communityNavigation/CommunityNavigation";
 import CommunityList from "@/components/community/communityList/CommunityList";
 
