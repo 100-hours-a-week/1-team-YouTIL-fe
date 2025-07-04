@@ -4,6 +4,7 @@ import './CheckDeleteCommentModal.scss';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useFetch } from '@/hooks/useFetch';
 import useGetAccessToken from '@/hooks/useGetAccessToken';
+import { communityKeys } from '@/querykey/community.querykey';
 
 interface Props {
   commentId: number;
@@ -30,7 +31,7 @@ const CheckDeleteCommentModal = ({ commentId, onClose, onDeleteComplete, tilId }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ['community-comments'],
+        queryKey: communityKeys.communityComment(tilId).queryKey,
         exact: false,
       });
       onDeleteComplete();

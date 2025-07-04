@@ -15,6 +15,7 @@ import CommunityEditCommentInput from '../communityEditCommentInput/CommunityEdi
 import CommunityReplyCommentInput from '../communityReplyCommentInput/CommunityReplyCommentInput';
 import { useModal } from '@/hooks/useModal';
 import './CommunityCommentList.scss';
+import { communityKeys } from '@/querykey/community.querykey';
 
 interface CommunityCommentItem {
   id: number;
@@ -92,7 +93,7 @@ const CommunityCommentList = () => {
     hasNextPage,
     isFetchingNextPage,
   } = useInfiniteQuery({
-    queryKey: ['community-comments', tilIdNumber],
+    queryKey: communityKeys.communityComment(tilIdNumber).queryKey,
     queryFn: async ({ pageParam = 0 }) => {
       const response = await callApi<CommunityCommentResponse>({
         method: 'GET',

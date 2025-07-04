@@ -5,6 +5,7 @@ import './CommunityEditCommentInput.scss';
 import { useFetch } from '@/hooks/useFetch';
 import useGetAccessToken from '@/hooks/useGetAccessToken';
 import { useQueryClient } from '@tanstack/react-query';
+import { communityKeys } from '@/querykey/community.querykey';
 
 interface Props {
   originalContent: string;
@@ -58,7 +59,7 @@ const CommunityEditCommentInput = ({ originalContent, commentId, onComplete, til
       });
 
       await queryClient.invalidateQueries({
-        queryKey: ['community-comments'],
+        queryKey: communityKeys.communityComment(tilId).queryKey,
         exact: false,
       });
 

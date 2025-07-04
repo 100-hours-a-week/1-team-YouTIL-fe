@@ -7,17 +7,19 @@ import './CommunityCommentInput.scss';
 import { useFetch } from '@/hooks/useFetch';
 import useGetAccessToken from '@/hooks/useGetAccessToken';
 import { useParams } from 'next/navigation';
+import { useQueryClient } from '@tanstack/react-query';
+import { communityKeys } from '@/querykey/community.querykey';
 
 const CommunityCommentInput = () => {
   const [comment, setComment] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  // const queryClient = useQueryClient();
+  const queryClient = useQueryClient();
 
   const accessToken = useGetAccessToken();
   const { callApi } = useFetch();
   const params = useParams();
   const tilId = params.tilId; 
-
+  const tilIdNumber = Number(tilId);
   const mutation = useMutation({
     mutationFn: async (content: string) => {
       setIsSubmitting(true);
@@ -37,8 +39,7 @@ const CommunityCommentInput = () => {
     },
     onSuccess: () => {
       setComment('');
-      // queryClient.invalidateQueries({ queryKey: ['guestbooks-list', otherUserId] });
-      // queryClient.invalidateQueries({queryKey: profileKeys.profileCommentList(otherUserId ?? undefined).queryKey});
+      queryClient.invalidateQueries({queryKey: communityKeys.communityComment(tilIdNumber).queryKey})
     },
     onError: (error) => {
       console.error('댓글 등록 실패:', error);

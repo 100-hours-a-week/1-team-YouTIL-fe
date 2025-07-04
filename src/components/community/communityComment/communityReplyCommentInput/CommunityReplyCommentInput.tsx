@@ -5,6 +5,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useFetch } from '@/hooks/useFetch';
 import useGetAccessToken from '@/hooks/useGetAccessToken';
 import './CommunityReplyCommentInput.scss';
+import { communityKeys } from '@/querykey/community.querykey';
 
 interface Props {
   topCommentId: number;
@@ -39,7 +40,7 @@ const CommunityReplyCommentInput = ({ topCommentId, onComplete,tilId  }: Props) 
     },
     onSuccess: () => {
       setReplyContent('');
-      queryClient.invalidateQueries({ queryKey: ['community-comments'] });
+      queryClient.invalidateQueries({queryKey: communityKeys.communityComment(tilId).queryKey, exact: false})
       onComplete();
     },
     onError: (error: unknown) => {
