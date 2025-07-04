@@ -120,7 +120,9 @@ const CommunityList = () => {
               key={item.tilId}
               className="community-list__item"
               ref={isLastItem ? loadMoreRef : null}
-              onClick={() => router.push(`/community/${item.tilId}`)}
+              onClick={() => {router.push(`/community/${item.tilId}`);
+              document.body.scrollTo({ top: 0, behavior: 'auto' })
+            }}
             >
               <div className="community-list__header">
                 <p className="community-list__title">{item.title}</p>
