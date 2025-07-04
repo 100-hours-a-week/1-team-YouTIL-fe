@@ -158,16 +158,16 @@ const ProfileCommentList = () => {
     return (
       <div
         key={`comment-${item.id}-${isReply ? 'reply' : 'parent'}`}
-        className="comment-list__item"
+        className="profile-comment-list__item"
       >
-        <div className="comment-list__header">
+        <div className="profile-comment-list__header">
           {isReply && (
             <Image
               src="/images/replyIcon.png"
               alt="대댓글 아이콘"
               width={16}
               height={16}
-              className="comment-list__reply-icon"
+              className="profile-comment-list__reply-icon"
             />
           )}
           <Image
@@ -175,27 +175,27 @@ const ProfileCommentList = () => {
             alt={`${item.guestNickname}의 프로필`}
             width={32}
             height={32}
-            className="comment-list__profile-image"
+            className="profile-comment-list__profile-image"
             onClick={() => handleMoveToProfile(item.guestId)}
           />
-          <div className="comment-list__info">
-            <div className="comment-list__meta">
+          <div className="profile-comment-list__info">
+            <div className="profile-comment-list__meta">
               <span
-                className="comment-list__nickname"
+                className="profile-comment-list__nickname"
                 onClick={() => handleMoveToProfile(item.guestId)}
               >
                 {item.guestNickname}
               </span>
-              <div className="comment-list__meta-right">
-                <span className="comment-list__date">{formatDate(item.createdAt)}</span>
+              <div className="profile-comment-list__meta-right">
+                <span className="profile-comment-list__date">{formatDate(item.createdAt)}</span>
                 <div
-                  className="comment-list__menu-wrapper"
+                  className="profile-comment-list__menu-wrapper"
                   ref={(el) => {
                     refs.current[item.id] = el;
                   }}
                 >
                   <button
-                    className="comment-list__menu-button"
+                    className="profile-comment-list__menu-button"
                     onClick={(e) => {
                       e.stopPropagation();
                       setOpenMenuId((prev) => (prev === item.id ? null : item.id));
@@ -221,7 +221,7 @@ const ProfileCommentList = () => {
                 </div>
               </div>
             </div>
-            <div className="comment-list__text">
+            <div className="profile-comment-list__text">
               {item.deleted || item.content === '페이지 소유자가 삭제한 댓글입니다.' ? (
                 <del>{item.content}</del>
               ) : isEditing ? (
@@ -255,7 +255,7 @@ const ProfileCommentList = () => {
   };
 
   return (
-    <div className="comment-list">
+    <div className="profile-comment-list">
       {data?.pages.flatMap((page) =>
         page.data.guestbooks.map((comment) => (
           <div key={`group-${comment.id}`}>

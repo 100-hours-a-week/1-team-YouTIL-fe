@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import './ProfileEditCommentInput.scss';
 import { useFetch } from '@/hooks/useFetch';
 import useGetAccessToken from '@/hooks/useGetAccessToken';
-import { useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { profileKeys } from '@/querykey/profile.querykey';
 
 interface Props {
@@ -14,10 +14,13 @@ interface Props {
   onComplete: () => void;
 }
 
-const ProfileEditCommentInput = ({ originalContent, profileUserId, guestbookId, onComplete }: Props) => {
+const ProfileEditCommentInput = ({
+  originalContent,
+  profileUserId,
+  guestbookId,
+  onComplete,
+}: Props) => {
   const [editContent, setEditContent] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
   const { callApi } = useFetch();
   const accessToken = useGetAccessToken();
   const queryClient = useQueryClient();
@@ -25,6 +28,28 @@ const ProfileEditCommentInput = ({ originalContent, profileUserId, guestbookId, 
   useEffect(() => {
     setEditContent(originalContent);
   }, [originalContent]);
+
+  const { isPending } = useMutation({
+    mutationFn: async () => {
+      return await callApi({
+        method: 'PUT',
+        endpoint: `/users/${profileUserId}/guestbooks/${guestbookId}`,
+        body: { content: editContent.trim() },
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: profileKeys.profileCommentList._def, exact: false });
+      onComplete();
+    },
+    onError: (err) => {
+      console.error('댓글 수정 실패:', err);
+    },
+  });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.value.length <= 50) {
@@ -35,34 +60,14 @@ const ProfileEditCommentInput = ({ originalContent, profileUserId, guestbookId, 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
       e.preventDefault();
-      if (!isSubmitting) {
+      if (!isPending) {
         handleSubmit();
       }
     }
   };
 
   const handleSubmit = async () => {
-    if (!editContent.trim() || isSubmitting) return;
-
-    try {
-      setIsSubmitting(true);
-      await callApi({
-        method: 'PUT',
-        endpoint: `/users/${profileUserId}/guestbooks/${guestbookId}`,
-        body: { content: editContent.trim() },
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include',
-      });
-      await queryClient.invalidateQueries({queryKey: profileKeys.profileCommentList._def, exact: false});
-      onComplete();
-    } catch (err) {
-      console.error('댓글 수정 실패:', err);
-    } finally {
-      setIsSubmitting(false);
-    }
+    if (!editContent.trim() || isPending) return;
   };
 
   return (
@@ -73,12 +78,12 @@ const ProfileEditCommentInput = ({ originalContent, profileUserId, guestbookId, 
         value={editContent}
         onChange={handleChange}
         onKeyDown={handleKeyDown}
-        disabled={isSubmitting}
+        disabled={isPending}
       />
       <button
         className="edit-comment-input__button"
         onClick={handleSubmit}
-        disabled={isSubmitting}
+        disabled={isPending}
       >
         등록
       </button>

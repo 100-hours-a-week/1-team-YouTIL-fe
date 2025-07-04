@@ -49,7 +49,7 @@ const CommunityCommentList = () => {
   const userId = otherUserInfo.userId;
   const existAccess = useCheckAccess(accessToken);
   const router = useRouter();
-  const {tilId} = useParams();
+  const { tilId } = useParams();
   const tilIdNumber = Number(tilId);
 
   const deleteModal = useModal();
@@ -139,55 +139,55 @@ const CommunityCommentList = () => {
     setDeleteTargetId(id);
     deleteModal.open();
   };
-
+  
   const formatDate = (iso: string) => new Date(iso).toLocaleString();
-
+  
   const renderItem = (item: CommunityCommentItem, isReply = false) => {
     const isMenuOpen = openMenuId === item.id;
     const isEditing = editingId === item.id;
     const isReplying = replyingToId === item.id;
-
+    
     return (
       <div
-        key={`comment-${item.id}-${isReply ? 'reply' : 'parent'}`}
-        className="comment-list__item"
+      key={`comment-${item.id}-${isReply ? 'reply' : 'parent'}`}
+      className="community-comment-list__item"
       >
-        <div className="comment-list__header">
+        <div className="community-comment-list__header">
           {isReply && (
             <Image
               src="/images/replyIcon.png"
               alt="대댓글 아이콘"
               width={16}
               height={16}
-              className="comment-list__reply-icon"
-            />
-          )}
+              className="community-comment-list__reply-icon"
+              />
+            )}
           <Image
             src={item.profileImageUrl}
             alt={`${item.nickname}의 프로필`}
             width={32}
             height={32}
-            className="comment-list__profile-image"
+            className="community-comment-list__profile-image"
             onClick={() => handleMoveToProfile(item.userId)}
-          />
-          <div className="comment-list__info">
-            <div className="comment-list__meta">
+            />
+          <div className="community-comment-list__info">
+            <div className="community-comment-list__meta">
               <span
-                className="comment-list__nickname"
+                className="community-comment-list__nickname"
                 onClick={() => handleMoveToProfile(item.userId)}
               >
                 {item.nickname}
               </span>
-              <div className="comment-list__meta-right">
-                <span className="comment-list__date">{formatDate(item.createdAt)}</span>
+              <div className="community-comment-list__meta-right">
+                <span className="community-comment-list__date">{formatDate(item.createdAt)}</span>
                 <div
-                  className="comment-list__menu-wrapper"
+                  className="community-comment-list__menu-wrapper"
                   ref={(el) => {
                     refs.current[item.id] = el;
                   }}
                 >
                   <button
-                    className="comment-list__menu-button"
+                    className="community-comment-list__menu-button"
                     onClick={(e) => {
                       e.stopPropagation();
                       setOpenMenuId((prev) => (prev === item.id ? null : item.id));
@@ -213,7 +213,7 @@ const CommunityCommentList = () => {
                 </div>
               </div>
             </div>
-            <div className="comment-list__text">
+            <div className="community-comment-list__text">
               {item.deleted || item.content === '페이지 소유자가 삭제한 댓글입니다.' ? (
                 <del>{item.content}</del>
               ) : isEditing ? (
@@ -249,7 +249,7 @@ const CommunityCommentList = () => {
   };
 
   return (
-    <div className="comment-list">
+    <div className="community-comment-list">
       {data?.pages.flatMap((page) =>
         page.data.comments.map((comment) => (
           <div key={`group-${comment.id}`}>
