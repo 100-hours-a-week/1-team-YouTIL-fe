@@ -49,7 +49,6 @@ const CommunityList = () => {
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
-    refetch,
   } = useInfiniteQuery({
     queryKey: ['community-list', selectedCategory],
     queryFn: async ({ pageParam = 0 }) => {
