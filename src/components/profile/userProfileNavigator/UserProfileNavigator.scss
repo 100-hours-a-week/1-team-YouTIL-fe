@@ -1,0 +1,54 @@
+.userprofile-navigator {
+    &__tabs {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      margin-top: 20px;
+    }
+  
+    &__tab {
+      font-size: 1rem;
+      font-weight: 500;
+      padding: 12px 20px;
+      border-radius: 8px;
+      background-color: #ffffff;
+      cursor: pointer;
+      text-align: center;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      transition: background-color 0.3s ease, color 0.3s ease, transform 0.2s ease;
+      border: none;
+      width: 130px;
+      color: #333;
+  
+      &:hover {
+        background-color: #f0faff;
+      }
+  
+      &.active {
+        background-color: #e6f7ff;
+        color: #00b6f9;
+        font-weight: 600;
+      }
+    }
+  
+    &__underline {
+      display: none;
+    }
+  
+    &__content {
+      margin-top: 2rem;
+      animation: fadeIn 0.3s ease-in;
+    }
+  
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(6px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  }
+  

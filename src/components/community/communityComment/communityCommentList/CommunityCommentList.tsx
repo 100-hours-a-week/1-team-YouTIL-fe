@@ -8,57 +8,49 @@ import useGetAccessToken from '@/hooks/useGetAccessToken';
 import useCheckAccess from '@/hooks/useCheckExistAccess';
 import { useInfinityScrollObserver } from '@/hooks/useInfinityScrollObserver';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
-import ProfileCommentUtils from '../profileCommentUtils/ProfileCommentUtils';
+import { useRouter, useParams } from 'next/navigation';
+import CommunityCommentUtils from '../communityCommentUtils/CommunityCommentUtils';
 import CheckDeleteCommentModal from '../checkDeleteCommentModal/CheckDeleteCommentModal';
-import ProfileEditCommentInput from '../profileEditCommentInput/ProfileEditCommentInput';
-import ProfileReplyCommentInput from '../profileReplyCommentInput/ProfileReplyCommentInput';
+import CommunityEditCommentInput from '../communityEditCommentInput/CommunityEditCommentInput';
+import CommunityReplyCommentInput from '../communityReplyCommentInput/CommunityReplyCommentInput';
 import { useModal } from '@/hooks/useModal';
-import { profileKeys } from '@/querykey/profile.querykey';
-import './ProfileCommentList.scss';
+import './CommunityCommentList.scss';
+import { communityKeys } from '@/querykey/community.querykey';
 
-interface GuestbookReply {
+interface CommunityCommentItem {
   id: number;
+  userId: number;
+  nickname: string;
+  profileImageUrl: string;
   content: string;
+  topCommentId: number | null;
   createdAt: string;
-  deleted: boolean;
-  guestId: number;
-  guestNickname: string;
-  guestProfileImageUrl: string;
-  topGuestbookId: number;
-  replies: null;
   updatedAt: string;
+  deleted: boolean;
+  replies: CommunityCommentItem[];
 }
 
-interface GuestbookItem {
-  id: number;
-  content: string;
-  createdAt: string;
-  deleted: boolean;
-  guestId: number;
-  guestNickname: string;
-  guestProfileImageUrl: string;
-  topGuestbookId: null;
-  updatedAt: string;
-  replies: GuestbookReply[] | null;
-}
-
-interface GuestbookResponse {
+interface CommunityCommentResponse {
+  message: string;
+  success: boolean;
+  code: string;
+  responseAt: string;
   data: {
-    guestbooks: GuestbookItem[];
+    comments: CommunityCommentItem[];
     currentPage: number;
-    totalCount: number;
     pageSize: number;
   };
 }
 
-const ProfileCommentList = () => {
+const CommunityCommentList = () => {
   const { callApi } = useFetch();
   const accessToken = useGetAccessToken();
   const { otherUserInfo } = useOtherUserInfoStore();
   const userId = otherUserInfo.userId;
   const existAccess = useCheckAccess(accessToken);
   const router = useRouter();
+  const { tilId } = useParams();
+  const tilIdNumber = Number(tilId);
 
   const deleteModal = useModal();
   const [deleteTargetId, setDeleteTargetId] = useState<number | null>(null);
@@ -101,11 +93,11 @@ const ProfileCommentList = () => {
     hasNextPage,
     isFetchingNextPage,
   } = useInfiniteQuery({
-    queryKey: profileKeys.profileCommentList(userId ?? undefined).queryKey,
+    queryKey: communityKeys.communityComment(tilIdNumber).queryKey,
     queryFn: async ({ pageParam = 0 }) => {
-      const response = await callApi<GuestbookResponse>({
+      const response = await callApi<CommunityCommentResponse>({
         method: 'GET',
-        endpoint: `/users/${userId}/guestbooks?page=${pageParam}&offset=20`,
+        endpoint: `/community/${tilIdNumber}/comments?page=${pageParam}&offset=20`,
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
@@ -114,11 +106,11 @@ const ProfileCommentList = () => {
       return response;
     },
     getNextPageParam: (lastPage, allPages) => {
-      if (lastPage.data.guestbooks.length < 20) return undefined;
+      if (lastPage.data.comments.length < 20) return undefined;
       return allPages.length;
     },
     initialPageParam: 0,
-    enabled: !!userId && existAccess,
+    enabled: !!tilId && existAccess,
     staleTime: 300000,
     gcTime: 300000,
   });
@@ -147,55 +139,55 @@ const ProfileCommentList = () => {
     setDeleteTargetId(id);
     deleteModal.open();
   };
-
+  
   const formatDate = (iso: string) => new Date(iso).toLocaleString();
-
-  const renderItem = (item: GuestbookItem | GuestbookReply, isReply = false) => {
+  
+  const renderItem = (item: CommunityCommentItem, isReply = false) => {
     const isMenuOpen = openMenuId === item.id;
     const isEditing = editingId === item.id;
     const isReplying = replyingToId === item.id;
-
+    
     return (
       <div
-        key={`comment-${item.id}-${isReply ? 'reply' : 'parent'}`}
-        className="profile-comment-list__item"
+      key={`comment-${item.id}-${isReply ? 'reply' : 'parent'}`}
+      className="community-comment-list__item"
       >
-        <div className="profile-comment-list__header">
+        <div className="community-comment-list__header">
           {isReply && (
             <Image
               src="/images/replyIcon.png"
               alt="대댓글 아이콘"
               width={16}
               height={16}
-              className="profile-comment-list__reply-icon"
-            />
-          )}
+              className="community-comment-list__reply-icon"
+              />
+            )}
           <Image
-            src={item.guestProfileImageUrl}
-            alt={`${item.guestNickname}의 프로필`}
+            src={item.profileImageUrl}
+            alt={`${item.nickname}의 프로필`}
             width={32}
             height={32}
-            className="profile-comment-list__profile-image"
-            onClick={() => handleMoveToProfile(item.guestId)}
-          />
-          <div className="profile-comment-list__info">
-            <div className="profile-comment-list__meta">
+            className="community-comment-list__profile-image"
+            onClick={() => handleMoveToProfile(item.userId)}
+            />
+          <div className="community-comment-list__info">
+            <div className="community-comment-list__meta">
               <span
-                className="profile-comment-list__nickname"
-                onClick={() => handleMoveToProfile(item.guestId)}
+                className="community-comment-list__nickname"
+                onClick={() => handleMoveToProfile(item.userId)}
               >
-                {item.guestNickname}
+                {item.nickname}
               </span>
-              <div className="profile-comment-list__meta-right">
-                <span className="profile-comment-list__date">{formatDate(item.createdAt)}</span>
+              <div className="community-comment-list__meta-right">
+                <span className="community-comment-list__date">{formatDate(item.createdAt)}</span>
                 <div
-                  className="profile-comment-list__menu-wrapper"
+                  className="community-comment-list__menu-wrapper"
                   ref={(el) => {
                     refs.current[item.id] = el;
                   }}
                 >
                   <button
-                    className="profile-comment-list__menu-button"
+                    className="community-comment-list__menu-button"
                     onClick={(e) => {
                       e.stopPropagation();
                       setOpenMenuId((prev) => (prev === item.id ? null : item.id));
@@ -206,10 +198,10 @@ const ProfileCommentList = () => {
                     <span />
                   </button>
                   {isMenuOpen && (
-                    <ProfileCommentUtils
-                      guestId={item.guestId}
-                      guestbookId={item.id}
-                      topGuestbookId={item.topGuestbookId ?? null}
+                    <CommunityCommentUtils
+                      commentOwnerId={item.userId}
+                      commentId={item.id}
+                      topCommentId={item.topCommentId ?? null}
                       originalContent={item.content}
                       profileOwnerId={userId}
                       onCloseDropdown={() => setOpenMenuId(null)}
@@ -221,14 +213,14 @@ const ProfileCommentList = () => {
                 </div>
               </div>
             </div>
-            <div className="profile-comment-list__text">
+            <div className="community-comment-list__text">
               {item.deleted || item.content === '페이지 소유자가 삭제한 댓글입니다.' ? (
                 <del>{item.content}</del>
               ) : isEditing ? (
-                <ProfileEditCommentInput
+                <CommunityEditCommentInput
                   originalContent={editingContent}
-                  profileUserId={userId}
-                  guestbookId={item.id}
+                  commentId={item.id}
+                  tilId={tilIdNumber}
                   onComplete={() => {
                     setEditingId(null);
                     setEditingContent('');
@@ -239,9 +231,9 @@ const ProfileCommentList = () => {
               )}
             </div>
             {isReplying && replyTopId !== null && (
-              <ProfileReplyCommentInput
-                topGuestbookId={replyTopId}
-                userId={userId}
+              <CommunityReplyCommentInput
+                topCommentId={replyTopId}
+                tilId={tilIdNumber}
                 onComplete={() => {
                   setReplyingToId(null);
                   setReplyTopId(null);
@@ -250,24 +242,26 @@ const ProfileCommentList = () => {
             )}
           </div>
         </div>
+
+        {item.replies?.map((reply) => renderItem(reply, true))}
       </div>
     );
   };
 
   return (
-    <div className="profile-comment-list">
+    <div className="community-comment-list">
       {data?.pages.flatMap((page) =>
-        page.data.guestbooks.map((comment) => (
+        page.data.comments.map((comment) => (
           <div key={`group-${comment.id}`}>
             {renderItem(comment)}
-            {comment.replies?.map((reply) => renderItem(reply, true))}
           </div>
         ))
       )}
 
       {deleteModal.isOpen && deleteTargetId !== null && (
         <CheckDeleteCommentModal
-          guestbookId={deleteTargetId}
+          commentId={deleteTargetId}
+          tilId={tilIdNumber}
           onClose={() => {
             deleteModal.close();
             setDeleteTargetId(null);
@@ -284,4 +278,4 @@ const ProfileCommentList = () => {
   );
 };
 
-export default ProfileCommentList;
+export default CommunityCommentList;

@@ -1,0 +1,49 @@
+.comment-input {
+  position: fixed;
+  bottom: 54px;
+  margin-left: auto;
+  padding: 4px 8px;
+  z-index: 998;
+  background-color: #fff;
+  box-sizing: border-box;
+  width: 500px;
+  display: flex;
+  justify-content: space-between;
+
+  &__field {
+    flex: 1;
+    padding: 10px;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 12px;
+    margin-right: 8px;
+
+    &::placeholder {
+      color: #aaa;
+      transition: color 0.1s ease;
+    }
+
+    &:focus {
+      outline: none;
+      border: 1px solid #ccc;
+    }
+
+    &:focus::placeholder {
+      color: transparent;
+    }
+  }
+
+  &__button {
+    padding: 10px 16px;
+    background-color: #00B6F9;
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    width: 60px;
+    cursor: pointer;
+
+    &:hover {
+      background-color: #009ddc;
+    }
+  }
+}
