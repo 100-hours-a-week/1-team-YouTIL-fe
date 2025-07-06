@@ -21,6 +21,9 @@ interface TILItem {
   title: string;
   tags: string[];
   createdAt: string;
+  visitedCount:number;
+  recommendCount : number;
+
 }
 
 interface TILResponse {
@@ -40,7 +43,7 @@ const UserTILList = () => {
   const { data, isFetchingNextPage, hasNextPage, fetchNextPage } = useInfiniteQuery<TILResponse, Error>({
     queryKey: profileKeys.profileTIL(userId).queryKey,
     queryFn: async ({ pageParam }: QueryFunctionContext) => {
-      return await callApi<TILResponse>({
+      const response = await callApi<TILResponse>({
         method: 'GET',
         endpoint: `/users/${userId}/tils?page=${pageParam}&offset=20`,
         headers: {
@@ -48,6 +51,7 @@ const UserTILList = () => {
         },
         credentials: 'include',
       });
+      return response;
     },
     initialPageParam: 0,
     getNextPageParam: (lastPage, allPages) => {
@@ -113,8 +117,8 @@ const UserTILList = () => {
                   {til.userName}
                 </Link>
 
-                <span className="usertil-list__views">조회수 0</span>
-                <span className="usertil-list__likes">추천 0</span>
+                <span className="usertil-list__views">조회수 {til.visitedCount}</span>
+                <span className="usertil-list__likes">추천 {til.recommendCount}</span>
                 <span className="usertil-list__date">
                   {format(parseISO(til.createdAt), 'yyyy-MM-dd : HH:mm:ss')}
                 </span>
