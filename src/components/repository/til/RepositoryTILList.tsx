@@ -102,6 +102,7 @@ const RepositoryTILList = () => {
   });
 
   const { data: tilDetailData } = useQuery<TILDetailItem | null>({
+    // querykey: [til-detail, expandedTilId]
     queryKey: repositoryKeys.repositoryTILDetail(expandedTilId ?? undefined).queryKey,
     queryFn: async () => {
       if (expandedTilId === null) return null;

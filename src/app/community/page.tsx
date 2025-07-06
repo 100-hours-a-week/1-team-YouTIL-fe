@@ -1,7 +1,13 @@
+'use client';
+
+import CommunityNavigation from "@/components/community/communityNavigation/CommunityNavigation";
+import CommunityList from "@/components/community/communityList/CommunityList";
+
 const community =() =>{
     return(
         <div>
-            곧 출시 예정인 서비스입니다!
+            <CommunityNavigation/>
+            <CommunityList/>
         </div>
     )
 }

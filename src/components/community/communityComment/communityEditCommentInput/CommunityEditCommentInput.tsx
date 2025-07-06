@@ -1,23 +1,23 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import './ProfileEditCommentInput.scss';
+import './CommunityEditCommentInput.scss';
 import { useFetch } from '@/hooks/useFetch';
 import useGetAccessToken from '@/hooks/useGetAccessToken';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { profileKeys } from '@/querykey/profile.querykey';
+import { communityKeys } from '@/querykey/community.querykey';
 
 interface Props {
   originalContent: string;
-  profileUserId: number | null;
-  guestbookId: number;
+  commentId: number;
+  tilId: number;
   onComplete: () => void;
 }
 
-const ProfileEditCommentInput = ({
+const CommunityEditCommentInput = ({
   originalContent,
-  profileUserId,
-  guestbookId,
+  commentId,
+  tilId,
   onComplete,
 }: Props) => {
   const [editContent, setEditContent] = useState('');
@@ -33,7 +33,7 @@ const ProfileEditCommentInput = ({
     mutationFn: async () => {
       return await callApi({
         method: 'PUT',
-        endpoint: `/users/${profileUserId}/guestbooks/${guestbookId}`,
+        endpoint: `/community/${tilId}/comments/${commentId}`,
         body: { content: editContent.trim() },
         headers: {
           Authorization: `Bearer ${accessToken}`,
@@ -43,7 +43,10 @@ const ProfileEditCommentInput = ({
       });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: profileKeys.profileCommentList._def, exact: false });
+      queryClient.invalidateQueries({
+        queryKey: communityKeys.communityComment(tilId).queryKey,
+        exact: false,
+      });
       onComplete();
     },
     onError: (err) => {
@@ -91,4 +94,4 @@ const ProfileEditCommentInput = ({
   );
 };
 
-export default ProfileEditCommentInput;
+export default CommunityEditCommentInput;
