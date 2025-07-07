@@ -9,7 +9,7 @@ import Image from 'next/image';
 import './TechNews.scss';
 import { mainKeys } from '@/querykey/main.querykey';
 
-export interface NewsItem {
+interface NewsItem {
   title: string;
   link: string;
   thumbnail: string;
@@ -17,12 +17,10 @@ export interface NewsItem {
   summary: string;
 }
 
-export interface NewsData {
-  news: NewsItem[];
-}
-
-export interface NewsApiResponse {
-  data: NewsData;
+interface NewsApiResponse {
+  data: {
+    news: NewsItem[];
+  };
 }
 
 const TechNews = () => {
