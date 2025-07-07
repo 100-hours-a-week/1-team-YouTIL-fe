@@ -29,7 +29,7 @@ const ProfileEditCommentInput = ({
     setEditContent(originalContent);
   }, [originalContent]);
 
-  const { isPending } = useMutation({
+  const { isPending, mutate } = useMutation({
     mutationFn: async () => {
       return await callApi({
         method: 'PUT',
@@ -68,6 +68,7 @@ const ProfileEditCommentInput = ({
 
   const handleSubmit = async () => {
     if (!editContent.trim() || isPending) return;
+    mutate();
   };
 
   return (

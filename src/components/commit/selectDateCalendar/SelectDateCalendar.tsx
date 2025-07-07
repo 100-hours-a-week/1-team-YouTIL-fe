@@ -48,14 +48,13 @@ const SelectDateCalendar = () => {
 
   const { data: commitData } = useQuery({
     queryKey: commitKeys.commitListCalendar(
-      selectedOrganization?.organization_id,
+      selectedOrganization?.organization_id ?? '',
       selectedRepository?.repositoryId,
       selectedBranchName?.branchName,
       year
     ).queryKey,
     queryFn: async () => {
       if (!selectedRepository || !selectedBranchName) return { calendar: {} };
-
       const queryParams = new URLSearchParams({
         repositoryId: String(selectedRepository.repositoryId),
         branchId: selectedBranchName.branchName,

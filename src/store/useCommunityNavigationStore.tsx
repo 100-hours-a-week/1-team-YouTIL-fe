@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 
-type Category = 'ENTIRE' | 'FULLSTACK' | 'AI' | 'CLOUD' | null;
+type Category = 'ENTIRE' | 'FULLSTACK' | 'AI' | 'CLOUD';
 
 interface CommunityNavigationState {
   selectedCategory: Category;
@@ -8,6 +8,6 @@ interface CommunityNavigationState {
 }
 
 export const useCommunityNavigationStore = create<CommunityNavigationState>((set) => ({
-  selectedCategory: null,
+  selectedCategory: 'ENTIRE',
   setCategory: (category) => set({ selectedCategory: category }),
 }));

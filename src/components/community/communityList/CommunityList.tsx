@@ -14,6 +14,7 @@ import { parseISO, format } from 'date-fns';
 import './CommunityList.scss';
 import useSaveScrollAndNavigate from '@/hooks/useSaveScrollAndNavigate';
 import useScrollRestoreOnReturn from '@/hooks/useScrollRestoreOnReturn';
+import { communityKeys } from '@/querykey/community.querykey';
 
 interface CommunityItem {
   tilId: number;
@@ -50,7 +51,7 @@ const CommunityList = () => {
     hasNextPage,
     isFetchingNextPage,
   } = useInfiniteQuery({
-    queryKey: ['community-list', selectedCategory],
+    queryKey: communityKeys.list(selectedCategory).queryKey,
     queryFn: async ({ pageParam = 0 }) => {
       const response = await callApi<CommunityResponse>({
         method: 'GET',

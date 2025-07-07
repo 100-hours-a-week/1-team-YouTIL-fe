@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef } from 'react';
-import { useInfiniteQuery } from '@tanstack/react-query';
+import { useInfiniteQuery, useQueryClient } from '@tanstack/react-query';
 import { useOrganizationStore } from '@/store/useOrganizationStore';
 import { useRepositoryStore } from '@/store/useRepositoryStore';
 import { useBranchStore } from '@/store/useBranchStore';
@@ -10,6 +10,8 @@ import useCheckAccess from '@/hooks/useCheckExistAccess';
 import useGetAccessToken from '@/hooks/useGetAccessToken';
 import { useDraftSelectionStore } from '@/store/useDraftSelectionStore';
 import { useInfinityScrollObserver } from '@/hooks/useInfinityScrollObserver';
+import { commitKeys } from '@/querykey/commit.querykey';
+import { format } from 'date-fns';
 import './SelectBranchModal.scss';
 
 interface Branch {
@@ -42,6 +44,7 @@ const SelectBranchModal = ({ onClose }: Props) => {
   const { callApi } = useFetch();
   const accessToken = useGetAccessToken();
   const existAccess = useCheckAccess(accessToken);
+  const queryClient = useQueryClient();
 
   const [selectedBranchName, setSelectedBranchName] = useState<string | null>(null);
   const scrollContainerRef = useRef<HTMLDivElement | null>(null);
@@ -53,7 +56,7 @@ const SelectBranchModal = ({ onClose }: Props) => {
     isFetchingNextPage,
     isLoading,
   } = useInfiniteQuery({
-    queryKey: ['branches', draftOrg?.organization_id ?? '', draftRepo?.repositoryId],
+    queryKey: commitKeys.branch(draftOrg?.organization_id ?? '', draftRepo?.repositoryId).queryKey,
     queryFn: async ({ pageParam = 0 }) => {
       const response = await callApi<BranchResponse>({
         method: 'GET',
@@ -91,6 +94,9 @@ const SelectBranchModal = ({ onClose }: Props) => {
 
   const handleComplete = () => {
     if (!draftRepo || !draftBranch?.branchName) return;
+    queryClient.removeQueries({
+      queryKey: ['commit'],
+    });
     setSelectedOrganization(draftOrg);
     setSelectedRepository(draftRepo);
     setSelectedBranch({ branchName: draftBranch.branchName });

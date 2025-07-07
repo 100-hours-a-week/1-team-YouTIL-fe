@@ -38,6 +38,7 @@ const NewTILList = () => {
   const userId = useUserInfoStore((state) => state.userInfo.userId);
   const saveAndPush = useSaveScrollAndNavigate(`user-til-${userId}`);
   useScrollRestoreOnReturn(`user-til-${userId}`);
+
   const { data: tils, isError } = useQuery<TILItem[]>({
     queryKey: mainKeys.newTILList().queryKey,
     queryFn: async () => {

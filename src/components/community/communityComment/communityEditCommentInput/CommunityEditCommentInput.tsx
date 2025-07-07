@@ -29,7 +29,7 @@ const CommunityEditCommentInput = ({
     setEditContent(originalContent);
   }, [originalContent]);
 
-  const { isPending } = useMutation({
+  const { mutate, isPending } = useMutation({
     mutationFn: async () => {
       return await callApi({
         method: 'PUT',
@@ -71,6 +71,7 @@ const CommunityEditCommentInput = ({
 
   const handleSubmit = async () => {
     if (!editContent.trim() || isPending) return;
+    mutate();
   };
 
   return (

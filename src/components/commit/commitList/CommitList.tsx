@@ -11,6 +11,7 @@ import { useBranchStore } from '@/store/useBranchStore';
 import { useSelectedDateStore } from '@/store/useDateStore';
 import { useCommitListLogic } from '@/hooks/commit/commitList/useCommitListLogic';
 import NoCommitDescription from '../noCommitDescription/NoCommitDescription';
+import { commitKeys } from '@/querykey/commit.querykey';
 import './CommitList.scss';
 
 interface Commit {
@@ -35,13 +36,14 @@ const CommitList = () => {
   const selectedDate = useSelectedDateStore((state) => state.selectedDate);
 
   const { data: commitData, isLoading } = useQuery<CommitDetailResponse>({
-    queryKey: [
-      'commits',
-      selectedOrganization?.organization_id ?? '',
-      selectedRepository?.repositoryId,
-      selectedBranchName?.branchName,
-      selectedDate,
-    ],
+    // queryKey: [
+    //   'commits',
+    //   selectedOrganization?.organization_id ?? '',
+    //   selectedRepository?.repositoryId,
+    //   selectedBranchName?.branchName,
+    //   selectedDate,
+    // ],
+    queryKey : commitKeys.commitList(selectedOrganization?.organization_id ?? '', selectedRepository?.repositoryId, selectedBranchName?.branchName, selectedDate).queryKey,
     queryFn: async () => {
       const response = await callApi<CommitDetailResponse>({
         method: 'GET',
