@@ -1,7 +1,7 @@
 import { createQueryKeys } from '@lukemorales/query-key-factory';
 
 export const commitKeys = createQueryKeys('commit', {
-  commitListCalendar: (
+  commitCalendar: (
     organizationId: string | number,
     repositoryId: number | undefined,
     branchName: string | undefined,
@@ -17,7 +17,7 @@ export const commitKeys = createQueryKeys('commit', {
   organization:() => ['static'],
   repository: (organizationId: string | number) => [organizationId || ''],
   branch:(organization_id : string | number, repositoryId : number | undefined) => [organization_id || '', repositoryId],
-  commitList :(organization_id : string | number, 
+  list :(organization_id : string | number, 
     repositoryId : number | undefined, 
     branchName : string | undefined, 
     selectedDate : string) => [organization_id || '', repositoryId, branchName, selectedDate],

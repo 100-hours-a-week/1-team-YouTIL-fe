@@ -12,6 +12,8 @@ import Markdown from 'react-markdown';
 import './RepositoryInterviewList.scss';
 import { repositoryKeys } from '@/querykey/repository.querykey';
 import { useInfinityScrollObserver } from '@/hooks/useInfinityScrollObserver';
+import { useEffect } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 
 interface InterviewResponse {
   data: { interviews: InterviewItem[] };
@@ -43,7 +45,7 @@ const RepositoryInterviewList = () => {
   const accessToken = useGetAccessToken();
   const existAccess = useCheckAccess(accessToken);
   const { interviewDate } = useRepositoryDateStore();
-
+  const queryClient = useQueryClient();
   const {
     expandedInterviewId,
     visibleAnswerMap,
@@ -58,13 +60,21 @@ const RepositoryInterviewList = () => {
     toggleInterviewSelection,
   } = useRepositoryInterviewList();
 
+  useEffect(() => {
+    if (interviewDate && existAccess) {
+      queryClient.removeQueries({ queryKey: ['disabled-query'], exact: true });
+    }
+  }, [interviewDate, existAccess]);
+  
   const {
     data: interviewPages,
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
   } = useInfiniteQuery({
-    queryKey: repositoryKeys.interviewList(interviewDate).queryKey,
+    queryKey: interviewDate
+      ? repositoryKeys.interviewList(interviewDate).queryKey
+      : ['disabled-query'],
     queryFn: async ({ pageParam = 0 }) => {
       const targetDate = interviewDate || format(new Date(), 'yyyy-MM-dd');
       const response = await callApi<InterviewResponse>({
@@ -80,7 +90,7 @@ const RepositoryInterviewList = () => {
       return isLast ? undefined : allPages.length;
     },
     initialPageParam: 0,
-    enabled: existAccess,
+    enabled: !!interviewDate && existAccess,
     staleTime: 1800000,
     gcTime: 3600000,
   });
@@ -92,7 +102,10 @@ const RepositoryInterviewList = () => {
   });
 
   const { data: interviewDetailData } = useQuery<InterviewDetail | null>({
-    queryKey: repositoryKeys.interviewDetail(expandedInterviewId ?? undefined).queryKey,
+    queryKey:
+      expandedInterviewId !== null
+        ? repositoryKeys.interviewDetail(expandedInterviewId).queryKey
+        : ['disabled-query'],
     queryFn: async () => {
       if (expandedInterviewId === null) return null;
       const response = await callApi<InterviewDetailResponse>({

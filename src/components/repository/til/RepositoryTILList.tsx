@@ -2,6 +2,7 @@
 
 import './RepositoryTILList.scss';
 import Image from 'next/image';
+import { useEffect } from 'react';
 import { useQuery, useQueryClient, useInfiniteQuery } from '@tanstack/react-query';
 import { format, parseISO } from 'date-fns';
 import { useRepositoryTILList } from '@/hooks/repository/til/useRepositoryTILList';
@@ -66,13 +67,23 @@ const RepositoryTILList = () => {
   const { callApi } = useFetch();
   const queryClient = useQueryClient();
 
+  
+  useEffect(() => {
+    if (tilDate) {
+      queryClient.removeQueries({ queryKey: ['disabled-query'] });
+    }
+  }, [tilDate]);
+  
+  
   const {
     data: tilPages,
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
   } = useInfiniteQuery({
-    queryKey: repositoryKeys.tilList(tilDate).queryKey,
+    queryKey: tilDate
+    ? repositoryKeys.tilList(tilDate).queryKey
+    : ['disabled-query'], 
     queryFn: async ({ pageParam = 0 }) => {
       const targetDate = tilDate || format(new Date(), 'yyyy-MM-dd');
       const response = await callApi<TILResponse>({
@@ -88,7 +99,7 @@ const RepositoryTILList = () => {
       return isLast ? undefined : allPages.length;
     },
     initialPageParam: 0,
-    enabled: existAccess,
+    enabled: !!tilDate && existAccess,
     staleTime: 1800000,
     gcTime: 3600000,
   });
@@ -102,7 +113,9 @@ const RepositoryTILList = () => {
   });
 
   const { data: tilDetailData } = useQuery<TILDetailItem | null>({
-    queryKey: repositoryKeys.tilDetail(expandedTilId ?? undefined).queryKey,
+    queryKey: expandedTilId !== null
+    ? repositoryKeys.tilDetail(expandedTilId).queryKey
+    : ['disabled-query'],
     queryFn: async () => {
       if (expandedTilId === null) return null;
       const response = await callApi<{ data: TILDetailItem }>({
@@ -126,7 +139,7 @@ const RepositoryTILList = () => {
     e?.stopPropagation();
     setIsSubmitting(true);
 
-    queryClient.setQueryData<TILItem[]>(['til-list', tilDate], (prev) =>
+    queryClient.setQueryData<TILItem[]>(repositoryKeys.tilList(tilDate).queryKey, (prev) =>
       prev?.map((til) =>
         til.tilId === tilId ? { ...til, title: editedTitle.trim() } : til
       ) ?? prev
