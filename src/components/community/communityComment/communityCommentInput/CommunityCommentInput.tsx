@@ -39,7 +39,7 @@ const CommunityCommentInput = () => {
     },
     onSuccess: () => {
       setComment('');
-      queryClient.invalidateQueries({queryKey: communityKeys.communityComment(tilIdNumber).queryKey})
+      queryClient.invalidateQueries({queryKey: communityKeys.comment(tilIdNumber).queryKey})
     },
     onError: (error) => {
       console.error('댓글 등록 실패:', error);

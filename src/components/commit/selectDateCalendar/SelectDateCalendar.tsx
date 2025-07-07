@@ -26,6 +26,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useFetch } from '@/hooks/useFetch';
 import useCheckAccess from '@/hooks/useCheckExistAccess';
 import { commitKeys } from '@/querykey/commit.querykey';
+import { useQueryClient } from '@tanstack/react-query';
 
 interface CommitCalendarResponse {
   calendar: Record<string, number>;
@@ -38,6 +39,7 @@ const SelectDateCalendar = () => {
   const selectedBranchName = useBranchStore((state) => state.selectedBranch);
   const accessToken = useGetAccessToken();
   const existAccess = useCheckAccess(accessToken);
+  const queryClient = useQueryClient();
   const { callApi } = useFetch();
 
   const parsedStoredDate = storedDate ? parseISO(storedDate) : new Date();
@@ -46,16 +48,32 @@ const SelectDateCalendar = () => {
 
   const year = format(currentDate, 'yyyy');
 
-  const { data: commitData } = useQuery({
-    queryKey: commitKeys.commitListCalendar(
-      selectedOrganization?.organization_id,
-      selectedRepository?.repositoryId,
-      selectedBranchName?.branchName,
+  useEffect(() => {
+    if (
+      selectedOrganization &&
+      selectedRepository &&
+      selectedBranchName &&
       year
-    ).queryKey,
+    ) {
+      queryClient.removeQueries({ queryKey: ['disabled-query'], exact: false });
+    }
+  }, [selectedOrganization, selectedRepository, selectedBranchName, year]);
+
+  const { data: commitData } = useQuery({
+    queryKey:
+    selectedOrganization &&
+    selectedRepository &&
+    selectedBranchName &&
+    year
+      ? commitKeys.commitCalendar(
+          selectedOrganization.organization_id,
+          selectedRepository.repositoryId,
+          selectedBranchName.branchName,
+          year
+        ).queryKey
+      : ['disabled-query'],
     queryFn: async () => {
       if (!selectedRepository || !selectedBranchName) return { calendar: {} };
-
       const queryParams = new URLSearchParams({
         repositoryId: String(selectedRepository.repositoryId),
         branchId: selectedBranchName.branchName,

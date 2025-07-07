@@ -40,7 +40,7 @@ const CommunityReplyCommentInput = ({ topCommentId, onComplete,tilId  }: Props) 
     },
     onSuccess: () => {
       setReplyContent('');
-      queryClient.invalidateQueries({queryKey: communityKeys.communityComment(tilId).queryKey, exact: false})
+      queryClient.invalidateQueries({queryKey: communityKeys.comment(tilId).queryKey, exact: false})
       onComplete();
     },
     onError: (error: unknown) => {

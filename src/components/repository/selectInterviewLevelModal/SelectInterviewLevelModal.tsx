@@ -62,8 +62,8 @@ const SelectInterviewLevelModal = ({ onClose, tilId }: Props) => {
       setResultMessage(null);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({queryKey: repositoryKeys.repositoryInterview._def, exact: false})
-      queryClient.invalidateQueries({queryKey : repositoryKeys.repositoryInterviewCalendar._def, exact: false})
+      queryClient.invalidateQueries({queryKey: repositoryKeys.interviewList._def, exact: false})
+      queryClient.invalidateQueries({queryKey : repositoryKeys.interviewCalendar._def, exact: false})
       setResultMessage('success');
       setActiveTab('interview'); 
       setTimeout(onClose, 1500);

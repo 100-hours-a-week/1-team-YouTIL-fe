@@ -38,7 +38,7 @@ const ProfileCommentInput = () => {
     onSuccess: () => {
       setComment('');
       queryClient.invalidateQueries({ queryKey: ['guestbooks-list', otherUserId] });
-      queryClient.invalidateQueries({queryKey: profileKeys.profileCommentList(otherUserId ?? undefined).queryKey});
+      queryClient.invalidateQueries({queryKey: profileKeys.commentList(otherUserId ?? undefined).queryKey});
     },
     onError: (error) => {
       console.error('댓글 등록 실패:', error);

@@ -8,6 +8,7 @@ import useCheckAccess from '@/hooks/useCheckExistAccess';
 import { useDraftSelectionStore } from '@/store/useDraftSelectionStore';
 import { useInfinityScrollObserver } from '@/hooks/useInfinityScrollObserver';
 import './SelectOrganizationModal.scss';
+import { commitKeys } from '@/querykey/commit.querykey';
 
 interface Organization {
   organization_id: number;
@@ -42,7 +43,7 @@ const SelectOrganizationModal = ({ onClose, onComplete }: Props) => {
     hasNextPage,
     isFetchingNextPage,
   } = useInfiniteQuery({
-    queryKey: ['organization'],
+    queryKey: commitKeys.organization().queryKey,
     queryFn: async ({ pageParam = 0 }) => {
       const response = await callApi<OrganizationResponse>({
         method: 'GET',

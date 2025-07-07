@@ -30,9 +30,9 @@ const CheckDeleteInterviewModal = ({ interviewIds, onClose, onDeleteComplete }: 
       });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({queryKey : repositoryKeys.repositoryInterviewCalendar._def, exact: false})
-      queryClient.invalidateQueries({ queryKey: repositoryKeys.repositoryInterview._def, exact: false})
-      queryClient.invalidateQueries({queryKey: repositoryKeys.repositoryInterviewDetail._def, exact: false})
+      queryClient.invalidateQueries({queryKey : repositoryKeys.interviewCalendar._def, exact: false})
+      queryClient.invalidateQueries({ queryKey: repositoryKeys.interviewList._def, exact: false})
+      queryClient.invalidateQueries({queryKey: repositoryKeys.interviewDetail._def, exact: false})
       onDeleteComplete();
       onClose();
     },

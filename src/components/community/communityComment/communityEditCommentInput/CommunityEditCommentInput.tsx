@@ -29,7 +29,7 @@ const CommunityEditCommentInput = ({
     setEditContent(originalContent);
   }, [originalContent]);
 
-  const { isPending } = useMutation({
+  const { mutate, isPending } = useMutation({
     mutationFn: async () => {
       return await callApi({
         method: 'PUT',
@@ -44,7 +44,7 @@ const CommunityEditCommentInput = ({
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: communityKeys.communityComment(tilId).queryKey,
+        queryKey: communityKeys.comment(tilId).queryKey,
         exact: false,
       });
       onComplete();
@@ -71,6 +71,7 @@ const CommunityEditCommentInput = ({
 
   const handleSubmit = async () => {
     if (!editContent.trim() || isPending) return;
+    mutate();
   };
 
   return (

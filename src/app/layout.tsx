@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.scss";
 import LayoutWrapper from "@/app/layoutWrapper/LayoutWrapper";
-
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 export const metadata: Metadata = {
   title: "YouTIL",
   description: "YouTIL",
@@ -16,6 +16,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body>
         <LayoutWrapper>
           {children}
+          <ReactQueryDevtools/>
         </LayoutWrapper>
       </body>
     </html>

@@ -38,6 +38,7 @@ const NewTILList = () => {
   const userId = useUserInfoStore((state) => state.userInfo.userId);
   const saveAndPush = useSaveScrollAndNavigate(`user-til-${userId}`);
   useScrollRestoreOnReturn(`user-til-${userId}`);
+
   const { data: tils, isError } = useQuery<TILItem[]>({
     queryKey: mainKeys.newTILList().queryKey,
     queryFn: async () => {
@@ -99,6 +100,7 @@ const NewTILList = () => {
 
             <span className="til-list__views">조회수 {til.visitedCount}</span>
             <span className="til-list__likes">추천 {til.recommendCount}</span>
+            <span className="til-list__comments">댓글 {til.commentsCount}</span>
             <span className="til-list__date">
               {format(parseISO(til.createdAt), 'yyyy-MM-dd : HH:mm:ss')}
             </span>

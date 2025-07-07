@@ -8,6 +8,7 @@ import useCheckAccess from '@/hooks/useCheckExistAccess';
 import { useDraftSelectionStore } from '@/store/useDraftSelectionStore';
 import { useInfinityScrollObserver } from '@/hooks/useInfinityScrollObserver';
 import './SelectRepositoryModal.scss';
+import { commitKeys } from '@/querykey/commit.querykey';
 
 interface Repository {
   repositoryId: number;
@@ -43,7 +44,7 @@ const SelectRepositoryModal = ({ onClose, onComplete }: Props) => {
     isFetchingNextPage,
     isLoading,
   } = useInfiniteQuery({
-    queryKey: ['repository', draftOrg?.organization_id ?? ''],
+    queryKey: commitKeys.repository(draftOrg?.organization_id ?? '').queryKey,
     queryFn: async ({ pageParam = 0 }) => {
       const response = await callApi<RepositoryResponse>({
         method: 'GET',
