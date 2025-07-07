@@ -7,6 +7,7 @@ import useCheckAccess from '@/hooks/useCheckExistAccess';
 import { useTechNewsSlider } from '@/hooks/main/techNews/useTechNewsSlider';
 import Image from 'next/image';
 import './TechNews.scss';
+import { mainKeys } from '@/querykey/main.querykey';
 
 export interface NewsItem {
   title: string;
@@ -30,7 +31,7 @@ const TechNews = () => {
   const existAccess = useCheckAccess(accessToken);
 
   const { data } = useQuery({
-    queryKey: ['tech-news'] as const,
+    queryKey: mainKeys.techNews().queryKey,
     queryFn: async () => {
       const response = await callApi<NewsApiResponse>({
         method: 'GET',

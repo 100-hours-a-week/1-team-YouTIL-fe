@@ -11,7 +11,6 @@ import useGetAccessToken from '@/hooks/useGetAccessToken';
 import { useDraftSelectionStore } from '@/store/useDraftSelectionStore';
 import { useInfinityScrollObserver } from '@/hooks/useInfinityScrollObserver';
 import { commitKeys } from '@/querykey/commit.querykey';
-import { format } from 'date-fns';
 import './SelectBranchModal.scss';
 
 interface Branch {

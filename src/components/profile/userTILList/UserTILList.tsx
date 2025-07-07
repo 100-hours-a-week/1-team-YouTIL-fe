@@ -41,7 +41,7 @@ const UserTILList = () => {
   const saveAndNavigate = useSaveScrollAndNavigate(`user-til-${userId}`);
 
   const { data, isFetchingNextPage, hasNextPage, fetchNextPage } = useInfiniteQuery<TILResponse, Error>({
-    queryKey: profileKeys.profileTIL(userId).queryKey,
+    queryKey: profileKeys.tilList(userId).queryKey,
     queryFn: async ({ pageParam }: QueryFunctionContext) => {
       const response = await callApi<TILResponse>({
         method: 'GET',

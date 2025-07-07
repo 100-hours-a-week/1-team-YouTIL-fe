@@ -40,8 +40,7 @@ const ProfileReplyCommentInput = ({ topGuestbookId, userId, onComplete }: Props)
     },
     onSuccess: () => {
       setReplyContent('');
-      queryClient.invalidateQueries({ queryKey: ['guestbooks-list', userId] });
-      queryClient.invalidateQueries({queryKey: profileKeys.profileCommentList(userId ?? undefined).queryKey});
+      queryClient.invalidateQueries({queryKey: profileKeys.commentList(userId ?? undefined).queryKey});
       onComplete();
     },
     onError: (error: unknown) => {

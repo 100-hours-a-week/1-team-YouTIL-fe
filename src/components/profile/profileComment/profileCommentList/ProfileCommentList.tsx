@@ -101,7 +101,7 @@ const ProfileCommentList = () => {
     hasNextPage,
     isFetchingNextPage,
   } = useInfiniteQuery({
-    queryKey: profileKeys.profileCommentList(userId ?? undefined).queryKey,
+    queryKey: profileKeys.commentList(userId ?? undefined).queryKey,
     queryFn: async ({ pageParam = 0 }) => {
       const response = await callApi<GuestbookResponse>({
         method: 'GET',

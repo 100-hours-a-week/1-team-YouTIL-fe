@@ -9,6 +9,7 @@ import useGetAccessToken from '@/hooks/useGetAccessToken';
 import useCheckAccess from '@/hooks/useCheckExistAccess';
 import Markdown from 'react-markdown';
 import './CommunityDetail.scss';
+import { communityKeys } from '@/querykey/community.querykey';
 
 interface TILDetail {
   author: string;
@@ -25,17 +26,18 @@ interface TILDetail {
 
 const CommunityDetailPage = () => {
   const { tilId } = useParams();
+  const tilIdNumber = Number(tilId);
   const { callApi } = useFetch();
   const accessToken = useGetAccessToken();
   const existAccess = useCheckAccess(accessToken);
   const queryClient = useQueryClient();
 
   const { data: communityDetailData, isLoading } = useQuery({
-    queryKey: ['community-detail', tilId],
+    queryKey: communityKeys.detail(tilIdNumber).queryKey,
     queryFn: async () => {
       const response = await callApi<{ data: TILDetail }>({
         method: 'GET',
-        endpoint: `/community/${tilId}`,
+        endpoint: `/community/${tilIdNumber}`,
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
@@ -50,7 +52,7 @@ const CommunityDetailPage = () => {
     mutationFn: async () => {
       return await callApi({
         method: 'POST',
-        endpoint: `/community/${tilId}/like`,
+        endpoint: `/community/${tilIdNumber}/like`,
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
@@ -58,7 +60,7 @@ const CommunityDetailPage = () => {
       });
     },
     onSuccess: () => {
-      queryClient.setQueryData(['community-detail', tilId], (oldData: TILDetail | undefined) => {
+      queryClient.setQueryData(communityKeys.detail(tilIdNumber).queryKey, (oldData: TILDetail | undefined) => {
         if (!oldData) return oldData;
         return {
           ...oldData,

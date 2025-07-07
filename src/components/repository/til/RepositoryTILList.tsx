@@ -72,7 +72,7 @@ const RepositoryTILList = () => {
     hasNextPage,
     isFetchingNextPage,
   } = useInfiniteQuery({
-    queryKey: repositoryKeys.repositoryTIL(tilDate).queryKey,
+    queryKey: repositoryKeys.tilList(tilDate).queryKey,
     queryFn: async ({ pageParam = 0 }) => {
       const targetDate = tilDate || format(new Date(), 'yyyy-MM-dd');
       const response = await callApi<TILResponse>({
@@ -102,8 +102,7 @@ const RepositoryTILList = () => {
   });
 
   const { data: tilDetailData } = useQuery<TILDetailItem | null>({
-    // querykey: [til-detail, expandedTilId]
-    queryKey: repositoryKeys.repositoryTILDetail(expandedTilId ?? undefined).queryKey,
+    queryKey: repositoryKeys.tilDetail(expandedTilId ?? undefined).queryKey,
     queryFn: async () => {
       if (expandedTilId === null) return null;
       const response = await callApi<{ data: TILDetailItem }>({
@@ -146,9 +145,9 @@ const RepositoryTILList = () => {
       });
       setEditingTilId(null);
       queryClient.invalidateQueries({ queryKey: mainKeys.newTILList().queryKey });
-      queryClient.invalidateQueries({ queryKey: profileKeys.profileTIL._def, exact: false });
-      queryClient.invalidateQueries({ queryKey: repositoryKeys.repositoryTIL._def, exact: false });
-      queryClient.invalidateQueries({ queryKey: repositoryKeys.repositoryTILDetail._def, exact: false });
+      queryClient.invalidateQueries({ queryKey: profileKeys.tilList._def, exact: false });
+      queryClient.invalidateQueries({ queryKey: repositoryKeys.tilList._def, exact: false });
+      queryClient.invalidateQueries({ queryKey: repositoryKeys.tilDetail._def, exact: false });
 
     } catch (err) {
       console.error('TIL 수정 실패:', err);

@@ -64,7 +64,7 @@ const RepositoryInterviewList = () => {
     hasNextPage,
     isFetchingNextPage,
   } = useInfiniteQuery({
-    queryKey: repositoryKeys.repositoryInterview(interviewDate).queryKey,
+    queryKey: repositoryKeys.interviewList(interviewDate).queryKey,
     queryFn: async ({ pageParam = 0 }) => {
       const targetDate = interviewDate || format(new Date(), 'yyyy-MM-dd');
       const response = await callApi<InterviewResponse>({
@@ -92,7 +92,7 @@ const RepositoryInterviewList = () => {
   });
 
   const { data: interviewDetailData } = useQuery<InterviewDetail | null>({
-    queryKey: repositoryKeys.repositoryInterviewDetail(expandedInterviewId ?? undefined).queryKey,
+    queryKey: repositoryKeys.interviewDetail(expandedInterviewId ?? undefined).queryKey,
     queryFn: async () => {
       if (expandedInterviewId === null) return null;
       const response = await callApi<InterviewDetailResponse>({

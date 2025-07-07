@@ -43,7 +43,7 @@ const ProfileEditCommentInput = ({
       });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: profileKeys.profileCommentList._def, exact: false });
+      queryClient.invalidateQueries({ queryKey: profileKeys.commentList._def, exact: false });
       onComplete();
     },
     onError: (err) => {
