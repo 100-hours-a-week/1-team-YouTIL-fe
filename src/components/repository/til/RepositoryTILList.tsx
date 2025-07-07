@@ -27,6 +27,10 @@ interface TILResponse {
   };
 }
 
+interface TILDetailResponse {
+  data: TILDetailItem;
+}
+
 interface TILDetailItem {
   title: string;
   content: string;
@@ -39,6 +43,7 @@ interface TILDetailItem {
   recommendCount: number;
   commentsCount: number;
 }
+
 
 const RepositoryTILList = () => {
   const {
@@ -92,6 +97,7 @@ const RepositoryTILList = () => {
         headers: { Authorization: `Bearer ${accessToken}` },
         credentials: 'include',
       });
+      console.log(response); 
       return response;
     },
     getNextPageParam: (lastPage, allPages) => {
@@ -118,7 +124,7 @@ const RepositoryTILList = () => {
     : ['disabled-query'],
     queryFn: async () => {
       if (expandedTilId === null) return null;
-      const response = await callApi<{ data: TILDetailItem }>({
+      const response = await callApi<TILDetailResponse>({
         method: 'GET',
         endpoint: `/tils/${expandedTilId}`,
         headers: { Authorization: `Bearer ${accessToken}` },
