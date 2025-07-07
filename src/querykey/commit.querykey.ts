@@ -2,7 +2,7 @@ import { createQueryKeys } from '@lukemorales/query-key-factory';
 
 export const commitKeys = createQueryKeys('commit', {
   commitCalendar: ( // 커밋 리스트 캘린더 쿼리키
-    organizationId: string | number,
+    organizationId: number | undefined,
     repositoryId: number | undefined,
     branchName: string | undefined,
     year?:string
