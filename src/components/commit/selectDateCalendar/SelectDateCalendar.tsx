@@ -48,30 +48,13 @@ const SelectDateCalendar = () => {
 
   const year = format(currentDate, 'yyyy');
 
-  useEffect(() => {
-    if (
-      selectedOrganization &&
-      selectedRepository &&
-      selectedBranchName &&
-      year
-    ) {
-      queryClient.removeQueries({ queryKey: ['disabled-query'], exact: false });
-    }
-  }, [selectedOrganization, selectedRepository, selectedBranchName, year]);
-
   const { data: commitData } = useQuery({
-    queryKey:
-    selectedOrganization &&
-    selectedRepository &&
-    selectedBranchName &&
-    year
-      ? commitKeys.commitCalendar(
-          selectedOrganization.organization_id,
-          selectedRepository.repositoryId,
-          selectedBranchName.branchName,
-          year
-        ).queryKey
-      : ['disabled-query'],
+    queryKey: commitKeys.commitCalendar(
+      selectedOrganization?.organization_id,
+      selectedRepository?.repositoryId,
+      selectedBranchName?.branchName,
+      year
+    ).queryKey,
     queryFn: async () => {
       if (!selectedRepository || !selectedBranchName) return { calendar: {} };
       const queryParams = new URLSearchParams({

@@ -16,7 +16,9 @@ import { useEffect } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 
 interface InterviewResponse {
-  data: { interviews: InterviewItem[] };
+  data: { 
+    interviews: InterviewItem[] 
+  };
 }
 interface InterviewItem {
   id: number;
