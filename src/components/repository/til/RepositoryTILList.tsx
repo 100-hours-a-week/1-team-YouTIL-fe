@@ -17,6 +17,7 @@ import { useInfinityScrollObserver } from '@/hooks/useInfinityScrollObserver';
 import SelectOrganizationModal from './selectOrganizationModal/SelectOrganizationModal';
 import SelectRepositoryModal from './selectRepositoryModal/SelectRepositoryModal';
 import SelectBranchModal from './selectBranchModal/SelectBranchModal';
+import RepositoryConnectResultModal from './repositoryConnectResultModal/RepositoryConnectResultModal';
 
 interface TILItem {
   tilId: number;
@@ -60,12 +61,15 @@ const RepositoryTILList = () => {
     editingTilId,
     editedTitle,
     isSubmitting,
-    deleteModal,
     interviewModal,
+    deleteModal,
     organizationModal,
     repositoryModal,
     branchModal,
+    connectResultModal,
+    isConnectSuccess,
     setEditedTitle,
+    setSelectedTilIds,
     setEditingTilId,
     setIsSubmitting,
     handleClickTIL,
@@ -73,6 +77,7 @@ const RepositoryTILList = () => {
     handleStartEdit,
     handleDeleteComplete,
     handleDeleteClick,
+    setIsConnectSuccess
   } = useRepositoryTILList();
 
   const { callApi } = useFetch();
@@ -422,6 +427,18 @@ const RepositoryTILList = () => {
       {branchModal.isOpen && (
         <SelectBranchModal 
           onClose={branchModal.close} 
+          onComplete={(response) => {
+            const success = !!response?.success;
+            setIsConnectSuccess(success);
+            connectResultModal.open();
+          }}
+        />
+      )}
+
+      {connectResultModal.isOpen && isConnectSuccess !== null && (
+        <RepositoryConnectResultModal
+          isSuccess={isConnectSuccess!}
+          onClose={connectResultModal.close}
         />
       )}
 

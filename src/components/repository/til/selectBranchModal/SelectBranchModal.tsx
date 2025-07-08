@@ -23,11 +23,28 @@ interface BranchResponse {
   };
 }
 
-interface Props {
-  onClose: () => void;
+interface GithubUploadResponse {
+  success: boolean;
+  message: string;
+  code: string;
+  responseAt: string;
+  data: {
+    branch: string;
+    isConfigured: boolean;
+    organizationId: number | null;
+    owner: string;
+    repository: string;
+    repositoryId: number;
+    updatedAt: string;
+  };
 }
 
-const SelectBranchModal = ({ onClose }: Props) => {
+interface Props {
+  onClose: () => void;
+  onComplete: (response: GithubUploadResponse) => void;
+}
+
+const SelectBranchModal = ({ onClose, onComplete }: Props) => {
   const draftOrg = useGithubUploadStore((state) => state.draftOrg);
   const draftRepo = useGithubUploadStore((state) => state.draftRepo);
   const draftBranch = useGithubUploadStore((state) => state.draftBranch);
@@ -46,27 +63,6 @@ const SelectBranchModal = ({ onClose }: Props) => {
   const [selectedBranchName, setSelectedBranchName] = useState<string | null>(null);
   const scrollContainerRef = useRef<HTMLDivElement | null>(null);
 
-  const { mutate: uploadTarget } = useMutation({
-    mutationFn: async () => {
-      if (!draftRepo || !draftBranch?.branchName) return;
-  
-      return await callApi({
-        method: 'PUT',
-        endpoint: '/github',
-        headers: { Authorization: `Bearer ${accessToken}` },
-        body: {
-          organizationId: draftOrg?.organization_id,
-          repositoryId: draftRepo.repositoryId,
-          branch: draftBranch.branchName,
-        },
-        credentials: 'include',
-      });
-    },
-    onError: (err) => {
-      console.error('PUT /github 실패:', err);
-    },
-  });
-
   const {
     data,
     fetchNextPage,
@@ -76,7 +72,6 @@ const SelectBranchModal = ({ onClose }: Props) => {
   } = useInfiniteQuery({
     queryKey: ['asdf'], 
     queryFn: async ({ pageParam = 0 }) => {
-      console.log("asdf")
       const response = await callApi<BranchResponse>({
         method: 'GET',
         endpoint: `/github/branches?organizationId=${draftOrg?.organization_id ?? ''}&repositoryId=${draftRepo?.repositoryId}&page=${pageParam}&offset=20`,
@@ -101,6 +96,28 @@ const SelectBranchModal = ({ onClose }: Props) => {
     isFetchingNextPage,
   });
 
+  const { mutate: uploadTarget } = useMutation<GithubUploadResponse>({
+
+    mutationFn: async () => {
+      if (!draftRepo || !draftBranch?.branchName) {
+        throw new Error('레포지토리 또는 브랜치 정보가 부족합니다.');
+      }
+  
+      return await callApi<GithubUploadResponse>({
+        method: 'PUT',
+        endpoint: '/github',
+        headers: { Authorization: `Bearer ${accessToken}` },
+        body: {
+          organizationId: draftOrg?.organization_id,
+          repositoryId: draftRepo.repositoryId,
+          branch: draftBranch.branchName,
+        },
+        credentials: 'include',
+      });
+    },
+  });
+  
+
   const handleSelect = (branch: Branch) => {
     if (selectedBranchName === branch.name) {
       setSelectedBranchName(null);
@@ -116,8 +133,12 @@ const SelectBranchModal = ({ onClose }: Props) => {
     setSelectedOrganization(draftOrg);
     setSelectedRepository(draftRepo);
     setSelectedBranch({ branchName: draftBranch.branchName });
-    uploadTarget();
-    onClose();
+    uploadTarget(undefined, {
+      onSuccess: (response) => {
+        onComplete(response);
+        onClose();
+      },
+    });
   };
 
   const isCompleteEnabled = selectedBranchName !== null;
