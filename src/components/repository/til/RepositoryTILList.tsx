@@ -2,7 +2,7 @@
 
 import './RepositoryTILList.scss';
 import Image from 'next/image';
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { useQuery, useQueryClient, useInfiniteQuery } from '@tanstack/react-query';
 import { format, parseISO } from 'date-fns';
 import { useRepositoryTILList } from '@/hooks/repository/til/useRepositoryTILList';
@@ -19,6 +19,7 @@ import SelectRepositoryModal from './selectRepositoryModal/SelectRepositoryModal
 import SelectBranchModal from './selectBranchModal/SelectBranchModal';
 import RepositoryConnectResultModal from './repositoryConnectResultModal/RepositoryConnectResultModal';
 import { useMutation } from '@tanstack/react-query';
+import { useToastStore } from '@/store/useToastStore';
 
 interface TILItem {
   tilId: number;
@@ -183,6 +184,19 @@ const RepositoryTILList = () => {
         body: { tilId: expandedTilId },
       });
       return response;
+    },
+    onSuccess: () => {
+      console.log("asdf")
+      useToastStore.getState().addToast({
+        type: 'success',
+        message: '깃허브 업로드 성공!',
+      });
+    },
+    onError: () => {
+      useToastStore.getState().addToast({
+        type: 'error',
+        message: '깃허브 업로드 실패!',
+      });
     },
   });
 
@@ -376,7 +390,12 @@ const RepositoryTILList = () => {
             organizationModal.open();
           }}
         >
-          🔄
+          <Image
+            src="/images/gitIcon.png"
+            alt="GitHub Icon"
+            width={24}
+            height={24}
+          />
         </button>
       </div>
 

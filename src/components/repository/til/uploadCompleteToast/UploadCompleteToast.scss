@@ -1,0 +1,51 @@
+.upload-complete-toast {
+    &__container {
+      position: fixed;
+      bottom: 70px;
+      right: 37.5vw;
+      z-index: 10000;
+      pointer-events: none;
+    }
+  
+    &__wrapper {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+    }
+  
+    &__message {
+      padding: 10px 16px;
+      border-radius: 6px;
+      color: #fff;
+      font-weight: bold;
+      opacity: 1;
+      animation: fadeOut 1.5s ease-in forwards;
+      white-space: nowrap;
+      display: inline-block;
+      text-align: center;
+      
+      &--success {
+        background-color: #00b6fa;
+      }
+  
+      &--error {
+        background-color: #ff4d4f;
+      }
+    }
+  }
+  
+  @keyframes fadeOut {
+    0% {
+      opacity: 1;
+      transform: translateY(10px);
+    }
+    80% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
+      transform: translateY(0);
+    }
+  }
+  

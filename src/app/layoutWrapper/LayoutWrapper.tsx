@@ -8,6 +8,7 @@ import ScrollToTopOnRouteChange from '@/components/scrollToTopOnRouteChange/Scro
 import './LayoutWrapper.scss';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { queryClient } from '../../lib/queryClient';
+import UploadCompleteToast from '@/components/repository/til/uploadCompleteToast/UploadCompleteToast';
 
 export default function LayoutWrapper({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -25,7 +26,7 @@ export default function LayoutWrapper({ children }: { children: React.ReactNode 
           <main className="layout__main">
             {children}
           </main>
-
+          <UploadCompleteToast/>
           {!isLoginPage && <BottomNavigationBar />}
         </div>
       </div>
