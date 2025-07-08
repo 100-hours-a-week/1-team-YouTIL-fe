@@ -12,7 +12,9 @@ export const useRepositoryTILList = () => {
   const { tilDate } = useRepositoryDateStore();
   const interviewModal = useModal();
   const deleteModal = useModal();
-
+  const organizationModal = useModal();
+  const repositoryModal = useModal();
+  const branchModal = useModal();
   const [expandedTilId, setExpandedTilId] = useState<number | null>(null);
   const [selectedTilIds, setSelectedTilIds] = useState<number[]>([]);
   const [shakeDelete, setShakeDelete] = useState(false);
@@ -83,6 +85,9 @@ export const useRepositoryTILList = () => {
     isSubmitting,
     interviewModal,
     deleteModal,
+    organizationModal,
+    repositoryModal,
+    branchModal,
     setEditedTitle,
     setSelectedTilIds,
     setEditingTilId,

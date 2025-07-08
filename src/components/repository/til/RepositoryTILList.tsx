@@ -2,7 +2,7 @@
 
 import './RepositoryTILList.scss';
 import Image from 'next/image';
-import { useEffect } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useQuery, useQueryClient, useInfiniteQuery } from '@tanstack/react-query';
 import { format, parseISO } from 'date-fns';
 import { useRepositoryTILList } from '@/hooks/repository/til/useRepositoryTILList';
@@ -14,6 +14,9 @@ import { mainKeys } from '@/querykey/main.querykey';
 import { repositoryKeys } from '@/querykey/repository.querykey';
 import { profileKeys } from '@/querykey/profile.querykey';
 import { useInfinityScrollObserver } from '@/hooks/useInfinityScrollObserver';
+import SelectOrganizationModal from './selectOrganizationModal/SelectOrganizationModal';
+import SelectRepositoryModal from './selectRepositoryModal/SelectRepositoryModal';
+import SelectBranchModal from './selectBranchModal/SelectBranchModal';
 
 interface TILItem {
   tilId: number;
@@ -59,6 +62,9 @@ const RepositoryTILList = () => {
     isSubmitting,
     deleteModal,
     interviewModal,
+    organizationModal,
+    repositoryModal,
+    branchModal,
     setEditedTitle,
     setEditingTilId,
     setIsSubmitting,
@@ -71,13 +77,37 @@ const RepositoryTILList = () => {
 
   const { callApi } = useFetch();
   const queryClient = useQueryClient();
-
+  const [gitFetchEnabled, setGitFetchEnabled] = useState(false);
+  const floatingRef = useRef<HTMLDivElement>(null);
   
   useEffect(() => {
     if (tilDate) {
       queryClient.removeQueries({ queryKey: ['disabled-query'] });
     }
   }, [tilDate]);
+
+  useEffect(() => {
+    const updateFloatingPosition = () => {
+      const frame = document.querySelector('.layout__frame');
+      const buttons = floatingRef.current;
+
+      if (!frame || !buttons) return;
+
+      const rect = frame.getBoundingClientRect();
+      buttons.style.left = `${rect.right - 42}px`;
+      buttons.style.bottom = '70px';
+      buttons.style.opacity = '1';
+    };
+
+    updateFloatingPosition();
+    window.addEventListener('resize', updateFloatingPosition);
+    window.addEventListener('scroll', updateFloatingPosition);
+
+    return () => {
+      window.removeEventListener('resize', updateFloatingPosition);
+      window.removeEventListener('scroll', updateFloatingPosition);
+    };
+  }, []);
   
   
   const {
@@ -97,7 +127,6 @@ const RepositoryTILList = () => {
         headers: { Authorization: `Bearer ${accessToken}` },
         credentials: 'include',
       });
-      console.log(response); 
       return response;
     },
     getNextPageParam: (lastPage, allPages) => {
@@ -137,6 +166,23 @@ const RepositoryTILList = () => {
     gcTime: 3600000,
   });
 
+  const { data: gitData } = useQuery({
+    queryKey: ['github', 'upload'],
+    queryFn: async () => {
+      const response = await callApi({
+        method: 'GET',
+        endpoint: '/github',
+        headers: { Authorization: `Bearer ${accessToken}` },
+        credentials: 'include',
+      });
+      console.log('📦 /github 응답:', response);
+      return response;
+    },
+    enabled: gitFetchEnabled,
+    staleTime: 0,
+    gcTime: 0,
+  });
+
   const handleConfirmEdit = async (
     e?: React.MouseEvent | React.KeyboardEvent,
     tilId?: number
@@ -173,6 +219,11 @@ const RepositoryTILList = () => {
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const handleGitUpload = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.stopPropagation();
+    setGitFetchEnabled(true);
   };
 
   return (
@@ -264,15 +315,26 @@ const RepositoryTILList = () => {
                   >
                     <p className="repository-til-list__item-date">{formattedDate}</p>
                     {isExpanded && (
-                      <button
-                        className="repository-til-list__item-generate-button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          interviewModal.open();
-                        }}
-                      >
-                        면접질문생성
-                      </button>
+                      <>
+                        <button
+                          className="repository-til-list__item-generate-button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            interviewModal.open();
+                          }}
+                        >
+                          면접질문생성
+                        </button>
+                        <button
+                          className="repository-til-list__item-upload-button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleGitUpload(e);
+                          }}
+                        >
+                          git 업로드
+                        </button>
+                      </>
                     )}
                   </div>
                 </div>
@@ -310,6 +372,17 @@ const RepositoryTILList = () => {
         })}
       </ul>
 
+      <div className="repository-til-list__floating-wrapper" ref={floatingRef}>
+        <button
+          className="repository-til-list__floating-button"
+          onClick={() => {
+            organizationModal.open();
+          }}
+        >
+          🔄
+        </button>
+      </div>
+
       {interviewModal.isOpen && (
         <SelectInterviewLevelModal
           tilId={expandedTilId!}
@@ -324,6 +397,34 @@ const RepositoryTILList = () => {
           onDeleteComplete={handleDeleteComplete}
         />
       )}
+
+
+      {organizationModal.isOpen && (
+        <SelectOrganizationModal
+          onClose={organizationModal.close}
+          onComplete={() => {
+            organizationModal.close();
+            repositoryModal.open();
+          }}
+        />
+      )}
+
+      {repositoryModal.isOpen && (
+        <SelectRepositoryModal 
+          onClose={repositoryModal.close} 
+          onComplete={() =>{
+            repositoryModal.close();
+            branchModal.open();
+          }}
+        />
+      )}
+
+      {branchModal.isOpen && (
+        <SelectBranchModal 
+          onClose={branchModal.close} 
+        />
+      )}
+
     </div>
   );
 };
