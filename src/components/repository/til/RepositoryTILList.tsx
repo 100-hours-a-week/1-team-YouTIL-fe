@@ -20,6 +20,7 @@ import SelectBranchModal from './selectBranchModal/SelectBranchModal';
 import RepositoryConnectResultModal from './repositoryConnectResultModal/RepositoryConnectResultModal';
 import { useMutation } from '@tanstack/react-query';
 import { useToastStore } from '@/store/useToastStore';
+import UploadCompleteToast from './uploadCompleteToast/UploadCompleteToast';
 
 interface TILItem {
   tilId: number;
@@ -85,7 +86,7 @@ const RepositoryTILList = () => {
   const { callApi } = useFetch();
   const queryClient = useQueryClient();
   const floatingRef = useRef<HTMLDivElement>(null);
-  
+
   useEffect(() => {
     if (tilDate) {
       queryClient.removeQueries({ queryKey: ['disabled-query'] });
@@ -186,7 +187,6 @@ const RepositoryTILList = () => {
       return response;
     },
     onSuccess: () => {
-      console.log("asdf")
       useToastStore.getState().addToast({
         type: 'success',
         message: '깃허브 업로드 성공!',
@@ -398,6 +398,8 @@ const RepositoryTILList = () => {
           />
         </button>
       </div>
+
+      <UploadCompleteToast />
 
       {interviewModal.isOpen && (
         <SelectInterviewLevelModal
