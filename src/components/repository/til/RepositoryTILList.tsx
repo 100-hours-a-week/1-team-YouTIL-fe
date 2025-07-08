@@ -18,6 +18,7 @@ import SelectOrganizationModal from './selectOrganizationModal/SelectOrganizatio
 import SelectRepositoryModal from './selectRepositoryModal/SelectRepositoryModal';
 import SelectBranchModal from './selectBranchModal/SelectBranchModal';
 import RepositoryConnectResultModal from './repositoryConnectResultModal/RepositoryConnectResultModal';
+import { useMutation } from '@tanstack/react-query';
 
 interface TILItem {
   tilId: number;
@@ -82,7 +83,6 @@ const RepositoryTILList = () => {
 
   const { callApi } = useFetch();
   const queryClient = useQueryClient();
-  const [gitFetchEnabled, setGitFetchEnabled] = useState(false);
   const floatingRef = useRef<HTMLDivElement>(null);
   
   useEffect(() => {
@@ -171,21 +171,19 @@ const RepositoryTILList = () => {
     gcTime: 3600000,
   });
 
-  const { data: gitData } = useQuery({
-    queryKey: ['github', 'upload'],
-    queryFn: async () => {
+  const { mutate } = useMutation({
+    mutationFn: async (expandedTilId: number) => {
       const response = await callApi({
-        method: 'GET',
-        endpoint: '/github',
-        headers: { Authorization: `Bearer ${accessToken}` },
+        method: 'POST',
+        endpoint: '/tils/upload',
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
         credentials: 'include',
+        body: { tilId: expandedTilId },
       });
-      console.log('📦 /github 응답:', response);
       return response;
     },
-    enabled: gitFetchEnabled,
-    staleTime: 0,
-    gcTime: 0,
   });
 
   const handleConfirmEdit = async (
@@ -195,12 +193,6 @@ const RepositoryTILList = () => {
     if (!tilId || isSubmitting || !editedTitle.trim()) return;
     e?.stopPropagation();
     setIsSubmitting(true);
-
-    queryClient.setQueryData<TILItem[]>(repositoryKeys.tilList(tilDate).queryKey, (prev) =>
-      prev?.map((til) =>
-        til.tilId === tilId ? { ...til, title: editedTitle.trim() } : til
-      ) ?? prev
-    );
 
     try {
       await callApi({
@@ -228,7 +220,7 @@ const RepositoryTILList = () => {
 
   const handleGitUpload = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
-    setGitFetchEnabled(true);
+    mutate(expandedTilId!!);
   };
 
   return (
@@ -273,7 +265,7 @@ const RepositoryTILList = () => {
                           refs.current[til.tilId] = el;
                         }}
                       >
-                        <input
+                         <input
                           value={editedTitle}
                           onClick={(e) => e.stopPropagation()}
                           onChange={(e) => {

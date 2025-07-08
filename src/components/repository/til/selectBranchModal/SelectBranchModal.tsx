@@ -96,8 +96,7 @@ const SelectBranchModal = ({ onClose, onComplete }: Props) => {
     isFetchingNextPage,
   });
 
-  const { mutate: uploadTarget } = useMutation<GithubUploadResponse>({
-
+  const { mutate: uploadTarget, isPending } = useMutation<GithubUploadResponse>({
     mutationFn: async () => {
       if (!draftRepo || !draftBranch?.branchName) {
         throw new Error('레포지토리 또는 브랜치 정보가 부족합니다.');
@@ -116,6 +115,7 @@ const SelectBranchModal = ({ onClose, onComplete }: Props) => {
       });
     },
   });
+  
   
 
   const handleSelect = (branch: Branch) => {
@@ -150,7 +150,7 @@ const SelectBranchModal = ({ onClose, onComplete }: Props) => {
       <div className="branch-modal__content">
         <h2 className="branch-modal__title">브랜치 선택</h2>
 
-        {isLoading ? (
+        {isLoading || isPending ? (
           <p className="branch-modal__loading">로딩 중...</p>
         ) : (
           <>
