@@ -39,7 +39,7 @@ const CommunityCommentInput = () => {
     },
     onSuccess: () => {
       setComment('');
-      queryClient.invalidateQueries({queryKey: communityKeys.communityComment(tilIdNumber).queryKey})
+      queryClient.invalidateQueries({queryKey: communityKeys.comment(tilIdNumber).queryKey})
     },
     onError: (error) => {
       console.error('댓글 등록 실패:', error);
@@ -74,7 +74,7 @@ const CommunityCommentInput = () => {
       <input
         className="comment-input__field"
         type="text"
-        placeholder="방명록을 남겨보세요 (최대 50자)"
+        placeholder="댓글을 남겨주세요 (최대 50자)"
         value={comment}
         onChange={handleChange}
         onKeyDown={handleKeyDown}

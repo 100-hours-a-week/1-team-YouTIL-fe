@@ -31,7 +31,7 @@ const CheckDeleteCommentModal = ({ commentId, onClose, onDeleteComplete, tilId }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: communityKeys.communityComment(tilId).queryKey,
+        queryKey: communityKeys.comment(tilId).queryKey,
         exact: false,
       });
       onDeleteComplete();

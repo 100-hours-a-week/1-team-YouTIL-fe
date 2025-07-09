@@ -39,7 +39,7 @@ const ProfilePage = () => {
   const otherUserInfo = useOtherUserInfoStore((state) => state.otherUserInfo);
 
   const { isLoading: isUserInfoLoading, isError: isUserInfoError } = useQuery<UserInfoResponse>({
-    queryKey: profileKeys.profileUserInfo().queryKey,
+    queryKey: profileKeys.userInfo().queryKey,
     queryFn: async () => {
       const response = await callApi<UserInfoResponse>({
         method: 'GET',
@@ -60,8 +60,8 @@ const ProfilePage = () => {
     gcTime: 3600000,
   });
 
-  const { isLoading: isOtherUserInfoLoading, isError: isOtherUserInfoError } = useQuery<UserInfo>({
-    queryKey: profileKeys.profileOtherUserInfo(parsedUserId).queryKey,
+  const { isLoading: isOtherUserInfoLoading, isError: isOtherUserInfoError } = useQuery<UserInfoResponse>({
+    queryKey: profileKeys.otherUserInfo(parsedUserId).queryKey,
     queryFn: async () => {
       const response = await callApi<UserInfoResponse>({
         method: 'GET',
@@ -74,8 +74,7 @@ const ProfilePage = () => {
 
       const { description, name, profileUrl, userId: uid } = response.data;
       setOtherUserInfo({ description, name, profileUrl, userId: uid });
-
-      return response.data;
+      return response;
     },
     enabled: !!parsedUserId && existAccess,
     staleTime: 0,

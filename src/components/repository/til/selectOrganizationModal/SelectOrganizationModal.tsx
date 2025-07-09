@@ -1,14 +1,14 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useRef, useState } from 'react';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { useFetch } from '@/hooks/useFetch';
 import useGetAccessToken from '@/hooks/useGetAccessToken';
 import useCheckAccess from '@/hooks/useCheckExistAccess';
-import { useDraftSelectionStore } from '@/store/useDraftSelectionStore';
+import { useGithubUploadStore } from '@/store/useGIthubUploadStore';
 import { useInfinityScrollObserver } from '@/hooks/useInfinityScrollObserver';
+import { repositoryKeys } from '@/querykey/repository.querykey';
 import './SelectOrganizationModal.scss';
-import { commitKeys } from '@/querykey/commit.querykey';
 
 interface Organization {
   organization_id: number;
@@ -23,16 +23,14 @@ interface OrganizationResponse {
 
 interface Props {
   onClose: () => void;
-  onComplete: () => void;
+  onComplete :() => void;
 }
 
-const SelectOrganizationModal = ({ onClose, onComplete }: Props) => {
+const SelectOrganizationModal = ({ onClose, onComplete}: Props) => {
   const { callApi } = useFetch();
   const accessToken = useGetAccessToken();
   const existAccess = useCheckAccess(accessToken);
-
-  const { setDraftOrg } = useDraftSelectionStore.getState();
-
+  const { setDraftOrg } = useGithubUploadStore.getState();
   const [selectedOrgId, setSelectedOrgId] = useState<number | null>(null);
   const [noSelection, setNoSelection] = useState(false);
 
@@ -43,7 +41,7 @@ const SelectOrganizationModal = ({ onClose, onComplete }: Props) => {
     hasNextPage,
     isFetchingNextPage,
   } = useInfiniteQuery({
-    queryKey: commitKeys.organization().queryKey,
+    queryKey: repositoryKeys.uplpadOrganization().queryKey,
     queryFn: async ({ pageParam = 0 }) => {
       const response = await callApi<OrganizationResponse>({
         method: 'GET',
@@ -137,7 +135,12 @@ const SelectOrganizationModal = ({ onClose, onComplete }: Props) => {
 
             <button
               className="organization-modal__close"
-              onClick={onComplete}
+              onClick={() => {
+                if (isCompleteEnabled) {
+                  onClose();
+                  onComplete();
+                }
+              }}
               disabled={!isCompleteEnabled}
             >
               선택 완료

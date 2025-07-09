@@ -23,7 +23,7 @@ interface TILItem {
   createdAt: string;
   visitedCount:number;
   recommendCount : number;
-
+  commentCount: number;
 }
 
 interface TILResponse {
@@ -41,7 +41,7 @@ const UserTILList = () => {
   const saveAndNavigate = useSaveScrollAndNavigate(`user-til-${userId}`);
 
   const { data, isFetchingNextPage, hasNextPage, fetchNextPage } = useInfiniteQuery<TILResponse, Error>({
-    queryKey: profileKeys.profileTIL(userId).queryKey,
+    queryKey: profileKeys.tilList(userId).queryKey,
     queryFn: async ({ pageParam }: QueryFunctionContext) => {
       const response = await callApi<TILResponse>({
         method: 'GET',
@@ -119,6 +119,7 @@ const UserTILList = () => {
 
                 <span className="usertil-list__views">조회수 {til.visitedCount}</span>
                 <span className="usertil-list__likes">추천 {til.recommendCount}</span>
+                <span className="usertil-list__comments">댓글 {til.commentCount}</span>
                 <span className="usertil-list__date">
                   {format(parseISO(til.createdAt), 'yyyy-MM-dd : HH:mm:ss')}
                 </span>

@@ -83,11 +83,11 @@ const UserProfileInfo = () => {
         description: updatedDescription,
       });
 
-      queryClient.invalidateQueries({queryKey: profileKeys.profileOtherUserInfo._def, exact: false});
+      queryClient.invalidateQueries({queryKey: profileKeys.otherUserInfo._def, exact: false});
       queryClient.invalidateQueries({queryKey: mainKeys.newTILList().queryKey});
-      queryClient.invalidateQueries({queryKey: repositoryKeys.repositoryTIL._def, exact: false});
-      queryClient.invalidateQueries({queryKey: profileKeys.profileCommentList._def, exact: false});
-      queryClient.invalidateQueries({queryKey: profileKeys.profileTIL._def, exact:false})
+      queryClient.invalidateQueries({queryKey: repositoryKeys.tilList._def, exact: false});
+      queryClient.invalidateQueries({queryKey: profileKeys.commentList._def, exact: false});
+      queryClient.invalidateQueries({queryKey: profileKeys.tilList._def, exact:false})
       setEditMode(false);
     },
   });

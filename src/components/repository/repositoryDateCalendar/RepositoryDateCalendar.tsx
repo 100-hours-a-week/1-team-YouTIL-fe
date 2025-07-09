@@ -76,8 +76,7 @@ const RepositoryDateCalendar = () => {
   const selectedYear = currentDate.getFullYear();
 
   const { data: tilRecordData } = useQuery<TILYearlyRecordResponse>({
-    //queryKey: ['til-date', selectedYear],
-    queryKey: repositoryKeys.repositoryTILCalendar(selectedYear).queryKey,
+    queryKey: repositoryKeys.tilCalendar(selectedYear).queryKey,
     queryFn: async () => {
       const response = await callApi<TILYearlyRecordResponse>({
         method: 'GET',
@@ -95,7 +94,7 @@ const RepositoryDateCalendar = () => {
   });
 
   const { data: interviewRecordData } = useQuery<InterviewYearlyRecordResponse>({
-    queryKey: repositoryKeys.repositoryInterviewCalendar(selectedYear).queryKey,
+    queryKey: repositoryKeys.interviewCalendar(selectedYear).queryKey,
     queryFn: async () => {
       const response = await callApi<InterviewYearlyRecordResponse>({
         method: 'GET',

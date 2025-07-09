@@ -1,17 +1,15 @@
 'use client';
 
 import { useState, useRef } from 'react';
-import { useInfiniteQuery, useQueryClient } from '@tanstack/react-query';
-import { useOrganizationStore } from '@/store/useOrganizationStore';
-import { useRepositoryStore } from '@/store/useRepositoryStore';
-import { useBranchStore } from '@/store/useBranchStore';
+import { useInfiniteQuery } from '@tanstack/react-query';
 import { useFetch } from '@/hooks/useFetch';
 import useCheckAccess from '@/hooks/useCheckExistAccess';
 import useGetAccessToken from '@/hooks/useGetAccessToken';
-import { useDraftSelectionStore } from '@/store/useDraftSelectionStore';
+import { useGithubUploadStore } from '@/store/useGIthubUploadStore';
 import { useInfinityScrollObserver } from '@/hooks/useInfinityScrollObserver';
-import { commitKeys } from '@/querykey/commit.querykey';
+import { useMutation } from '@tanstack/react-query';
 import './SelectBranchModal.scss';
+import { repositoryKeys } from '@/querykey/repository.querykey';
 
 interface Branch {
   name: string;
@@ -26,24 +24,41 @@ interface BranchResponse {
   };
 }
 
-interface Props {
-  onClose: () => void;
+interface GithubUploadResponse {
+  success: boolean;
+  message: string;
+  code: string;
+  responseAt: string;
+  data: {
+    branch: string;
+    isConfigured: boolean;
+    organizationId: number | null;
+    owner: string;
+    repository: string;
+    repositoryId: number;
+    updatedAt: string;
+  };
 }
 
-const SelectBranchModal = ({ onClose }: Props) => {
-  const draftOrg = useDraftSelectionStore((state) => state.draftOrg);
-  const draftRepo = useDraftSelectionStore((state) => state.draftRepo);
-  const draftBranch = useDraftSelectionStore((state) => state.draftBranch);
+interface Props {
+  onClose: () => void;
+  onComplete: (response: GithubUploadResponse) => void;
+}
 
-  const setDraftBranch = useDraftSelectionStore((state) => state.setDraftBranch);
-  const setSelectedBranch = useBranchStore((state) => state.setSelectedBranch);
-  const setSelectedOrganization = useOrganizationStore((state) => state.setSelectedOrganization);
-  const setSelectedRepository = useRepositoryStore((state) => state.setSelectedRepository);
+const SelectBranchModal = ({ onClose, onComplete }: Props) => {
+  const draftOrg = useGithubUploadStore((state) => state.draftOrg);
+  const draftRepo = useGithubUploadStore((state) => state.draftRepo);
+  const draftBranch = useGithubUploadStore((state) => state.draftBranch);
+
+  const setDraftBranch = useGithubUploadStore((state) => state.setDraftBranch);
+
+  const setSelectedBranch = useGithubUploadStore((state) => state.setBranchName);
+  const setSelectedOrganization = useGithubUploadStore((state) => state.setOrganizationId);
+  const setSelectedRepository = useGithubUploadStore((state) => state.setRepositoryId);
 
   const { callApi } = useFetch();
   const accessToken = useGetAccessToken();
   const existAccess = useCheckAccess(accessToken);
-  const queryClient = useQueryClient();
 
   const [selectedBranchName, setSelectedBranchName] = useState<string | null>(null);
   const scrollContainerRef = useRef<HTMLDivElement | null>(null);
@@ -55,7 +70,7 @@ const SelectBranchModal = ({ onClose }: Props) => {
     isFetchingNextPage,
     isLoading,
   } = useInfiniteQuery({
-    queryKey: commitKeys.branch(draftOrg?.organization_id ?? '', draftRepo?.repositoryId).queryKey,
+    queryKey: repositoryKeys.uploadBranch(draftOrg?.organization_id ?? '', draftRepo?.repositoryId).queryKey,
     queryFn: async ({ pageParam = 0 }) => {
       const response = await callApi<BranchResponse>({
         method: 'GET',
@@ -81,6 +96,28 @@ const SelectBranchModal = ({ onClose }: Props) => {
     isFetchingNextPage,
   });
 
+  const { mutate: uploadTarget, isPending } = useMutation<GithubUploadResponse>({
+    mutationFn: async () => {
+      if (!draftRepo || !draftBranch?.branchName) {
+        throw new Error('레포지토리 또는 브랜치 정보가 부족합니다.');
+      }
+  
+      return await callApi<GithubUploadResponse>({
+        method: 'PUT',
+        endpoint: '/github',
+        headers: { Authorization: `Bearer ${accessToken}` },
+        body: {
+          organizationId: draftOrg?.organization_id,
+          repositoryId: draftRepo.repositoryId,
+          branch: draftBranch.branchName,
+        },
+        credentials: 'include',
+      });
+    },
+  });
+  
+  
+
   const handleSelect = (branch: Branch) => {
     if (selectedBranchName === branch.name) {
       setSelectedBranchName(null);
@@ -93,13 +130,15 @@ const SelectBranchModal = ({ onClose }: Props) => {
 
   const handleComplete = () => {
     if (!draftRepo || !draftBranch?.branchName) return;
-    queryClient.removeQueries({
-      queryKey: ['commit'],
-    });
     setSelectedOrganization(draftOrg);
     setSelectedRepository(draftRepo);
     setSelectedBranch({ branchName: draftBranch.branchName });
-    onClose();
+    uploadTarget(undefined, {
+      onSuccess: (response) => {
+        onComplete(response);
+        onClose();
+      },
+    });
   };
 
   const isCompleteEnabled = selectedBranchName !== null;
@@ -111,7 +150,7 @@ const SelectBranchModal = ({ onClose }: Props) => {
       <div className="branch-modal__content">
         <h2 className="branch-modal__title">브랜치 선택</h2>
 
-        {isLoading ? (
+        {isLoading || isPending ? (
           <p className="branch-modal__loading">로딩 중...</p>
         ) : (
           <>

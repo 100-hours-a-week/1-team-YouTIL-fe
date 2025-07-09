@@ -12,14 +12,14 @@ import { mainKeys } from '@/querykey/main.querykey';
 import './Heatmap.scss';
 import 'cal-heatmap/cal-heatmap.css';
 
-export interface TILDayCount {
+interface TILDayCount {
   date: string;
   count: number;
 }
 
-export type TILYearlyRawRecord = Record<string, number[]>;
+type TILYearlyRawRecord = Record<string, number[]>;
 
-export interface TILYearlyRecordResponse {
+interface TILYearlyRecordResponse {
   data: {
     year: number;
     tils: TILYearlyRawRecord;
@@ -45,7 +45,6 @@ const Heatmap = () => {
   const existAccess = useCheckAccess(accessToken);
 
   const { data: tilData = [] } = useQuery<TILDayCount[]>({
-    //queryKey: ['til-heatmap', year],
     queryKey: mainKeys.heatmapCalendar(year).queryKey,
     queryFn: async () => {
       const response = await callApi<TILYearlyRecordResponse>({

@@ -44,7 +44,7 @@ const CommunityEditCommentInput = ({
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: communityKeys.communityComment(tilId).queryKey,
+        queryKey: communityKeys.comment(tilId).queryKey,
         exact: false,
       });
       onComplete();

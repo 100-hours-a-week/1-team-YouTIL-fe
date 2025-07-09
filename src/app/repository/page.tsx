@@ -2,7 +2,6 @@ import RepositoryDateCalendar from '@/components/repository/repositoryDateCalend
 import RepositoryNavigator from '@/components/repository/repositoryNavigator/RepositoryNavigator';
 
 const repository = () => {
-
   return (
     <div>
       <RepositoryDateCalendar/>

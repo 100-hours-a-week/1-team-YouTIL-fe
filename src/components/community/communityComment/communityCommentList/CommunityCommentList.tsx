@@ -93,7 +93,7 @@ const CommunityCommentList = () => {
     hasNextPage,
     isFetchingNextPage,
   } = useInfiniteQuery({
-    queryKey: communityKeys.communityComment(tilIdNumber).queryKey,
+    queryKey: communityKeys.comment(tilIdNumber).queryKey,
     queryFn: async ({ pageParam = 0 }) => {
       const response = await callApi<CommunityCommentResponse>({
         method: 'GET',

@@ -9,39 +9,54 @@ import useGetAccessToken from '@/hooks/useGetAccessToken';
 import useCheckAccess from '@/hooks/useCheckExistAccess';
 import Markdown from 'react-markdown';
 import './CommunityDetail.scss';
+import { communityKeys } from '@/querykey/community.querykey';
 
-interface TILDetail {
-  author: string;
-  content: string;
-  createdAt: string;
-  tags: string[];
+interface CommunityDetail {
+  postId: number;
   title: string;
-  visited_count: number;
-  recommend_count: number;
-  userId: number;
+  content: string;
+  tags: string[];
+  createdAt: string;
+  author: string;
   profileImageUrl: string;
+  recommend_count: number;
   liked: boolean;
+  visited_count: number;
+  comments_count: number;
+  userId: number;
+}
+
+interface CommunityDetailResponse {
+  code: string;
+  message: string;
+  success: boolean;
+  responseAt: string;
+  data: CommunityDetail;
 }
 
 const CommunityDetailPage = () => {
   const { tilId } = useParams();
+  const tilIdNumber = Number(tilId);
   const { callApi } = useFetch();
   const accessToken = useGetAccessToken();
   const existAccess = useCheckAccess(accessToken);
   const queryClient = useQueryClient();
 
-  const { data: communityDetailData, isLoading } = useQuery({
-    queryKey: ['community-detail', tilId],
+  const {
+    data: communityDetailData,
+    isLoading,
+  } = useQuery<CommunityDetail>({
+    queryKey: communityKeys.detail(tilIdNumber).queryKey,
     queryFn: async () => {
-      const response = await callApi<{ data: TILDetail }>({
+      const response = await callApi<CommunityDetailResponse>({
         method: 'GET',
-        endpoint: `/community/${tilId}`,
+        endpoint: `/community/${tilIdNumber}`,
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
         credentials: 'include',
       });
-      return response?.data;
+      return response.data;
     },
     enabled: !!tilId && existAccess,
   });
@@ -50,7 +65,7 @@ const CommunityDetailPage = () => {
     mutationFn: async () => {
       return await callApi({
         method: 'POST',
-        endpoint: `/community/${tilId}/like`,
+        endpoint: `/community/${tilIdNumber}/like`,
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
@@ -58,16 +73,19 @@ const CommunityDetailPage = () => {
       });
     },
     onSuccess: () => {
-      queryClient.setQueryData(['community-detail', tilId], (oldData: TILDetail | undefined) => {
-        if (!oldData) return oldData;
-        return {
-          ...oldData,
-          liked: !oldData.liked,
-          recommend_count: oldData.liked
-            ? oldData.recommend_count - 1
-            : oldData.recommend_count + 1,
-        };
-      });
+      queryClient.setQueryData<CommunityDetail>(
+        communityKeys.detail(tilIdNumber).queryKey,
+        (oldData) => {
+          if (!oldData) return oldData;
+          return {
+            ...oldData,
+            liked: !oldData.liked,
+            recommend_count: oldData.liked
+              ? oldData.recommend_count - 1
+              : oldData.recommend_count + 1,
+          };
+        }
+      );
     },
   });
 
@@ -87,11 +105,18 @@ const CommunityDetailPage = () => {
             className="community-detail__profile-image"
           />
         </Link>
-        <Link href={`/profile/${communityDetailData.userId}`} className="community-detail__nickname">
+        <Link
+          href={`/profile/${communityDetailData.userId}`}
+          className="community-detail__nickname"
+        >
           {communityDetailData.author}
         </Link>
-        <span className="community-detail__count">조회수 {communityDetailData.visited_count}</span>
-        <span className="community-detail__count">추천 {communityDetailData.recommend_count}</span>
+        <span className="community-detail__count">
+          조회수 {communityDetailData.visited_count}
+        </span>
+        <span className="community-detail__count">
+          추천 {communityDetailData.recommend_count}
+        </span>
         <span className="community-detail__date">
           {new Date(communityDetailData.createdAt).toLocaleString()}
         </span>
@@ -107,9 +132,9 @@ const CommunityDetailPage = () => {
 
       <div
         className="community-detail__content"
-        onCopy={(e) => {
+        onCopy={async (e) => {
           e.preventDefault();
-          navigator.clipboard.writeText(communityDetailData.content);
+          await navigator.clipboard.writeText(communityDetailData.content);
         }}
       >
         <Markdown>{communityDetailData.content}</Markdown>

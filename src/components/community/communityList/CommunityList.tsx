@@ -14,6 +14,7 @@ import { parseISO, format } from 'date-fns';
 import './CommunityList.scss';
 import useSaveScrollAndNavigate from '@/hooks/useSaveScrollAndNavigate';
 import useScrollRestoreOnReturn from '@/hooks/useScrollRestoreOnReturn';
+import { communityKeys } from '@/querykey/community.querykey';
 
 interface CommunityItem {
   tilId: number;
@@ -50,7 +51,7 @@ const CommunityList = () => {
     hasNextPage,
     isFetchingNextPage,
   } = useInfiniteQuery({
-    queryKey: ['community-list', selectedCategory],
+    queryKey: communityKeys.list(selectedCategory).queryKey,
     queryFn: async ({ pageParam = 0 }) => {
       const response = await callApi<CommunityResponse>({
         method: 'GET',
@@ -108,7 +109,7 @@ const CommunityList = () => {
   ];
 
   const handleScrollTop = () => {
-    document.body.scrollTo({ top: 0, behavior: 'smooth' });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   return (
@@ -174,7 +175,7 @@ const CommunityList = () => {
       </div>
 
       <div className="community-list__floating-buttons" ref={floatingRef}>
-      <button className="community-list__button" onClick={() => {window.location.reload();}}>
+        <button className="community-list__button" onClick={() => {window.location.reload();}}>
           🔄
         </button>
         <button className="community-list__button" onClick={handleScrollTop}>

@@ -34,7 +34,7 @@ const CommunityDetailPage = () => {
   const myUserInfo = useUserInfoStore((state) => state.userInfo);
 
   const { isLoading, isError } = useQuery<UserInfoResponse>({
-    queryKey: profileKeys.profileUserInfo().queryKey,
+    queryKey: profileKeys.userInfo().queryKey,
     queryFn: async () => {
       const response = await callApi<UserInfoResponse>({
         method: 'GET',

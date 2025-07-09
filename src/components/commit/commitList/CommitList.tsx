@@ -11,6 +11,9 @@ import { useBranchStore } from '@/store/useBranchStore';
 import { useSelectedDateStore } from '@/store/useDateStore';
 import { useCommitListLogic } from '@/hooks/commit/commitList/useCommitListLogic';
 import NoCommitDescription from '../noCommitDescription/NoCommitDescription';
+import { commitKeys } from '@/querykey/commit.querykey';
+import { useEffect } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import './CommitList.scss';
 
 interface Commit {
@@ -28,20 +31,27 @@ const CommitList = () => {
   const { callApi } = useFetch();
   const accessToken = useGetAccessToken();
   const existAccess = useCheckAccess(accessToken);
-
+  const queryClient = useQueryClient();
   const selectedOrganization = useOrganizationStore((state) => state.selectedOrganization);
   const selectedRepository = useRepositoryStore((state) => state.selectedRepository);
   const selectedBranchName = useBranchStore((state) => state.selectedBranch);
   const selectedDate = useSelectedDateStore((state) => state.selectedDate);
+  useEffect(() => {
+    if (selectedRepository && selectedBranchName && selectedDate) {
+      queryClient.removeQueries({ queryKey: ['disabled-query'], exact: true });
+    }
+  }, [selectedRepository, selectedBranchName, selectedDate]);
 
   const { data: commitData, isLoading } = useQuery<CommitDetailResponse>({
-    queryKey: [
-      'commits',
-      selectedOrganization?.organization_id ?? '',
-      selectedRepository?.repositoryId,
-      selectedBranchName?.branchName,
-      selectedDate,
-    ],
+    queryKey:
+    selectedRepository && selectedBranchName && selectedDate
+      ? commitKeys.list(
+          selectedOrganization?.organization_id ?? '',
+          selectedRepository.repositoryId,
+          selectedBranchName.branchName,
+          selectedDate
+        ).queryKey
+      : ['disabled-query'],
     queryFn: async () => {
       const response = await callApi<CommitDetailResponse>({
         method: 'GET',
