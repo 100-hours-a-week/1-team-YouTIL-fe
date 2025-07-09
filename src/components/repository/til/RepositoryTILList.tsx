@@ -72,7 +72,6 @@ const RepositoryTILList = () => {
     connectResultModal,
     isConnectSuccess,
     setEditedTitle,
-    setSelectedTilIds,
     setEditingTilId,
     setIsSubmitting,
     handleClickTIL,
@@ -234,7 +233,11 @@ const RepositoryTILList = () => {
 
   const handleGitUpload = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
-    mutate(expandedTilId!!);
+    if (expandedTilId !== null) {
+      mutate(expandedTilId);
+    } else {
+      console.error('expandedTilId is null');
+    }
   };
 
   return (

@@ -7,6 +7,7 @@ import useGetAccessToken from '@/hooks/useGetAccessToken';
 import useCheckAccess from '@/hooks/useCheckExistAccess';
 import { useGithubUploadStore } from '@/store/useGIthubUploadStore';
 import { useInfinityScrollObserver } from '@/hooks/useInfinityScrollObserver';
+import { repositoryKeys } from '@/querykey/repository.querykey';
 import './SelectOrganizationModal.scss';
 
 interface Organization {
@@ -29,11 +30,8 @@ const SelectOrganizationModal = ({ onClose, onComplete}: Props) => {
   const { callApi } = useFetch();
   const accessToken = useGetAccessToken();
   const existAccess = useCheckAccess(accessToken);
-
   const { setDraftOrg } = useGithubUploadStore.getState();
-
   const [selectedOrgId, setSelectedOrgId] = useState<number | null>(null);
-
   const [noSelection, setNoSelection] = useState(false);
 
   const {
@@ -43,7 +41,7 @@ const SelectOrganizationModal = ({ onClose, onComplete}: Props) => {
     hasNextPage,
     isFetchingNextPage,
   } = useInfiniteQuery({
-    queryKey: ['ASDF'],
+    queryKey: repositoryKeys.uplpadOrganization().queryKey,
     queryFn: async ({ pageParam = 0 }) => {
       const response = await callApi<OrganizationResponse>({
         method: 'GET',

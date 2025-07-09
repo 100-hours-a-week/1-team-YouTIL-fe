@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef } from 'react';
-import { useInfiniteQuery, useQueryClient } from '@tanstack/react-query';
+import { useInfiniteQuery } from '@tanstack/react-query';
 import { useFetch } from '@/hooks/useFetch';
 import useCheckAccess from '@/hooks/useCheckExistAccess';
 import useGetAccessToken from '@/hooks/useGetAccessToken';
@@ -9,6 +9,7 @@ import { useGithubUploadStore } from '@/store/useGIthubUploadStore';
 import { useInfinityScrollObserver } from '@/hooks/useInfinityScrollObserver';
 import { useMutation } from '@tanstack/react-query';
 import './SelectBranchModal.scss';
+import { repositoryKeys } from '@/querykey/repository.querykey';
 
 interface Branch {
   name: string;
@@ -58,7 +59,6 @@ const SelectBranchModal = ({ onClose, onComplete }: Props) => {
   const { callApi } = useFetch();
   const accessToken = useGetAccessToken();
   const existAccess = useCheckAccess(accessToken);
-  const queryClient = useQueryClient();
 
   const [selectedBranchName, setSelectedBranchName] = useState<string | null>(null);
   const scrollContainerRef = useRef<HTMLDivElement | null>(null);
@@ -70,7 +70,7 @@ const SelectBranchModal = ({ onClose, onComplete }: Props) => {
     isFetchingNextPage,
     isLoading,
   } = useInfiniteQuery({
-    queryKey: ['asdf'], 
+    queryKey: repositoryKeys.uploadBranch(draftOrg?.organization_id ?? '', draftRepo?.repositoryId).queryKey,
     queryFn: async ({ pageParam = 0 }) => {
       const response = await callApi<BranchResponse>({
         method: 'GET',

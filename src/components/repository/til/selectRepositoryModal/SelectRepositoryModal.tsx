@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useState } from 'react';
+import { useState } from 'react';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { useFetch } from '@/hooks/useFetch';
 import useGetAccessToken from '@/hooks/useGetAccessToken';
@@ -8,7 +8,7 @@ import useCheckAccess from '@/hooks/useCheckExistAccess';
 import { useGithubUploadStore } from '@/store/useGIthubUploadStore';
 import { useInfinityScrollObserver } from '@/hooks/useInfinityScrollObserver';
 import './SelectRepositoryModal.scss';
-import { useGithubLogin } from '@/hooks/useGithubLogin';
+import { repositoryKeys } from '@/querykey/repository.querykey';
 
 interface Repository {
   repositoryId: number;
@@ -41,7 +41,7 @@ const SelectRepositoryModal = ({ onClose, onComplete }: Props) => {
     isFetchingNextPage,
     isLoading,
   } = useInfiniteQuery({
-    queryKey: [draftOrg],
+    queryKey: repositoryKeys.uploadRepository(draftOrg?.organization_id ?? '').queryKey,
     queryFn: async ({ pageParam = 0 }) => {
       const response = await callApi<RepositoryResponse>({
         method: 'GET',
