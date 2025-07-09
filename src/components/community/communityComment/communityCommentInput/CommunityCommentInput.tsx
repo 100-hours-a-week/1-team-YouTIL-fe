@@ -74,7 +74,7 @@ const CommunityCommentInput = () => {
       <input
         className="comment-input__field"
         type="text"
-        placeholder="방명록을 남겨보세요 (최대 50자)"
+        placeholder="댓글을 남겨주세요 (최대 50자)"
         value={comment}
         onChange={handleChange}
         onKeyDown={handleKeyDown}
