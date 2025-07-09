@@ -26,7 +26,6 @@ import { useQuery } from '@tanstack/react-query';
 import { useFetch } from '@/hooks/useFetch';
 import useCheckAccess from '@/hooks/useCheckExistAccess';
 import { commitKeys } from '@/querykey/commit.querykey';
-import { useQueryClient } from '@tanstack/react-query';
 
 interface CommitCalendarResponse {
   calendar: Record<string, number>;
@@ -39,7 +38,6 @@ const SelectDateCalendar = () => {
   const selectedBranchName = useBranchStore((state) => state.selectedBranch);
   const accessToken = useGetAccessToken();
   const existAccess = useCheckAccess(accessToken);
-  const queryClient = useQueryClient();
   const { callApi } = useFetch();
 
   const parsedStoredDate = storedDate ? parseISO(storedDate) : new Date();

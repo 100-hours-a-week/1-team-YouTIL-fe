@@ -2,7 +2,7 @@
 
 import './RepositoryTILList.scss';
 import Image from 'next/image';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useQuery, useQueryClient, useInfiniteQuery } from '@tanstack/react-query';
 import { format, parseISO } from 'date-fns';
 import { useRepositoryTILList } from '@/hooks/repository/til/useRepositoryTILList';
@@ -14,6 +14,13 @@ import { mainKeys } from '@/querykey/main.querykey';
 import { repositoryKeys } from '@/querykey/repository.querykey';
 import { profileKeys } from '@/querykey/profile.querykey';
 import { useInfinityScrollObserver } from '@/hooks/useInfinityScrollObserver';
+import SelectOrganizationModal from './selectOrganizationModal/SelectOrganizationModal';
+import SelectRepositoryModal from './selectRepositoryModal/SelectRepositoryModal';
+import SelectBranchModal from './selectBranchModal/SelectBranchModal';
+import RepositoryConnectResultModal from './repositoryConnectResultModal/RepositoryConnectResultModal';
+import { useMutation } from '@tanstack/react-query';
+import { useToastStore } from '@/store/useToastStore';
+import UploadCompleteToast from './uploadCompleteToast/UploadCompleteToast';
 
 interface TILItem {
   tilId: number;
@@ -57,8 +64,13 @@ const RepositoryTILList = () => {
     editingTilId,
     editedTitle,
     isSubmitting,
-    deleteModal,
     interviewModal,
+    deleteModal,
+    organizationModal,
+    repositoryModal,
+    branchModal,
+    connectResultModal,
+    isConnectSuccess,
     setEditedTitle,
     setEditingTilId,
     setIsSubmitting,
@@ -67,17 +79,41 @@ const RepositoryTILList = () => {
     handleStartEdit,
     handleDeleteComplete,
     handleDeleteClick,
+    setIsConnectSuccess
   } = useRepositoryTILList();
 
   const { callApi } = useFetch();
   const queryClient = useQueryClient();
+  const floatingRef = useRef<HTMLDivElement>(null);
 
-  
   useEffect(() => {
     if (tilDate) {
       queryClient.removeQueries({ queryKey: ['disabled-query'] });
     }
   }, [tilDate]);
+
+  useEffect(() => {
+    const updateFloatingPosition = () => {
+      const frame = document.querySelector('.layout__frame');
+      const buttons = floatingRef.current;
+
+      if (!frame || !buttons) return;
+
+      const rect = frame.getBoundingClientRect();
+      buttons.style.left = `${rect.right - 42}px`;
+      buttons.style.bottom = '70px';
+      buttons.style.opacity = '1';
+    };
+
+    updateFloatingPosition();
+    window.addEventListener('resize', updateFloatingPosition);
+    window.addEventListener('scroll', updateFloatingPosition);
+
+    return () => {
+      window.removeEventListener('resize', updateFloatingPosition);
+      window.removeEventListener('scroll', updateFloatingPosition);
+    };
+  }, []);
   
   
   const {
@@ -97,7 +133,6 @@ const RepositoryTILList = () => {
         headers: { Authorization: `Bearer ${accessToken}` },
         credentials: 'include',
       });
-      console.log(response); 
       return response;
     },
     getNextPageParam: (lastPage, allPages) => {
@@ -137,6 +172,33 @@ const RepositoryTILList = () => {
     gcTime: 3600000,
   });
 
+  const { mutate } = useMutation({
+    mutationFn: async (expandedTilId: number) => {
+      const response = await callApi({
+        method: 'POST',
+        endpoint: '/tils/upload',
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+        credentials: 'include',
+        body: { tilId: expandedTilId },
+      });
+      return response;
+    },
+    onSuccess: () => {
+      useToastStore.getState().addToast({
+        type: 'success',
+        message: '깃허브 업로드 성공!',
+      });
+    },
+    onError: () => {
+      useToastStore.getState().addToast({
+        type: 'error',
+        message: '깃허브 업로드 실패!',
+      });
+    },
+  });
+
   const handleConfirmEdit = async (
     e?: React.MouseEvent | React.KeyboardEvent,
     tilId?: number
@@ -144,12 +206,6 @@ const RepositoryTILList = () => {
     if (!tilId || isSubmitting || !editedTitle.trim()) return;
     e?.stopPropagation();
     setIsSubmitting(true);
-
-    queryClient.setQueryData<TILItem[]>(repositoryKeys.tilList(tilDate).queryKey, (prev) =>
-      prev?.map((til) =>
-        til.tilId === tilId ? { ...til, title: editedTitle.trim() } : til
-      ) ?? prev
-    );
 
     try {
       await callApi({
@@ -172,6 +228,15 @@ const RepositoryTILList = () => {
       console.error('TIL 수정 실패:', err);
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const handleGitUpload = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.stopPropagation();
+    if (expandedTilId !== null) {
+      mutate(expandedTilId);
+    } else {
+      console.error('expandedTilId is null');
     }
   };
 
@@ -217,7 +282,7 @@ const RepositoryTILList = () => {
                           refs.current[til.tilId] = el;
                         }}
                       >
-                        <input
+                         <input
                           value={editedTitle}
                           onClick={(e) => e.stopPropagation()}
                           onChange={(e) => {
@@ -264,15 +329,26 @@ const RepositoryTILList = () => {
                   >
                     <p className="repository-til-list__item-date">{formattedDate}</p>
                     {isExpanded && (
-                      <button
-                        className="repository-til-list__item-generate-button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          interviewModal.open();
-                        }}
-                      >
-                        면접질문생성
-                      </button>
+                      <>
+                        <button
+                          className="repository-til-list__item-generate-button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            interviewModal.open();
+                          }}
+                        >
+                          면접질문생성
+                        </button>
+                        <button
+                          className="repository-til-list__item-upload-button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleGitUpload(e);
+                          }}
+                        >
+                          git 업로드
+                        </button>
+                      </>
                     )}
                   </div>
                 </div>
@@ -310,6 +386,24 @@ const RepositoryTILList = () => {
         })}
       </ul>
 
+      <div className="repository-til-list__floating-wrapper" ref={floatingRef}>
+        <button
+          className="repository-til-list__floating-button"
+          onClick={() => {
+            organizationModal.open();
+          }}
+        >
+          <Image
+            src="/images/gitIcon.png"
+            alt="GitHub Icon"
+            width={24}
+            height={24}
+          />
+        </button>
+      </div>
+
+      <UploadCompleteToast />
+
       {interviewModal.isOpen && (
         <SelectInterviewLevelModal
           tilId={expandedTilId!}
@@ -324,6 +418,46 @@ const RepositoryTILList = () => {
           onDeleteComplete={handleDeleteComplete}
         />
       )}
+
+
+      {organizationModal.isOpen && (
+        <SelectOrganizationModal
+          onClose={organizationModal.close}
+          onComplete={() => {
+            organizationModal.close();
+            repositoryModal.open();
+          }}
+        />
+      )}
+
+      {repositoryModal.isOpen && (
+        <SelectRepositoryModal 
+          onClose={repositoryModal.close} 
+          onComplete={() =>{
+            repositoryModal.close();
+            branchModal.open();
+          }}
+        />
+      )}
+
+      {branchModal.isOpen && (
+        <SelectBranchModal 
+          onClose={branchModal.close} 
+          onComplete={(response) => {
+            const success = !!response?.success;
+            setIsConnectSuccess(success);
+            connectResultModal.open();
+          }}
+        />
+      )}
+
+      {connectResultModal.isOpen && isConnectSuccess !== null && (
+        <RepositoryConnectResultModal
+          isSuccess={isConnectSuccess!}
+          onClose={connectResultModal.close}
+        />
+      )}
+
     </div>
   );
 };

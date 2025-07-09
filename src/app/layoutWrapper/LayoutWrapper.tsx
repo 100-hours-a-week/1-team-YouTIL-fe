@@ -25,7 +25,6 @@ export default function LayoutWrapper({ children }: { children: React.ReactNode 
           <main className="layout__main">
             {children}
           </main>
-
           {!isLoginPage && <BottomNavigationBar />}
         </div>
       </div>

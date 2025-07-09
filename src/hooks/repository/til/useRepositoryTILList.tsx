@@ -12,7 +12,10 @@ export const useRepositoryTILList = () => {
   const { tilDate } = useRepositoryDateStore();
   const interviewModal = useModal();
   const deleteModal = useModal();
-
+  const organizationModal = useModal();
+  const repositoryModal = useModal();
+  const branchModal = useModal();
+  const connectResultModal = useModal();
   const [expandedTilId, setExpandedTilId] = useState<number | null>(null);
   const [selectedTilIds, setSelectedTilIds] = useState<number[]>([]);
   const [shakeDelete, setShakeDelete] = useState(false);
@@ -20,6 +23,7 @@ export const useRepositoryTILList = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [editedTitle, setEditedTitle] = useState('');
   const refs = useRef<Record<number, HTMLDivElement | null>>({});
+  const [isConnectSuccess, setIsConnectSuccess] = useState<boolean | null>(null);
 
   useEffect(() => {
     const handleMouseDown = (event: MouseEvent) => {
@@ -83,6 +87,11 @@ export const useRepositoryTILList = () => {
     isSubmitting,
     interviewModal,
     deleteModal,
+    organizationModal,
+    repositoryModal,
+    branchModal,
+    connectResultModal,
+    isConnectSuccess,
     setEditedTitle,
     setSelectedTilIds,
     setEditingTilId,
@@ -92,6 +101,7 @@ export const useRepositoryTILList = () => {
     handleStartEdit,
     handleDeleteComplete,
     handleDeleteClick,
+    setIsConnectSuccess
   };
 };
 

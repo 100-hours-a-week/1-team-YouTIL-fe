@@ -175,7 +175,7 @@ const CommunityList = () => {
       </div>
 
       <div className="community-list__floating-buttons" ref={floatingRef}>
-      <button className="community-list__button" onClick={() => {window.location.reload();}}>
+        <button className="community-list__button" onClick={() => {window.location.reload();}}>
           🔄
         </button>
         <button className="community-list__button" onClick={handleScrollTop}>
