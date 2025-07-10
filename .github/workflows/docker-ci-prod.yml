@@ -59,7 +59,7 @@ jobs:
           git clone https://x-access-token:${{ secrets.CLOUD_REPO_TOKEN }}@github.com/100-hours-a-week/1-team-YouTIL-cloud.git
           cd 1-team-YouTIL-cloud
           
-          echo "# updated at $(date +%Y-%m-%dT%H:%M:%S)" >> values.yaml
+          echo "# updated at $(date +%Y-%m-%dT%H:%M:%S)" >> v2/helm/youtil-fe/values.yaml
 
           git add v2/helm/youtil-fe/values.yaml
           git commit -m "🔁 FE Docker image updated: Trigger ArgoCD"
