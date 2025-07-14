@@ -2,7 +2,7 @@
 
 import './RepositoryTILList.scss';
 import Image from 'next/image';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useQuery, useQueryClient, useInfiniteQuery } from '@tanstack/react-query';
 import { format, parseISO } from 'date-fns';
 import { useRepositoryTILList } from '@/hooks/repository/til/useRepositoryTILList';
@@ -21,6 +21,9 @@ import RepositoryConnectResultModal from './repositoryConnectResultModal/Reposit
 import { useMutation } from '@tanstack/react-query';
 import { useToastStore } from '@/store/useToastStore';
 import UploadCompleteToast from './uploadCompleteToast/UploadCompleteToast';
+import { useRepositoryDateStore } from '@/store/useRepositoryDateStore';
+import GenerateInterviewModal from '../generateInterviewModal/GenerateInterviewModal';
+
 
 interface TILItem {
   tilId: number;
@@ -71,6 +74,7 @@ const RepositoryTILList = () => {
     branchModal,
     connectResultModal,
     isConnectSuccess,
+    generateInterviewModal,
     setEditedTitle,
     setEditingTilId,
     setIsSubmitting,
@@ -85,6 +89,14 @@ const RepositoryTILList = () => {
   const { callApi } = useFetch();
   const queryClient = useQueryClient();
   const floatingRef = useRef<HTMLDivElement>(null);
+
+  const [currentStatus, setCurrentStatus] = useState<string | null>(null);
+  const [currentPosition, setCurrentPosition] = useState<string | null>(null);
+  const [currentTotal, setCurrentTotal] = useState<string | null>(null);
+  const {setActiveTab} = useRepositoryDateStore();
+  const isFirstRender = useRef(true);
+  const [isError, setIsError] = useState(false);
+  const [requestId, setRequestId] = useState<string | null>(null);
 
   useEffect(() => {
     if (tilDate) {
@@ -114,6 +126,34 @@ const RepositoryTILList = () => {
       window.removeEventListener('scroll', updateFloatingPosition);
     };
   }, []);
+
+  useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
+    }
+    if (!requestId) return;
+
+    const eventSource = new EventSource(`https://dev-api.youtil.co.kr/api/v1/tils/subscribe/${requestId}/success`);
+  
+    eventSource.addEventListener('status', (event) => {
+      const data = JSON.parse(event.data);
+  
+      setCurrentStatus(data.status);
+      setCurrentTotal(data.total);
+      setCurrentPosition(data.position);
+      
+      if (data.status === 'FINISHED') {
+        eventSource.close();
+        setIsError(false);
+        setTimeout(() => {
+          generateInterviewModal.close();
+          setCurrentStatus(null);
+          setActiveTab('interview');
+        }, 1000);
+      }
+    });
+  }, [requestId]);
   
   
   const {
@@ -402,12 +442,27 @@ const RepositoryTILList = () => {
         </button>
       </div>
 
+      {(currentStatus !== null || isError) && (
+        <GenerateInterviewModal
+          isError={isError}
+          status={currentStatus}
+          total={currentTotal}
+          position={currentPosition}
+          onClose={() => {
+            setIsError(false);
+            generateInterviewModal.close();
+            setCurrentStatus(null);
+          }}
+        />
+      )}
+
       <UploadCompleteToast />
 
       {interviewModal.isOpen && (
         <SelectInterviewLevelModal
           tilId={expandedTilId!}
           onClose={interviewModal.close}
+          setRequestId={setRequestId}
         />
       )}
 
