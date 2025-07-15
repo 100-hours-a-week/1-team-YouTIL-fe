@@ -46,7 +46,7 @@ const GenerateTILModal = ({ isError, status, total, position, onClose }: Props) 
     <div className="generate-til-modal">
       <div
         className="generate-til-modal__overlay"
-        onClick={isError && onClose ? onClose : undefined}
+        onClick={(isError || status === 'ERROR') && onClose ? onClose : undefined}
       />
       <div className="generate-til-modal__content">
         {(isError || status === 'ERROR') ? (

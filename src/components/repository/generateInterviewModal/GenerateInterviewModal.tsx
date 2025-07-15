@@ -44,7 +44,7 @@ const GenerateInterviewModal = ({ isError, status, total, position, onClose }: P
     <div className="generate-interview-modal">
       <div
         className="generate-interview-modal__overlay"
-        onClick={isError && onClose ? onClose : undefined}
+        onClick={(isError || status === 'ERROR') && onClose ? onClose : undefined}
       />
       <div className="generate-interview-modal__content">
         {(isError || status === 'ERROR') ? (
