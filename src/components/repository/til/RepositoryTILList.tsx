@@ -343,22 +343,40 @@ const RepositoryTILList = () => {
                       </div>
                     ) : (
                       <>
-                        <h3
-                          className={`repository-til-list__item-title${
-                            isExpanded ? ' repository-til-list__item-title--expanded' : ''
-                          }`}
+                      <h3
+                        className={`repository-til-list__item-title${
+                          isExpanded ? ' repository-til-list__item-title--expanded' : ''
+                        }`}
+                      >
+                        {til.title}
+                      </h3>
+                      <Image
+                        src="/images/pencilEdit.png"
+                        alt="edit icon"
+                        width={16}
+                        height={16}
+                        className="repository-til-list__item-edit-icon"
+                        onClick={(e) => handleStartEdit(e, til.tilId, til.title)}
+                      />
+                      {isExpanded && tilDetailData && (
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            navigator.clipboard.writeText(tilDetailData.content);
+                          }}
+                          className="repository-til-list__item-copy-button"
                         >
-                          {til.title}
-                        </h3>
-                        <Image
-                          src="/images/pencilEdit.png"
-                          alt="edit icon"
-                          width={16}
-                          height={16}
-                          className="repository-til-list__item-edit-icon"
-                          onClick={(e) => handleStartEdit(e, til.tilId, til.title)}
-                        />
-                      </>
+                          <Image
+                            src="/images/copy.png"
+                            alt="copy"
+                            width={16}
+                            height={16}
+                            className="repository-til-list__item-copy-icon"
+                          />
+                        </button>
+                      )}
+                    </>
                     )}
                   </div>
 
@@ -403,13 +421,7 @@ const RepositoryTILList = () => {
               </div>
 
               {expandedTilId === til.tilId && tilDetailData && (
-                <div
-                  className="repository-til-list__item-detail"
-                  onCopy={(e) => {
-                    e.preventDefault();
-                    navigator.clipboard.writeText(tilDetailData.content);
-                  }}
-                >
+                <div className="repository-til-list__item-detail">
                   <Markdown>{tilDetailData.content}</Markdown>
                   <p className="repository-til-list__item-tags">
                     {tilDetailData.tag.map((tag, i) => (
