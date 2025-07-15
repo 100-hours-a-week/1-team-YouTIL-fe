@@ -16,6 +16,7 @@ export const useRepositoryTILList = () => {
   const repositoryModal = useModal();
   const branchModal = useModal();
   const connectResultModal = useModal();
+  const generateInterviewModal = useModal();
   const [expandedTilId, setExpandedTilId] = useState<number | null>(null);
   const [selectedTilIds, setSelectedTilIds] = useState<number[]>([]);
   const [shakeDelete, setShakeDelete] = useState(false);
@@ -92,6 +93,7 @@ export const useRepositoryTILList = () => {
     branchModal,
     connectResultModal,
     isConnectSuccess,
+    generateInterviewModal,
     setEditedTitle,
     setSelectedTilIds,
     setEditingTilId,
