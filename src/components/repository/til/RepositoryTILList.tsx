@@ -23,6 +23,9 @@ import { useToastStore } from '@/store/useToastStore';
 import UploadCompleteToast from './uploadCompleteToast/UploadCompleteToast';
 import { useRepositoryDateStore } from '@/store/useRepositoryDateStore';
 import GenerateInterviewModal from '../generateInterviewModal/GenerateInterviewModal';
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { oneLight } from 'react-syntax-highlighter/dist/cjs/styles/prism';
+
 
 
 interface TILItem {
@@ -85,6 +88,18 @@ const RepositoryTILList = () => {
     handleDeleteClick,
     setIsConnectSuccess
   } = useRepositoryTILList();
+
+  const whiteTheme = {
+    ...oneLight,
+    'pre[class*="language-"]': {
+      ...oneLight['pre[class*="language-"]'],
+      background: '#ffffff',
+    },
+    'code[class*="language-"]': {
+      ...oneLight['code[class*="language-"]'],
+      background: '#ffffff',
+    },
+  };
 
   const { callApi } = useFetch();
   const queryClient = useQueryClient();
@@ -422,7 +437,39 @@ const RepositoryTILList = () => {
 
               {expandedTilId === til.tilId && tilDetailData && (
                 <div className="repository-til-list__item-detail">
-                  <Markdown>{tilDetailData.content}</Markdown>
+                 <Markdown
+                    components={{
+                      code({ className, children, ...rest }) {
+                        const match = /language-(\w+)/.exec(className || '');
+
+                        if (match) {
+                          return (
+                            <SyntaxHighlighter
+                              style={whiteTheme}
+                              language={match[1]}
+                              PreTag="div"
+                              customStyle={{
+                                padding: '1rem',
+                                borderRadius: '0.5rem',
+                                fontSize: '0.875rem',
+                                backgroundColor: '#ffffff',
+                              }}
+                            >
+                              {String(children).replace(/\n$/, '')}
+                            </SyntaxHighlighter>
+                          );
+                        }
+
+                        return (
+                          <code className={className} {...rest}>
+                            {children}
+                          </code>
+                        );
+                      },
+                    }}
+                  >
+                    {tilDetailData.content}
+                  </Markdown>
                   <p className="repository-til-list__item-tags">
                     {tilDetailData.tag.map((tag, i) => (
                       <span key={i} className="repository-til-list__item-tag">#{tag}</span>
