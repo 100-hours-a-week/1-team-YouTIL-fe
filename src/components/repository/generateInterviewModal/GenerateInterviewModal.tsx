@@ -12,36 +12,37 @@ interface Props {
 }
 
 const STATUS_MESSAGE_MAP: Record<string, string> = {
+  ERROR: '면접질문 생성에 실패했습니다...',
   WAITING: '대기열에 등록되었습니다...',
   PROCESSING: '면접질문 생성 준비 중입니다...',
-  GET_COMMIT_DATA_FROM_GITHUB: '선택한 TIL을 불러오고 있습니다...',
-  COMMIT_ANALYSIS_START: 'TIL 분석을 시작합니다...',
-  SUPERVISOR_START: '검토 중입니다...',
-  RESEARCH_TEAM_START: '연구팀에서 내용을 정리 중입니다...',
-  INTRODUCTION_START: '도입부를 작성 중입니다...',
-  CONCLUSION_START: '결론을 작성 중입니다...',
   FINISHED: '면접질문 생성이 완료되었습니다!',
 };
 
 const STATUS_ORDER: string[] = [
+  'ERROR',
   'WAITING',
-  'PROCESSING',
-  'GET_COMMIT_DATA_FROM_GITHUB',
-  'COMMIT_ANALYSIS_START',
-  'SUPERVISOR_START',
-  'RESEARCH_TEAM_START',
-  'INTRODUCTION_START',
-  'CONCLUSION_START',
+  'PROCESSING_STAGE_1',
+  'PROCESSING_STAGE_2',
   'FINISHED',
 ];
 
 const GenerateInterviewModal = ({ isError, status, total, position, onClose }: Props) => {
+  const internalStatus =
+    status === 'PROCESSING' ? 'PROCESSING_STAGE_1' : status;
+
   const statusMessage = status && STATUS_MESSAGE_MAP[status];
-  const statusIndex = status ? STATUS_ORDER.indexOf(status) : 0;
-  const progressPercent = Math.max(0, (statusIndex / (STATUS_ORDER.length - 1)) * 100);
+  const statusIndex = internalStatus
+    ? STATUS_ORDER.indexOf(internalStatus)
+    : 0;
+
+  const progressPercent = Math.max(
+    0,
+    (statusIndex / (STATUS_ORDER.length - 1)) * 100
+  );
+
   return (
     <div className="generate-interview-modal">
-    <div
+      <div
         className="generate-interview-modal__overlay"
         onClick={isError && onClose ? onClose : undefined}
       />

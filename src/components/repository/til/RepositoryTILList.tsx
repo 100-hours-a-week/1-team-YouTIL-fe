@@ -134,7 +134,7 @@ const RepositoryTILList = () => {
     }
     if (!requestId) return;
 
-    const eventSource = new EventSource(`https://dev-api.youtil.co.kr/api/v1/tils/subscribe/${requestId}/success`);
+    const eventSource = new EventSource(`https://dev-api.youtil.co.kr/api/v1/tils/subscribe/${requestId}`);
   
     eventSource.addEventListener('status', (event) => {
       const data = JSON.parse(event.data);

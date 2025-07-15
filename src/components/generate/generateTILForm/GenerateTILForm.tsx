@@ -69,7 +69,7 @@ const GenerateTILForm = () => {
     }
     if (!requestId) return;
   
-    const eventSource = new EventSource(`https://dev-api.youtil.co.kr/api/v1/tils/subscribe/${requestId}/success`);
+    const eventSource = new EventSource(`https://dev-api.youtil.co.kr/api/v1/tils/subscribe/${requestId}`);
   
     eventSource.addEventListener('status', (event) => {
       const data = JSON.parse(event.data);
@@ -121,12 +121,10 @@ const GenerateTILForm = () => {
         },
         credentials: 'include',
       });
-      // const newRequestId = response.data.requestId;
-      // if (newRequestId !== requestId) {
-      //   setRequestId(newRequestId);
-      // }
-
-      setRequestId(response.data.requestId);
+      const newRequestId = response.data.requestId;
+      if (newRequestId !== requestId) {
+        setRequestId(newRequestId);
+      }
       return response;
     },
     onSuccess: () => {
@@ -139,10 +137,6 @@ const GenerateTILForm = () => {
     onError: () => {
       setIsError(true);
       generateTILModal.open();
-    },
-    onMutate: () => {
-      const tempRequestId = window.crypto.randomUUID();
-      setRequestId(tempRequestId);
     },
   });
 

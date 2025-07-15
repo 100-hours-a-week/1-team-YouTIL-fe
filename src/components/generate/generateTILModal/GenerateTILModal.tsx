@@ -12,6 +12,7 @@ interface Props {
 }
 
 const STATUS_MESSAGE_MAP: Record<string, string> = {
+  ERROR: '면접질문 생성에 실패했습니다...',
   WAITING: '대기열에 등록되었습니다...',
   PROCESSING: 'TIL 생성 준비 중입니다...',
   GET_COMMIT_DATA_FROM_GITHUB: '커밋 데이터를 불러오고 있습니다...',
@@ -24,6 +25,7 @@ const STATUS_MESSAGE_MAP: Record<string, string> = {
 };
 
 const STATUS_ORDER: string[] = [
+  'ERROR',
   'WAITING',
   'PROCESSING',
   'GET_COMMIT_DATA_FROM_GITHUB',
