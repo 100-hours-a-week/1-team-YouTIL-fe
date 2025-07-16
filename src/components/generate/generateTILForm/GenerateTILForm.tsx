@@ -48,6 +48,7 @@ const GenerateTILForm = () => {
   const selectedRepository = useRepositoryStore((state) => state.selectedRepository);
   const selectedBranch = useBranchStore((state) => state.selectedBranch);
   const accessToken = useGetAccessToken();
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
 
   const [currentStatus, setCurrentStatus] = useState<string | null>(null);
   const [currentPosition, setCurrentPosition] = useState<string | null>(null);
@@ -69,7 +70,7 @@ const GenerateTILForm = () => {
     }
     if (!requestId) return;
   
-    const eventSource = new EventSource(`https://dev-api.youtil.co.kr/api/v1/tils/subscribe/${requestId}`);
+    const eventSource = new EventSource(`${baseUrl}/tils/subscribe/${requestId}`);
   
     eventSource.addEventListener('status', (event) => {
       const data = JSON.parse(event.data);
