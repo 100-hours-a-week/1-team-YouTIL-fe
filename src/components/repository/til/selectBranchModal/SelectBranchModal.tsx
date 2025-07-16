@@ -74,7 +74,7 @@ const SelectBranchModal = ({ onClose, onComplete }: Props) => {
     queryFn: async ({ pageParam = 0 }) => {
       const response = await callApi<BranchResponse>({
         method: 'GET',
-        endpoint: `/github/branches?organizationId=${draftOrg?.organization_id ?? ''}&repositoryId=${draftRepo?.repositoryId}&page=${pageParam}&offset=20`,
+        endpoint: `/github/branches?organizationId=${encodeURIComponent(draftOrg?.organization_id ?? '')}&repositoryId=${encodeURIComponent(draftRepo?.repositoryId ?? '')}&page=${pageParam}&offset=20`,
         headers: { Authorization: `Bearer ${accessToken}` },
         credentials: 'include',
       });

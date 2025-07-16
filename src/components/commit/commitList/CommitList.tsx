@@ -55,7 +55,7 @@ const CommitList = () => {
     queryFn: async () => {
       const response = await callApi<CommitDetailResponse>({
         method: 'GET',
-        endpoint: `/github/commits?organizationId=${selectedOrganization?.organization_id ?? ''}&repositoryId=${selectedRepository?.repositoryId}&branchId=${selectedBranchName?.branchName}&date=${selectedDate}`,
+        endpoint: `/github/commits?organizationId=${encodeURIComponent(selectedOrganization?.organization_id ?? '')}&repositoryId=${encodeURIComponent(selectedRepository?.repositoryId ?? '')}&branchId=${encodeURIComponent(selectedBranchName?.branchName ?? '')}&date=${selectedDate}`,
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
