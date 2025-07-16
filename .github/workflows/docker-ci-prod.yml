@@ -27,20 +27,27 @@ jobs:
         with:
           version: 10.10.0
 
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Get AWS Account ID
+        id: aws-account
+        run: echo "ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)" >> $GITHUB_ENV
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
       - name: Set Docker Image Tag
         run: |
           TIMESTAMP=$(date +%Y%m%d-%H%M%S)
-          IMAGE=asia-northeast3-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/youtil-docker-registry/youtil-fe-prod
+          IMAGE="$ACCOUNT_ID.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/youtil/fe-prod"
           echo "IMAGE_TAG=${IMAGE}:${TIMESTAMP}" >> $GITHUB_ENV
           echo "IMAGE_LATEST=${IMAGE}:latest" >> $GITHUB_ENV
-
-      - name: Authenticate to Google Cloud
-        uses: google-github-actions/auth@v2
-        with:
-          credentials_json: '${{ secrets.GCP_SA_KEY }}'
-
-      - name: Configure Docker to use GCP Artifact Registry
-        run: gcloud auth configure-docker asia-northeast3-docker.pkg.dev
 
       - name: Create .env.production file
         run: echo "${{ secrets.ENV_PROD }}" > .env
@@ -52,3 +59,16 @@ jobs:
         run: |
           docker push ${{ env.IMAGE_TAG }}
           docker push ${{ env.IMAGE_LATEST }}
+      - name: Trigger ArgoCD by updating values.yaml
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git clone https://x-access-token:${{ secrets.CLOUD_REPO_TOKEN }}@github.com/100-hours-a-week/1-team-YouTIL-cloud.git
+          cd 1-team-YouTIL-cloud
+          
+          echo "# updated at $(date +%Y-%m-%dT%H:%M:%S)" >> v2/helm/youtil-fe/values.yaml
+
+          git add v2/helm/youtil-fe/values.yaml
+          git commit -m "🔁 FE Docker image updated: Trigger ArgoCD"
+          git push origin main
+

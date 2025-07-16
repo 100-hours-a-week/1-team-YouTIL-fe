@@ -2,7 +2,7 @@
 
 import './RepositoryTILList.scss';
 import Image from 'next/image';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useQuery, useQueryClient, useInfiniteQuery } from '@tanstack/react-query';
 import { format, parseISO } from 'date-fns';
 import { useRepositoryTILList } from '@/hooks/repository/til/useRepositoryTILList';
@@ -21,6 +21,12 @@ import RepositoryConnectResultModal from './repositoryConnectResultModal/Reposit
 import { useMutation } from '@tanstack/react-query';
 import { useToastStore } from '@/store/useToastStore';
 import UploadCompleteToast from './uploadCompleteToast/UploadCompleteToast';
+import { useRepositoryDateStore } from '@/store/useRepositoryDateStore';
+import GenerateInterviewModal from '../generateInterviewModal/GenerateInterviewModal';
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { oneLight } from 'react-syntax-highlighter/dist/cjs/styles/prism';
+
+
 
 interface TILItem {
   tilId: number;
@@ -71,6 +77,7 @@ const RepositoryTILList = () => {
     branchModal,
     connectResultModal,
     isConnectSuccess,
+    generateInterviewModal,
     setEditedTitle,
     setEditingTilId,
     setIsSubmitting,
@@ -82,9 +89,30 @@ const RepositoryTILList = () => {
     setIsConnectSuccess
   } = useRepositoryTILList();
 
+  const whiteTheme = {
+    ...oneLight,
+    'pre[class*="language-"]': {
+      ...oneLight['pre[class*="language-"]'],
+      background: '#ffffff',
+    },
+    'code[class*="language-"]': {
+      ...oneLight['code[class*="language-"]'],
+      background: '#ffffff',
+    },
+  };
+
   const { callApi } = useFetch();
   const queryClient = useQueryClient();
   const floatingRef = useRef<HTMLDivElement>(null);
+
+  const [currentStatus, setCurrentStatus] = useState<string | null>(null);
+  const [currentPosition, setCurrentPosition] = useState<string | null>(null);
+  const [currentTotal, setCurrentTotal] = useState<string | null>(null);
+  const {setActiveTab} = useRepositoryDateStore();
+  const isFirstRender = useRef(true);
+  const [isError, setIsError] = useState(false);
+  const [requestId, setRequestId] = useState<string | null>(null);
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
 
   useEffect(() => {
     if (tilDate) {
@@ -114,6 +142,34 @@ const RepositoryTILList = () => {
       window.removeEventListener('scroll', updateFloatingPosition);
     };
   }, []);
+
+  useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
+    }
+    if (!requestId) return;
+
+    const eventSource = new EventSource(`${baseUrl}/tils/subscribe/${requestId}`);
+  
+    eventSource.addEventListener('status', (event) => {
+      const data = JSON.parse(event.data);
+  
+      setCurrentStatus(data.status);
+      setCurrentTotal(data.total);
+      setCurrentPosition(data.position);
+      
+      if (data.status === 'FINISHED') {
+        eventSource.close();
+        setIsError(false);
+        setTimeout(() => {
+          generateInterviewModal.close();
+          setCurrentStatus(null);
+          setActiveTab('interview');
+        }, 1000);
+      }
+    });
+  }, [requestId]);
   
   
   const {
@@ -303,22 +359,40 @@ const RepositoryTILList = () => {
                       </div>
                     ) : (
                       <>
-                        <h3
-                          className={`repository-til-list__item-title${
-                            isExpanded ? ' repository-til-list__item-title--expanded' : ''
-                          }`}
+                      <h3
+                        className={`repository-til-list__item-title${
+                          isExpanded ? ' repository-til-list__item-title--expanded' : ''
+                        }`}
+                      >
+                        {til.title}
+                      </h3>
+                      <Image
+                        src="/images/pencilEdit.png"
+                        alt="edit icon"
+                        width={16}
+                        height={16}
+                        className="repository-til-list__item-edit-icon"
+                        onClick={(e) => handleStartEdit(e, til.tilId, til.title)}
+                      />
+                      {isExpanded && tilDetailData && (
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            navigator.clipboard.writeText(tilDetailData.content);
+                          }}
+                          className="repository-til-list__item-copy-button"
                         >
-                          {til.title}
-                        </h3>
-                        <Image
-                          src="/images/pencilEdit.png"
-                          alt="edit icon"
-                          width={16}
-                          height={16}
-                          className="repository-til-list__item-edit-icon"
-                          onClick={(e) => handleStartEdit(e, til.tilId, til.title)}
-                        />
-                      </>
+                          <Image
+                            src="/images/copy.png"
+                            alt="copy"
+                            width={16}
+                            height={16}
+                            className="repository-til-list__item-copy-icon"
+                          />
+                        </button>
+                      )}
+                    </>
                     )}
                   </div>
 
@@ -363,14 +437,40 @@ const RepositoryTILList = () => {
               </div>
 
               {expandedTilId === til.tilId && tilDetailData && (
-                <div
-                  className="repository-til-list__item-detail"
-                  onCopy={(e) => {
-                    e.preventDefault();
-                    navigator.clipboard.writeText(tilDetailData.content);
-                  }}
-                >
-                  <Markdown>{tilDetailData.content}</Markdown>
+                <div className="repository-til-list__item-detail">
+                 <Markdown
+                    components={{
+                      code({ className, children, ...rest }) {
+                        const match = /language-(\w+)/.exec(className || '');
+
+                        if (match) {
+                          return (
+                            <SyntaxHighlighter
+                              style={whiteTheme}
+                              language={match[1]}
+                              PreTag="div"
+                              customStyle={{
+                                padding: '1rem',
+                                borderRadius: '0.5rem',
+                                fontSize: '0.875rem',
+                                backgroundColor: '#ffffff',
+                              }}
+                            >
+                              {String(children).replace(/\n$/, '')}
+                            </SyntaxHighlighter>
+                          );
+                        }
+
+                        return (
+                          <code className={className} {...rest}>
+                            {children}
+                          </code>
+                        );
+                      },
+                    }}
+                  >
+                    {tilDetailData.content}
+                  </Markdown>
                   <p className="repository-til-list__item-tags">
                     {tilDetailData.tag.map((tag, i) => (
                       <span key={i} className="repository-til-list__item-tag">#{tag}</span>
@@ -402,12 +502,27 @@ const RepositoryTILList = () => {
         </button>
       </div>
 
+      {(currentStatus !== null || isError) && (
+        <GenerateInterviewModal
+          isError={isError}
+          status={currentStatus}
+          total={currentTotal}
+          position={currentPosition}
+          onClose={() => {
+            setIsError(false);
+            generateInterviewModal.close();
+            setCurrentStatus(null);
+          }}
+        />
+      )}
+
       <UploadCompleteToast />
 
       {interviewModal.isOpen && (
         <SelectInterviewLevelModal
           tilId={expandedTilId!}
           onClose={interviewModal.close}
+          setRequestId={setRequestId}
         />
       )}
 

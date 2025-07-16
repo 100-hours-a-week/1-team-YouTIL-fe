@@ -6,15 +6,23 @@ import { useQueryClient } from '@tanstack/react-query';
 import './SelectInterviewLevelModal.scss';
 import Image from 'next/image';
 import { useFetch } from '@/hooks/useFetch';
-import { useRepositoryDateStore } from '@/store/useRepositoryDateStore';
 import useGetAccessToken from '@/hooks/useGetAccessToken';
-import SuccessIcon from '@/components/icon/SuccessIcon';
-import FailedIcon from '@/components/icon/FailedIcon';
 import { repositoryKeys } from '@/querykey/repository.querykey';
+
+interface InterviewCreationResponse {
+  message: string;
+  success: boolean;
+  code: string;
+  responseAt: string;
+  data: {
+    requestId: string;
+  };
+}
 
 interface Props {
   tilId: number;
   onClose: () => void;
+  setRequestId: (id: string | null) => void;
 }
 
 const difficultyOptions: {
@@ -27,11 +35,9 @@ const difficultyOptions: {
   { label: '어려움', image: '/images/interviewhard.png', value: 1 },
 ];
 
-const SelectInterviewLevelModal = ({ onClose, tilId }: Props) => {
+const SelectInterviewLevelModal = ({ onClose, tilId, setRequestId }: Props) => {
   const [selectedLevel, setSelectedLevel] = useState<null | 1 | 2 | 3>(null);
-  const {setActiveTab} = useRepositoryDateStore();
   const [errorShake, setErrorShake] = useState(false);
-  const [resultMessage, setResultMessage] = useState<'success' | 'error' | null>(null);
   const { callApi } = useFetch();
   const queryClient = useQueryClient();
   const accessToken = useGetAccessToken();
@@ -44,7 +50,7 @@ const SelectInterviewLevelModal = ({ onClose, tilId }: Props) => {
 
   const mutation = useMutation({
     mutationFn: async () => {
-      return await callApi<{ message: string }>({
+      const response = await callApi<InterviewCreationResponse>({
         method: 'POST',
         endpoint: '/interviews',
         body: {
@@ -56,26 +62,18 @@ const SelectInterviewLevelModal = ({ onClose, tilId }: Props) => {
         },
         credentials: 'include',
       });
+      setRequestId(response.data.requestId);
     },
     onMutate: () => {
+      onClose();
       setIsGenerating(true);
-      setResultMessage(null);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({queryKey: repositoryKeys.interviewList._def, exact: false})
       queryClient.invalidateQueries({queryKey : repositoryKeys.interviewCalendar._def, exact: false})
-      setResultMessage('success');
-      setActiveTab('interview'); 
-      setTimeout(onClose, 1500);
-    },
-    onError: () => {
-      setResultMessage('error');
-    },
-    onSettled: () => {
-      setIsGenerating(false);
     },
   });
-
+  
   const handleGenerate = () => {
     if (selectedLevel) {
       mutation.mutate();
@@ -93,31 +91,6 @@ const SelectInterviewLevelModal = ({ onClose, tilId }: Props) => {
           mutation.isPending ? 'interview-level-modal__content--loading' : ''
         }`}
       >
-        {mutation.isPending ? (
-          <div className="interview-level-modal__loading">
-            <div className="interview-level-modal__loading-spinner-text">
-              <div className="spinner" />
-              <p className="loading__text">면접질문 생성중...</p>
-            </div>
-            <p className="loading__subtext">면접질문 생성시 30초 정도의 시간이 소요 됩니다</p>
-          </div>
-        ) : resultMessage === 'success' ? (
-            <div className="interview-level-modal__result success">
-              <div className="interview-level-modal__text">
-                <p className="interview-level-modal__line1">면접질문 생성에 성공하였습니다!</p>
-                <p className="interview-level-modal__line2">면접 질문을 확인해보세요</p>
-              </div>
-              <SuccessIcon />
-            </div>
-        ) : resultMessage === 'error' ? (
-            <div className="interview-level-modal__result error">
-              <div className="interview-level-modal__text">
-                <p className="interview-level-modal__line1">면접질문 생성에 실패하였습니다</p>
-                <p className="interview-level-modal__line2">다시 시도해주세요</p>
-              </div>
-              <FailedIcon />
-            </div>
-        ) : (
           <>
             <h2 className="interview-level-modal__title">면접 난이도를 선택해주세요</h2>
             <div className="interview-level-modal__levels">
@@ -147,7 +120,6 @@ const SelectInterviewLevelModal = ({ onClose, tilId }: Props) => {
               </button>
             </div>
           </>
-        )}
       </div>
     </div>
   );
