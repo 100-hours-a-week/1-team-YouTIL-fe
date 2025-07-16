@@ -7,7 +7,7 @@ import { useRepositoryStore } from '@/store/useRepositoryStore';
 import { useBranchStore } from '@/store/useBranchStore';
 import useGetAccessToken from '@/hooks/useGetAccessToken';
 import { useFetch } from '@/hooks/useFetch';
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useQueryClient, useMutation } from '@tanstack/react-query';
 import GenerateTILModal from '../generateTILModal/GenerateTILModal';
@@ -26,6 +26,16 @@ interface TILPayload {
   is_shared: boolean;
 }
 
+interface TILCreationResponse {
+  message: string;
+  success: boolean;
+  code: string;
+  responseAt: string;
+  data: {
+    requestId: string;
+  };
+}
+
 type Category = 'FULLSTACK' | 'AI' | 'CLOUD';
 
 const GenerateTILForm = () => {
@@ -39,14 +49,46 @@ const GenerateTILForm = () => {
   const selectedBranch = useBranchStore((state) => state.selectedBranch);
   const accessToken = useGetAccessToken();
 
+  const [currentStatus, setCurrentStatus] = useState<string | null>(null);
+  const [currentPosition, setCurrentPosition] = useState<string | null>(null);
+  const [currentTotal, setCurrentTotal] = useState<string | null>(null);
+
   const [title, setTitle] = useState('');
   const [category, setCategory] = useState<Category>('FULLSTACK');
   const [visibility, setVisibility] = useState<'public' | 'private'>('public');
   const [shake, setShake] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(false);
-
-  const generateModal = useModal();
+  const [requestId, setRequestId] = useState<string | null>(null);
+  const isFirstRender = useRef(true);
+  const generateTILModal = useModal();
+  
+  useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
+    }
+    if (!requestId) return;
+  
+    const eventSource = new EventSource(`https://dev-api.youtil.co.kr/api/v1/tils/subscribe/${requestId}`);
+  
+    eventSource.addEventListener('status', (event) => {
+      const data = JSON.parse(event.data);
+      
+      setCurrentStatus(data.status);
+      setCurrentTotal(data.total);
+      setCurrentPosition(data.position);
+  
+      if (data.status === 'FINISHED') {
+        eventSource.close();
+        setIsError(false);
+        setTimeout(() => {
+          generateTILModal.close();
+          setCurrentStatus(null);
+          router.push('/repository');
+        }, 1000);
+      }
+    });
+  }, [requestId]);
 
   const validateTitle = (title: string, setShake: (s: boolean) => void): boolean => {
     if (title.trim() === '') {
@@ -69,7 +111,7 @@ const GenerateTILForm = () => {
 
   const mutation = useMutation({
     mutationFn: async (payload: TILPayload) => {
-      return await callApi({
+      const response = await callApi<TILCreationResponse>({
         method: 'POST',
         endpoint: '/tils',
         body: payload,
@@ -79,24 +121,22 @@ const GenerateTILForm = () => {
         },
         credentials: 'include',
       });
+      const newRequestId = response.data.requestId;
+      if (newRequestId !== requestId) {
+        setRequestId(newRequestId);
+      }
+      return response;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({queryKey: mainKeys.newTILList().queryKey});
-      queryClient.refetchQueries({ queryKey: mainKeys.heatmapCalendar._def, exact: false })
-      queryClient.invalidateQueries({ queryKey: repositoryKeys.tilCalendar._def, exact: false })
-      queryClient.invalidateQueries({queryKey: repositoryKeys.tilList._def, exact: false})
-      queryClient.invalidateQueries({queryKey: profileKeys.tilList._def, exact:false})
-      router.push('/repository');
+      queryClient.invalidateQueries({ queryKey: mainKeys.newTILList().queryKey });
+      queryClient.refetchQueries({ queryKey: mainKeys.heatmapCalendar._def, exact: false });
+      queryClient.invalidateQueries({ queryKey: repositoryKeys.tilCalendar._def, exact: false });
+      queryClient.invalidateQueries({ queryKey: repositoryKeys.tilList._def, exact: false });
+      queryClient.invalidateQueries({ queryKey: profileKeys.tilList._def, exact: false });
     },
     onError: () => {
       setIsError(true);
-      generateModal.open();
-    },
-    onMutate: () => {
-      setIsLoading(true);
-    },
-    onSettled: () => {
-      setIsLoading(false);
+      generateTILModal.open();
     },
   });
 
@@ -110,12 +150,16 @@ const GenerateTILForm = () => {
 
   return (
     <>
-      {(isLoading || generateModal.isOpen) && (
+     {(currentStatus !== null || isError) && (
         <GenerateTILModal
           isError={isError}
+          status={currentStatus}
+          total={currentTotal}
+          position={currentPosition}
           onClose={() => {
             setIsError(false);
-            generateModal.close();
+            generateTILModal.close();
+            setCurrentStatus(null);
           }}
         />
       )}
