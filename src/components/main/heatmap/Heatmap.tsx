@@ -120,9 +120,9 @@ const Heatmap = () => {
         <div className={`heatmap-wrapper__dropdown-content ${isOpen ? 'show' : ''}`}>
           {[0, 1, 2, 3, 4].map(offset => (
             <li key={offset}>
-              <a onClick={() => handleYearJump(basicYear + offset)}>
+              <button onClick={() => handleYearJump(basicYear + offset)}>
                 {basicYear + offset}
-              </a>
+              </button>
             </li>
           ))}
         </div>
