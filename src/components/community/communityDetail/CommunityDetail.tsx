@@ -92,10 +92,10 @@ const CommunityDetailPage = () => {
   if (isLoading || !communityDetailData) return <p>Loading...</p>;
 
   return (
-    <div className="community-detail">
+    <article  className="community-detail">
       <h1 className="community-detail__title">{communityDetailData.title}</h1>
 
-      <div className="community-detail__meta">
+      <header  className="community-detail__meta">
         <Link href={`/profile/${communityDetailData.userId}`}>
           <Image
             src={communityDetailData.profileImageUrl}
@@ -120,7 +120,7 @@ const CommunityDetailPage = () => {
         <span className="community-detail__date">
           {new Date(communityDetailData.createdAt).toLocaleString()}
         </span>
-      </div>
+      </header >
 
       <div className="community-detail__tags">
         {communityDetailData.tags.map((tag, i) => (
@@ -130,7 +130,7 @@ const CommunityDetailPage = () => {
         ))}
       </div>
 
-      <div
+      <section
         className="community-detail__content"
         onCopy={async (e) => {
           e.preventDefault();
@@ -138,7 +138,7 @@ const CommunityDetailPage = () => {
         }}
       >
         <Markdown>{communityDetailData.content}</Markdown>
-      </div>
+      </section>
 
       <button
         className={`community-detail__like-button ${
@@ -148,7 +148,7 @@ const CommunityDetailPage = () => {
       >
         추천 {communityDetailData.recommend_count}
       </button>
-    </div>
+    </article >
   );
 };
 
