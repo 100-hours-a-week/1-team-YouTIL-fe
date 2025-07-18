@@ -109,7 +109,7 @@ const UserProfileInfo = () => {
   };
 
   return (
-    <div className="user-profile">
+    <section className="user-profile">
       {isOwner && (
         !editMode ? (
           <button className="user-profile__edit-button" onClick={() => setEditMode(true)}>
@@ -122,7 +122,7 @@ const UserProfileInfo = () => {
         )
       )}
 
-      <div className="user-profile__content">
+      <figure className="user-profile__content">
         <div
           className="user-profile__image-wrapper"
           onClick={() => {
@@ -152,11 +152,11 @@ const UserProfileInfo = () => {
         </div>
 
         {!editMode ? (
-          <div className="user-profile__introduction">
+          <figcaption className="user-profile__introduction">
             {originalDescription ?? '유저 소개 없음'}
-          </div>
+          </figcaption>
         ) : (
-          <div className="user-profile__textarea-wrapper">
+          <section className="user-profile__textarea-wrapper">
             <textarea
               className="user-profile__textarea"
               value={updatedDescription}
@@ -170,10 +170,10 @@ const UserProfileInfo = () => {
             <div className="user-profile__textarea-count">
               {updatedDescription.length} / 40
             </div>
-          </div>
+          </section>
         )}
-      </div>
-    </div>
+      </figure>
+    </section>
   );
 };
 

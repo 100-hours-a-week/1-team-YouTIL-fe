@@ -7,11 +7,11 @@ const UserNickNameDescription = () => {
   const name = useOtherUserInfoStore((state) => state.otherUserInfo.name);
 
   return (
-    <div className="user-nickname">
+    <section  className="user-nickname">
       <div className="user-nickname__box">
         {name ? `${name} 님의 마이페이지` : '닉네임 정보 없음'}
       </div>
-    </div>
+    </section >
   );
 };
 
