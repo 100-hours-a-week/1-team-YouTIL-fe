@@ -49,7 +49,7 @@ const TechNews = () => {
   const { scrollRef, scrollByItem, isSliding } = useTechNewsSlider(data);
 
   return (
-    <div className="technews">
+    <section className="technews" aria-label="기술 뉴스 슬라이드">
       <div className="technews__controls">
         <button onClick={() => scrollByItem('left', true)}>&lt;</button>
         <button onClick={() => scrollByItem('right', true)}>&gt;</button>
@@ -77,7 +77,7 @@ const TechNews = () => {
           </a>
         ))}
       </div>
-    </div>
+    </section>
   );
 };
 
