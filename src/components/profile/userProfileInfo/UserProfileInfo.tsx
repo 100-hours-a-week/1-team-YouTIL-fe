@@ -136,6 +136,7 @@ const UserProfileInfo = () => {
               className="user-profile__image"
               width={120}
               height={120}
+              priority={true}
             />
           )}
           {editMode && isOwner && (

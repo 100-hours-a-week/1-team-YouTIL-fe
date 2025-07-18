@@ -3,6 +3,8 @@ import "./globals.scss";
 import LayoutWrapper from "@/app/layoutWrapper/LayoutWrapper";
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import BackgroundImage from "@/components/background/BackgroundImage";
+import pretendard from "@/font/prentedard";
+
 export const metadata: Metadata = {
   title: "YouTIL",
   description: "YouTIL",
@@ -13,8 +15,8 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
-      <body>
+    <html lang='ko' className={`${pretendard.variable}`}>
+      <body className={`${pretendard.className}`}>
         <BackgroundImage/>
         <LayoutWrapper>
           {children}

@@ -112,6 +112,7 @@ const RepositoryTILList = () => {
   const isFirstRender = useRef(true);
   const [isError, setIsError] = useState(false);
   const [requestId, setRequestId] = useState<string | null>(null);
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
 
   useEffect(() => {
     if (tilDate) {
@@ -149,7 +150,7 @@ const RepositoryTILList = () => {
     }
     if (!requestId) return;
 
-    const eventSource = new EventSource(`https://dev-api.youtil.co.kr/api/v1/tils/subscribe/${requestId}`);
+    const eventSource = new EventSource(`${baseUrl}/tils/subscribe/${requestId}`);
   
     eventSource.addEventListener('status', (event) => {
       const data = JSON.parse(event.data);

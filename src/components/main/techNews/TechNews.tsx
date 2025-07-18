@@ -1,4 +1,4 @@
-'use client';
+'use client'
 
 import { useQuery } from '@tanstack/react-query';
 import { useFetch } from '@/hooks/useFetch';
@@ -42,7 +42,7 @@ const TechNews = () => {
       return response.data?.news ?? [];
     },
     enabled: existAccess,
-    staleTime: Infinity,
+    staleTime: 3600000,
     gcTime: 3600000,
   });
 
@@ -70,8 +70,8 @@ const TechNews = () => {
               width={300}
               height={180}
               className="technews__thumbnail"
-              unoptimized
-            />
+              priority={index === 0}
+              />
             <div className="technews__gradient" />
             <div className="technews__headline">{news.title}</div>
           </a>
