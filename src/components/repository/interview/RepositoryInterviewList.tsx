@@ -126,8 +126,8 @@ const RepositoryInterviewList = () => {
   const allInterviews = interviewPages?.pages.flatMap((page) => page.data.interviews) ?? [];
 
   return (
-    <div className="repository-interview-list">
-      <div className="repository-interview-list__header">
+    <section className="repository-interview-list">
+      <header className="repository-interview-list__header">
         <h2 className="repository-interview-list__title">면접 질문 목록</h2>
         {!!allInterviews.length && (
           <button
@@ -137,7 +137,7 @@ const RepositoryInterviewList = () => {
             삭제
           </button>
         )}
-      </div>
+      </header>
       <ul className="repository-interview-list__items">
         {allInterviews.map((interview, index) => {
           const formattedDate = format(parseISO(interview.createdAt), 'yyyy-MM-dd : HH:mm:ss');
@@ -151,7 +151,8 @@ const RepositoryInterviewList = () => {
               className={`repository-interview-list__item ${isSelected ? 'selected' : ''}`}
               ref={isLastItem ? loadMoreRef : null}
             >
-              <div className="repository-interview-list__item-header-wrapper">
+              <article>
+              <header className="repository-interview-list__item-header-wrapper">
                 <div
                   className="repository-interview-list__item-header"
                   onClick={() => handleClickInterview(interview.id)}
@@ -165,7 +166,7 @@ const RepositoryInterviewList = () => {
                       [{mapLevelToLabel(interview.level)}] {interview.title}
                     </h3>
                   </div>
-                  <p className="repository-interview-list__item-date">{formattedDate}</p>
+                  <time className="repository-interview-list__item-date">{formattedDate}</time>
                 </div>
 
                 {!isExpanded && (
@@ -176,12 +177,12 @@ const RepositoryInterviewList = () => {
                     onChange={() => toggleInterviewSelection(interview.id)}
                   />
                 )}
-              </div>
+              </header>
 
               {isExpanded && interviewDetailData && (
                 <div className="repository-interview-list__item-detail">
                   {interviewDetailData.questions.map((q) => (
-                    <div
+                    <section
                       key={q.questionId}
                       className="repository-interview-list__item-question-block"
                       onCopy={(e) => {
@@ -206,10 +207,11 @@ const RepositoryInterviewList = () => {
                       {visibleAnswerMap[q.questionId] && (
                         <Markdown>{q.answer}</Markdown>
                       )}
-                    </div>
+                    </section>
                   ))}
                 </div>
               )}
+              </article>
             </div>
           );
         })}
@@ -222,7 +224,7 @@ const RepositoryInterviewList = () => {
           onDeleteComplete={handleDeleteComplete}
         />
       )}
-    </div>
+    </section>
   );
 };
 

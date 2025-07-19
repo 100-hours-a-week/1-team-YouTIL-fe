@@ -98,10 +98,12 @@ const SelectOrganizationModal = ({ onClose, onComplete}: Props) => {
   const organizations = data?.pages.flatMap((page) => page.data.organizations) ?? [];
 
   return (
-    <div className="organization-modal">
+    <dialog className="organization-modal" open>
       <div className="organization-modal__overlay" onClick={onClose} />
-      <div className="organization-modal__content">
-        <h2 className="organization-modal__title">조직 선택</h2>
+      <section className="organization-modal__content" role="dialog" aria-modal="true" aria-labelledby="organization-modal-title">
+        <header>
+          <h2 className="organization-modal__title">조직 선택</h2>
+        </header>
 
         {isLoading ? (
           <p className="organization-modal__loading">로딩 중...</p>
@@ -126,13 +128,15 @@ const SelectOrganizationModal = ({ onClose, onComplete}: Props) => {
               })}
             </ul>
 
-            <div className="organization-modal__checkbox">
+            <fieldset className="organization-modal__checkbox">
               <label>
                 <input type="checkbox" checked={noSelection} onChange={handleCheckboxChange} />
                 조직을 선택하지 않음
               </label>
-            </div>
-
+            </fieldset>
+            
+            <footer>
+              
             <button
               className="organization-modal__close"
               onClick={() => {
@@ -142,13 +146,14 @@ const SelectOrganizationModal = ({ onClose, onComplete}: Props) => {
                 }
               }}
               disabled={!isCompleteEnabled}
-            >
+              >
               선택 완료
             </button>
+          </footer>
           </>
         )}
-      </div>
-    </div>
+      </section>
+    </dialog>
   );
 };
 

@@ -297,8 +297,8 @@ const RepositoryTILList = () => {
   };
 
   return (
-    <div className="repository-til-list">
-      <div className="repository-til-list__header">
+    <section className="repository-til-list">
+      <header className="repository-til-list__header">
         <h2 className="repository-til-list__title">TIL 목록</h2>
         {allTils.length > 0 && (
           <button
@@ -308,7 +308,7 @@ const RepositoryTILList = () => {
             삭제
           </button>
         )}
-      </div>
+      </header>
       <ul className="repository-til-list__items">
         {allTils.map((til, index) => {
           const parsedDate = parseISO(til.createdAt);
@@ -322,7 +322,7 @@ const RepositoryTILList = () => {
               className={`repository-til-list__item${isSelected ? ' selected' : ''}`}
               ref={isLastItem ? loadMoreRef : null}
             >
-              <div className="repository-til-list__item-header-wrapper">
+              <article className="repository-til-list__item-header-wrapper">
                 <div
                   className="repository-til-list__item-header"
                   onClick={() => {
@@ -434,10 +434,10 @@ const RepositoryTILList = () => {
                     onChange={() => toggleTILSelection(til.tilId)}
                   />
                 )}
-              </div>
+              </article>
 
               {expandedTilId === til.tilId && tilDetailData && (
-                <div className="repository-til-list__item-detail">
+                <section className="repository-til-list__item-detail">
                  <Markdown
                     components={{
                       code({ className, children, ...rest }) {
@@ -471,6 +471,7 @@ const RepositoryTILList = () => {
                   >
                     {tilDetailData.content}
                   </Markdown>
+                  <footer>
                   <p className="repository-til-list__item-tags">
                     {tilDetailData.tag.map((tag, i) => (
                       <span key={i} className="repository-til-list__item-tag">#{tag}</span>
@@ -479,14 +480,15 @@ const RepositoryTILList = () => {
                   <p className="repository-til-list__item-meta">
                     조회수 {tilDetailData.visitedCount} · 추천 {tilDetailData.recommendCount} · 댓글 {tilDetailData.commentsCount}
                   </p>
-                </div>
+                </footer>
+                </section>
               )}
             </li>
           );
         })}
       </ul>
 
-      <div className="repository-til-list__floating-wrapper" ref={floatingRef}>
+      <aside className="repository-til-list__floating-wrapper" ref={floatingRef}>
         <button
           className="repository-til-list__floating-button"
           onClick={() => {
@@ -500,7 +502,7 @@ const RepositoryTILList = () => {
             height={24}
           />
         </button>
-      </div>
+      </aside>
 
       {(currentStatus !== null || isError) && (
         <GenerateInterviewModal
@@ -573,7 +575,7 @@ const RepositoryTILList = () => {
         />
       )}
 
-    </div>
+    </section>
   );
 };
 

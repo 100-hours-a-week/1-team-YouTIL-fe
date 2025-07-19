@@ -84,15 +84,20 @@ const SelectInterviewLevelModal = ({ onClose, tilId, setRequestId }: Props) => {
   };
 
   return (
-    <div className="interview-level-modal">
+    <section className="interview-level-modal">
       <div className="interview-level-modal__overlay" onClick={isGenerating ? undefined : onClose} />
-      <div
+      <article
         className={`interview-level-modal__content ${
           mutation.isPending ? 'interview-level-modal__content--loading' : ''
         }`}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="interview-level-title"
       >
           <>
+          <header>
             <h2 className="interview-level-modal__title">면접 난이도를 선택해주세요</h2>
+          </header>
             <div className="interview-level-modal__levels">
               {difficultyOptions.map(({ label, image, value }) => (
                 <div
@@ -108,7 +113,7 @@ const SelectInterviewLevelModal = ({ onClose, tilId, setRequestId }: Props) => {
               ))}
             </div>
 
-            <div className="interview-level-modal__buttons">
+            <footer className="interview-level-modal__buttons">
               <button className="interview-level-modal__button cancel" onClick={onClose}>
                 취소
               </button>
@@ -118,10 +123,10 @@ const SelectInterviewLevelModal = ({ onClose, tilId, setRequestId }: Props) => {
               >
                 생성
               </button>
-            </div>
+            </footer>
           </>
-      </div>
-    </div>
+      </article>
+    </section>
   );
 };
 

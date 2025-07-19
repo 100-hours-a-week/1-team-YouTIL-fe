@@ -145,16 +145,18 @@ const SelectBranchModal = ({ onClose, onComplete }: Props) => {
   const branches = data?.pages.flatMap((page) => page.data.branches) ?? [];
 
   return (
-    <div className="branch-modal">
+    <dialog className="branch-modal" open>
       <div className="branch-modal__overlay" onClick={onClose} />
-      <div className="branch-modal__content">
-        <h2 className="branch-modal__title">브랜치 선택</h2>
+      <section className="branch-modal__content" role="dialog" aria-modal="true" aria-labelledby="branch-modal-title">
+        <header>
+          <h2 className="branch-modal__title">브랜치 선택</h2>
+        </header>
 
         {isLoading || isPending ? (
           <p className="branch-modal__loading">로딩 중...</p>
         ) : (
           <>
-            <div className="branch-modal__list" ref={scrollContainerRef}>
+            <section className="branch-modal__list" ref={scrollContainerRef}>
               {branches.map((branch, index) => {
                 const isLastItem = index === branches.length - 1;
 
@@ -169,19 +171,20 @@ const SelectBranchModal = ({ onClose, onComplete }: Props) => {
                   </div>
                 );
               })}
-            </div>
-
+            </section>
+            <footer>
             <button
               className="branch-modal__close"
               onClick={handleComplete}
               disabled={!isCompleteEnabled}
-            >
+              >
               선택 완료
             </button>
+            </footer>
           </>
         )}
-      </div>
-    </div>
+      </section>
+    </dialog>
   );
 };
 

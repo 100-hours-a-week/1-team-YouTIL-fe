@@ -148,11 +148,11 @@ const CommunityCommentList = () => {
     const isReplying = replyingToId === item.id;
     
     return (
-      <div
+      <article
       key={`comment-${item.id}-${isReply ? 'reply' : 'parent'}`}
       className="community-comment-list__item"
       >
-        <div className="community-comment-list__header">
+        <header className="community-comment-list__header">
           {isReply && (
             <Image
               src="/images/replyIcon.png"
@@ -179,7 +179,7 @@ const CommunityCommentList = () => {
                 {item.nickname}
               </span>
               <div className="community-comment-list__meta-right">
-                <span className="community-comment-list__date">{formatDate(item.createdAt)}</span>
+                <time  className="community-comment-list__date">{formatDate(item.createdAt)}</time >
                 <div
                   className="community-comment-list__menu-wrapper"
                   ref={(el) => {
@@ -241,10 +241,10 @@ const CommunityCommentList = () => {
               />
             )}
           </div>
-        </div>
+        </header >
 
         {item.replies?.map((reply) => renderItem(reply, true))}
-      </div>
+      </article>
     );
   };
 
