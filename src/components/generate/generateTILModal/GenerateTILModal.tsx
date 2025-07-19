@@ -43,20 +43,20 @@ const GenerateTILModal = ({ isError, status, total, position, onClose }: Props) 
   const progressPercent = Math.max(0, (statusIndex / (STATUS_ORDER.length - 1)) * 100);
 
   return (
-    <div className="generate-til-modal">
+    <section className="generate-til-modal">
       <div
         className="generate-til-modal__overlay"
         onClick={(isError || status === 'ERROR') && onClose ? onClose : undefined}
       />
-      <div className="generate-til-modal__content">
+      <article className="generate-til-modal__content">
         {(isError || status === 'ERROR') ? (
-          <div className="generate-til-modal__result generate-til-modal__result--error">
+          <section className="generate-til-modal__result generate-til-modal__result--error">
             <div className="generate-til-modal__text-group">
               <p className="generate-til-modal__line1">TIL 생성에 실패하였습니다</p>
               <p className="generate-til-modal__line2">다시 시도해주세요</p>
             </div>
             <FailedIcon />
-          </div>
+          </section>
         ) : (
           <>
             <p className="generate-til-modal__text">
@@ -76,8 +76,8 @@ const GenerateTILModal = ({ isError, status, total, position, onClose }: Props) 
             </p>
           </>
         )}
-      </div>
-    </div>
+      </article>
+    </section>
   );
 };
 
