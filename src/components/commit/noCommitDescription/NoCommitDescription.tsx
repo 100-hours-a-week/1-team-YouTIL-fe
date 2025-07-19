@@ -5,7 +5,7 @@ import './NoCommitDescription.scss';
 
 const NoCommitDescription = () => {
   return (
-    <div className="no-commit">
+    <section className="no-commit">
       <Image
         className="no-commit__image"
         src="/images/youtilSadLogo.png"
@@ -15,7 +15,7 @@ const NoCommitDescription = () => {
         priority
       />
       <div className="no-commit__text">커밋 내역이 존재하지 않습니다</div>
-    </div>
+    </section>
   );
 };
 
