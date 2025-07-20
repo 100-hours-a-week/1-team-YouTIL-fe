@@ -165,7 +165,7 @@ const GenerateTILForm = () => {
         />
       )}
 
-      <main className="generate">
+      <div className="generate">
         <form className="generate__form" onSubmit={handleSubmit}>
           <label className="generate__label">
             선택된 커밋 목록
@@ -192,7 +192,7 @@ const GenerateTILForm = () => {
             />
           </label>
 
-          <label className="generate__label">
+          <div className="generate__label">
             카테고리
             <select
               value={category}
@@ -203,10 +203,9 @@ const GenerateTILForm = () => {
               <option value="AI">인공지능</option>
               <option value="CLOUD">클라우드</option>
             </select>
-          </label>
+          </div>
 
-          <fieldset className="generate__visibility">
-            <legend className="generate__label">공개 여부</legend>
+          <div className="generate__visibility">
             <label>
               <input
                 type="radio"
@@ -233,7 +232,7 @@ const GenerateTILForm = () => {
                 <p className="generate__visibility-radio-desc">다른 사용자에게 공유되지 않습니다.</p>
               </span>
             </label>
-          </fieldset>
+          </div>
 
           <button
             type="submit"
@@ -242,7 +241,7 @@ const GenerateTILForm = () => {
             생성하기
           </button>
         </form>
-      </main>
+      </div>
     </>
   );
 };

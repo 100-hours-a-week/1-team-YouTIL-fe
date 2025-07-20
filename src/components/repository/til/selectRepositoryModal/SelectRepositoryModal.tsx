@@ -86,12 +86,10 @@ const SelectRepositoryModal = ({ onClose, onComplete }: Props) => {
   const repositories = data?.pages.flatMap((page) => page.data.repositories) ?? [];
 
   return (
-    <dialog className="repository-modal" open>
+    <div className="repository-modal">
       <div className="repository-modal__overlay" onClick={onClose} />
-      <section className="repository-modal__content" role="dialog" aria-modal="true" aria-labelledby="repository-modal-title">
-        <header>
-          <h2 className="repository-modal__title">레포지토리 선택</h2>
-        </header>
+      <div className="repository-modal__content">
+        <h2 className="repository-modal__title">레포지토리 선택</h2>
 
         {isLoading ? (
           <p className="repository-modal__loading">로딩 중...</p>
@@ -115,20 +113,18 @@ const SelectRepositoryModal = ({ onClose, onComplete }: Props) => {
                 );
               })}
             </ul>
-            <footer>
 
             <button
               className="repository-modal__close"
               onClick={onComplete}
               disabled={!isCompleteEnabled}
-              >
+            >
               선택 완료
             </button>
-            </footer>
           </>
         )}
-      </section>
-    </dialog>
+      </div>
+    </div>
   );
 };
 

@@ -13,6 +13,16 @@ import { profileKeys } from '@/querykey/profile.querykey';
 import { mainKeys } from '@/querykey/main.querykey';
 import { repositoryKeys } from '@/querykey/repository.querykey';
 
+interface AWSImageReponse{
+  message: string;
+  success: boolean;
+  code: string;
+  responseAt: string;
+  data: {
+    imageUrl: string;
+  };
+}
+
 const UserProfileInfo = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const accessToken = useGetAccessToken();
@@ -47,10 +57,9 @@ const UserProfileInfo = () => {
       if (selectedImageFile) {
         const formData = new FormData();
         formData.append('image', selectedImageFile);
-
-        const GCPImageUrl = await callApi<{ data: { imageUrl: string } }>({
+        const AWSImageUrl = await callApi<AWSImageReponse>({
           method: 'POST',
-          endpoint: '/GCP/images',
+          endpoint: '/AWS/images',
           body: formData,
           headers: {
             Authorization: `Bearer ${accessToken}`,
@@ -58,17 +67,18 @@ const UserProfileInfo = () => {
           credentials: 'include',
           isFormData: true,
         });
-
-        newProfileImageUrl = GCPImageUrl.data.imageUrl;
+        newProfileImageUrl = AWSImageUrl.data.imageUrl;
       }
+
+      const payload = {
+        description: updatedDescription,
+        profileImageUrl: newProfileImageUrl,
+      };
 
       await callApi({
         method: 'PATCH',
         endpoint: '/users',
-        body: {
-          description: updatedDescription,
-          profileImageUrl: newProfileImageUrl,
-        },
+        body: payload,
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${accessToken}`,

@@ -1,131 +1,132 @@
 .generate {
-    padding: 2rem;
-    padding-top: 0;
+  padding: 2rem;
+  padding-top: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  margin-bottom: 45px;
+
+  &__form {
     display: flex;
     flex-direction: column;
-    gap: 2rem;
-    margin-bottom: 45px;
-  
-    &__form {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 1.5rem;
-      width: 85%;
-      margin: 0 auto;
-    }
-  
-    &__label {
-      width: 100%;
-      max-width: 600px;
-      margin: 0 auto;
-      font-weight: bold;
-      color: #333;
-      display: flex;
-      flex-direction: column;
-      gap: 0.5rem;
-    }
-  
-    &__commits {
-      border-radius: 8px;
-      padding: 1rem;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    }
-  
-    &__commits-list {
-      list-style: none;
-      padding: 0;
-      margin-top: 1rem;
-    }
-  
-    &__commit-item {
-      margin-bottom: 0.5rem;
-      padding: 0.5rem;
-      border: 1px solid #ddd;
-      border-radius: 4px;
-      background: #f9f9f9;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      font-weight: normal;
-    }
-  
-    &__input,
-    &__select {
-      padding: 0.5rem;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-      font-size: 1rem;
-      outline: none;
-  
-      &:focus {
-        border-color: #00b6fa;
-        box-shadow: 0 0 0 2px rgba(0, 182, 250, 0.2);
-      }
-    }
-  
-    &__visibility {
-      display: flex;
-      flex-direction: column;
-      gap: 0.5rem;
-      align-items: flex-start;
-      width: 100%;
-  
-      label {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        font-size: 0.95rem;
-  
-        input[type='radio'] {
-          accent-color: #00b6fa;
-        }
-      }
-    }
-  
-    &__visibility-radio {
-      display: flex;
-      flex-direction: column;
-    }
-  
-    &__visibility-radio-label {
-      font-size: 1rem;
-      margin: 0;
-    }
-  
-    &__visibility-radio-desc {
-      font-size: 0.7rem;
-      color: #666;
-      margin: 0;
-    }
-  
-    &__button {
-      background-color: #00b6fa;
-      color: white;
-      border: none;
-      padding: 0.5rem 1.5rem;
-      border-radius: 8px;
-      font-size: 1rem;
-      cursor: pointer;
-      transition: background-color 0.2s;
-  
-      &:hover {
-        background-color: #009fd6;
-      }
-      &.error {
-        background-color: #ff4d4f;
-      }
-      &.shake {
-        animation: shake 0.3s;
-      }
-    }
-  
-    @keyframes shake {
-      0%   { transform: translateX(0); }
-      25%  { transform: translateX(-4px); }
-      50%  { transform: translateX(4px); }
-      75%  { transform: translateX(-4px); }
-      100% { transform: translateX(0); }
+    align-items: center;
+    gap: 1.5rem;
+    width: 85%;
+    margin: 0 auto;
+  }
+
+  &__label {
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+    font-weight: bold;
+    color: #333;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    font-size: 1rem;
+  }
+
+
+  &__commits {
+    border-radius: 8px;
+    padding: 1rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+
+  &__commits-list {
+    list-style: none;
+    padding: 0;
+    margin-top: 1rem;
+  }
+
+  &__commit-item {
+    margin-bottom: 0.5rem;
+    padding: 0.5rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background: #f9f9f9;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-weight: normal;
+  }
+
+  &__input,
+  &__select {
+    padding: 0.5rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 1rem;
+    outline: none;
+
+    &:focus {
+      border-color: #00b6fa;
+      box-shadow: 0 0 0 2px rgba(0, 182, 250, 0.2);
     }
   }
-  
+
+  &__visibility {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    align-items: flex-start;
+    width: 100%;
+
+    label {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.95rem;
+
+      input[type='radio'] {
+        accent-color: #00b6fa;
+      }
+    }
+  }
+
+  &__visibility-radio {
+    display: flex;
+    flex-direction: column;
+  }
+
+  &__visibility-radio-label {
+    font-size: 1rem;
+    margin: 0;
+  }
+
+  &__visibility-radio-desc {
+    font-size: 0.7rem;
+    color: #666;
+    margin: 0;
+  }
+
+  &__button {
+    background-color: #00b6fa;
+    color: white;
+    border: none;
+    padding: 0.5rem 1.5rem;
+    border-radius: 8px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.2s;
+
+    &:hover {
+      background-color: #009fd6;
+    }
+    &.error {
+      background-color: #ff4d4f;
+    }
+    &.shake {
+      animation: shake 0.3s;
+    }
+  }
+
+  @keyframes shake {
+    0%   { transform: translateX(0); }
+    25%  { transform: translateX(-4px); }
+    50%  { transform: translateX(4px); }
+    75%  { transform: translateX(-4px); }
+    100% { transform: translateX(0); }
+  }
+}
