@@ -77,37 +77,13 @@
     }
   
     &__content {
-      font-size: 0.95rem;
-      line-height: 1.6;
-  
-      h1, h2, h3, h4 {
-        margin-top: 1.2rem;
-        margin-bottom: 0.5rem;
-        font-weight: bold;
-        font-size: 20px;
-      }
-  
-      ul {
-        padding-left: 1.2rem;
-        list-style: disc;
-        margin-bottom: 1rem;
-      }
-  
-      code {
-        background-color: #f4f4f4;
-        padding: 0.2rem 0.4rem;
-        border-radius: 4px;
-        font-family: monospace;
-      }
-  
-      pre {
-        background-color: #f4f4f4;
-        padding: 1rem;
-        overflow-x: auto;
-        border-radius: 6px;
-        margin-bottom: 1rem;
-      }
+      margin-top: 0.5rem;
+      background: #f9f9f9;
+      border-left: 3px solid #00b6fa;
+      padding: 0.75rem;
+      border-radius: 8px;
     }
+    
     &__like-button {
         margin: 2rem auto 0;
         padding: 0.75rem 1.5rem;
