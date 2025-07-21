@@ -188,6 +188,7 @@ const CommunityCommentList = () => {
                 >
                   <button
                     className="community-comment-list__menu-button"
+                    aria-label="댓글 옵션 열기"
                     onClick={(e) => {
                       e.stopPropagation();
                       setOpenMenuId((prev) => (prev === item.id ? null : item.id));

@@ -70,7 +70,8 @@ const TechNews = () => {
               width={300}
               height={180}
               className="technews__thumbnail"
-              priority={index === 0}
+              fetchPriority='high'
+              priority
               />
             <div className="technews__gradient" />
             <div className="technews__headline">{news.title}</div>

@@ -25,7 +25,6 @@ const whiteTheme = {
   },
 };
 
-
 interface CommunityDetail {
   postId: number;
   title: string;
@@ -104,21 +103,25 @@ const CommunityDetailPage = () => {
     },
   });
 
-  if (isLoading || !communityDetailData) return <p>Loading...</p>;
+  if (isLoading || !communityDetailData) {
+    return <article className="community-detail community-detail--skeleton" />;
+  }
 
   return (
-    <article  className="community-detail">
+    <article className="community-detail">
       <h1 className="community-detail__title">{communityDetailData.title}</h1>
 
-      <header  className="community-detail__meta">
+      <header className="community-detail__meta">
         <Link href={`/profile/${communityDetailData.userId}`}>
-          <Image
-            src={communityDetailData.profileImageUrl}
-            alt={`${communityDetailData.author}의 프로필 이미지`}
-            width={24}
-            height={24}
-            className="community-detail__profile-image"
-          />
+          <div style={{ width: 24, height: 24, position: 'relative' }}>
+            <Image
+              src={communityDetailData.profileImageUrl}
+              alt={`${communityDetailData.author}의 프로필 이미지`}
+              width={24}
+              height={24}
+              className="community-detail__profile-image"
+            />
+          </div>
         </Link>
         <Link
           href={`/profile/${communityDetailData.userId}`}
@@ -135,7 +138,7 @@ const CommunityDetailPage = () => {
         <span className="community-detail__date">
           {new Date(communityDetailData.createdAt).toLocaleString()}
         </span>
-      </header >
+      </header>
 
       <div className="community-detail__tags">
         {communityDetailData.tags.map((tag, i) => (
@@ -147,6 +150,7 @@ const CommunityDetailPage = () => {
 
       <section
         className="community-detail__content"
+        style={{ minHeight: 300 }}
         onCopy={async (e) => {
           e.preventDefault();
           await navigator.clipboard.writeText(communityDetailData.content);
@@ -156,7 +160,6 @@ const CommunityDetailPage = () => {
           components={{
             code({ className, children, ...rest }) {
               const match = /language-(\w+)/.exec(className || '');
-
               if (match) {
                 return (
                   <SyntaxHighlighter
@@ -174,7 +177,6 @@ const CommunityDetailPage = () => {
                   </SyntaxHighlighter>
                 );
               }
-
               return (
                 <code className={className} {...rest}>
                   {children}
@@ -195,7 +197,7 @@ const CommunityDetailPage = () => {
       >
         추천 {communityDetailData.recommend_count}
       </button>
-    </article >
+    </article>
   );
 };
 

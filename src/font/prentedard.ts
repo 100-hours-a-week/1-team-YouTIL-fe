@@ -5,7 +5,6 @@ const pretendard = localFont({
   display: 'swap',
   weight: '100 900',
   variable: '--font-pretendard',
-  adjustFontFallback: 'Arial'
 });
 
 export default pretendard;
