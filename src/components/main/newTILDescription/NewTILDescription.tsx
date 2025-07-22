@@ -2,9 +2,9 @@ import "./NewTILDescription.scss";
 
 const NewTILDescription =() =>{
     return(
-        <div className="description">
+        <article className="description">
             New TIL
-        </div>
+        </article>
     )
 }
 

@@ -13,6 +13,16 @@ import { profileKeys } from '@/querykey/profile.querykey';
 import { mainKeys } from '@/querykey/main.querykey';
 import { repositoryKeys } from '@/querykey/repository.querykey';
 
+interface AWSImageReponse{
+  message: string;
+  success: boolean;
+  code: string;
+  responseAt: string;
+  data: {
+    imageUrl: string;
+  };
+}
+
 const UserProfileInfo = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const accessToken = useGetAccessToken();
@@ -47,10 +57,9 @@ const UserProfileInfo = () => {
       if (selectedImageFile) {
         const formData = new FormData();
         formData.append('image', selectedImageFile);
-
-        const GCPImageUrl = await callApi<{ data: { imageUrl: string } }>({
+        const AWSImageUrl = await callApi<AWSImageReponse>({
           method: 'POST',
-          endpoint: '/GCP/images',
+          endpoint: '/AWS/images',
           body: formData,
           headers: {
             Authorization: `Bearer ${accessToken}`,
@@ -58,17 +67,18 @@ const UserProfileInfo = () => {
           credentials: 'include',
           isFormData: true,
         });
-
-        newProfileImageUrl = GCPImageUrl.data.imageUrl;
+        newProfileImageUrl = AWSImageUrl.data.imageUrl;
       }
+
+      const payload = {
+        description: updatedDescription,
+        profileImageUrl: newProfileImageUrl,
+      };
 
       await callApi({
         method: 'PATCH',
         endpoint: '/users',
-        body: {
-          description: updatedDescription,
-          profileImageUrl: newProfileImageUrl,
-        },
+        body: payload,
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${accessToken}`,
@@ -109,7 +119,7 @@ const UserProfileInfo = () => {
   };
 
   return (
-    <div className="user-profile">
+    <section className="user-profile">
       {isOwner && (
         !editMode ? (
           <button className="user-profile__edit-button" onClick={() => setEditMode(true)}>
@@ -122,7 +132,7 @@ const UserProfileInfo = () => {
         )
       )}
 
-      <div className="user-profile__content">
+      <figure className="user-profile__content">
         <div
           className="user-profile__image-wrapper"
           onClick={() => {
@@ -136,6 +146,7 @@ const UserProfileInfo = () => {
               className="user-profile__image"
               width={120}
               height={120}
+              priority={true}
             />
           )}
           {editMode && isOwner && (
@@ -151,11 +162,11 @@ const UserProfileInfo = () => {
         </div>
 
         {!editMode ? (
-          <div className="user-profile__introduction">
+          <figcaption className="user-profile__introduction">
             {originalDescription ?? '유저 소개 없음'}
-          </div>
+          </figcaption>
         ) : (
-          <div className="user-profile__textarea-wrapper">
+          <section className="user-profile__textarea-wrapper">
             <textarea
               className="user-profile__textarea"
               value={updatedDescription}
@@ -169,10 +180,10 @@ const UserProfileInfo = () => {
             <div className="user-profile__textarea-count">
               {updatedDescription.length} / 40
             </div>
-          </div>
+          </section>
         )}
-      </div>
-    </div>
+      </figure>
+    </section>
   );
 };
 

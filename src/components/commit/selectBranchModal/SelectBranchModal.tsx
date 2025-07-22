@@ -106,10 +106,12 @@ const SelectBranchModal = ({ onClose }: Props) => {
   const branches = data?.pages.flatMap((page) => page.data.branches) ?? [];
 
   return (
-    <div className="branch-modal">
+    <section className="branch-modal">
       <div className="branch-modal__overlay" onClick={onClose} />
-      <div className="branch-modal__content">
-        <h2 className="branch-modal__title">브랜치 선택</h2>
+      <article className="branch-modal__content">
+        <header>
+          <h2 className="branch-modal__title">브랜치 선택</h2>
+        </header>
 
         {isLoading ? (
           <p className="branch-modal__loading">로딩 중...</p>
@@ -131,18 +133,19 @@ const SelectBranchModal = ({ onClose }: Props) => {
                 );
               })}
             </div>
-
-            <button
-              className="branch-modal__close"
-              onClick={handleComplete}
-              disabled={!isCompleteEnabled}
-            >
-              선택 완료
-            </button>
+            <footer>
+              <button
+                className="branch-modal__close"
+                onClick={handleComplete}
+                disabled={!isCompleteEnabled}
+                >
+                선택 완료
+              </button>
+            </footer>
           </>
         )}
-      </div>
-    </div>
+      </article>
+    </section>
   );
 };
 

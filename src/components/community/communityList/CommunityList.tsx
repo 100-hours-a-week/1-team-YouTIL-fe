@@ -114,12 +114,12 @@ const CommunityList = () => {
 
   return (
     <>
-      <div className="community-list">
+      <section className="community-list">
         {allCommunityTils.map((item, index) => {
           const isLastItem = index === allCommunityTils.length - 1;
 
           return (
-            <div
+            <article
               key={item.tilId}
               className="community-list__item"
               ref={isLastItem ? loadMoreRef : null}
@@ -127,9 +127,9 @@ const CommunityList = () => {
                 saveAndNavigate(`/community/${item.tilId}`);
               }}
             >
-              <div className="community-list__header">
+              <header  className="community-list__header">
                 <p className="community-list__title">{item.title}</p>
-              </div>
+              </header >
 
               <div className="community-list__tags">
                 {item.tags.map((tag, i) => (
@@ -139,7 +139,7 @@ const CommunityList = () => {
                 ))}
               </div>
 
-              <div className="community-list__footer">
+              <footer  className="community-list__footer">
               <Link
                 href={`/profile/${item.userId}`}
                 onClick={(e) => e.stopPropagation()}
@@ -168,11 +168,11 @@ const CommunityList = () => {
                 <span className="community-list__date">
                   {format(parseISO(item.createdAt), 'yyyy-MM-dd : HH:mm:ss')}
                 </span>
-              </div>
-            </div>
+              </footer >
+            </article>
           );
         })}
-      </div>
+      </section>
 
       <div className="community-list__floating-buttons" ref={floatingRef}>
         <button className="community-list__button" onClick={() => {window.location.reload();}}>

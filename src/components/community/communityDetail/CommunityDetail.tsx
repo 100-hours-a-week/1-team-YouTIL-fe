@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useRef } from 'react';
 import { useParams } from 'next/navigation';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useFetch } from '@/hooks/useFetch';
@@ -10,6 +11,24 @@ import useCheckAccess from '@/hooks/useCheckExistAccess';
 import Markdown from 'react-markdown';
 import './CommunityDetail.scss';
 import { communityKeys } from '@/querykey/community.querykey';
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { oneLight } from 'react-syntax-highlighter/dist/cjs/styles/prism';
+
+const whiteTheme = {
+  ...oneLight,
+  'pre[class*="language-"]': {
+    ...oneLight['pre[class*="language-"]'],
+    background: '#ffffff',
+  },
+  'code[class*="language-"]': {
+    ...oneLight['code[class*="language-"]'],
+    background: '#ffffff',
+  },
+};
+
+interface Props {
+  onRendered?: () => void;
+}
 
 interface CommunityDetail {
   postId: number;
@@ -34,13 +53,15 @@ interface CommunityDetailResponse {
   data: CommunityDetail;
 }
 
-const CommunityDetailPage = () => {
+const CommunityDetailPage = ( { onRendered }: Props ) => {
   const { tilId } = useParams();
   const tilIdNumber = Number(tilId);
   const { callApi } = useFetch();
   const accessToken = useGetAccessToken();
   const existAccess = useCheckAccess(accessToken);
   const queryClient = useQueryClient();
+
+  const contentRef = useRef<HTMLDivElement>(null);
 
   const {
     data: communityDetailData,
@@ -89,56 +110,98 @@ const CommunityDetailPage = () => {
     },
   });
 
-  if (isLoading || !communityDetailData) return <p>Loading...</p>;
+  useEffect(() => {
+    if (!contentRef.current) return;
+
+    const handle = requestAnimationFrame(() => {
+      if (onRendered) onRendered();
+    });
+
+    return () => cancelAnimationFrame(handle);
+  }, [onRendered]);
+  if (isLoading || !communityDetailData) return;
 
   return (
-    <div className="community-detail">
-      <h1 className="community-detail__title">{communityDetailData.title}</h1>
+    <article className="community-detail">
+      <div className="community-detail__head">
+        <h1 className="community-detail__title">{communityDetailData.title}</h1>
 
-      <div className="community-detail__meta">
-        <Link href={`/profile/${communityDetailData.userId}`}>
-          <Image
-            src={communityDetailData.profileImageUrl}
-            alt={`${communityDetailData.author}의 프로필 이미지`}
-            width={24}
-            height={24}
-            className="community-detail__profile-image"
-          />
-        </Link>
-        <Link
-          href={`/profile/${communityDetailData.userId}`}
-          className="community-detail__nickname"
-        >
-          {communityDetailData.author}
-        </Link>
-        <span className="community-detail__count">
-          조회수 {communityDetailData.visited_count}
-        </span>
-        <span className="community-detail__count">
-          추천 {communityDetailData.recommend_count}
-        </span>
-        <span className="community-detail__date">
-          {new Date(communityDetailData.createdAt).toLocaleString()}
-        </span>
-      </div>
-
-      <div className="community-detail__tags">
-        {communityDetailData.tags.map((tag, i) => (
-          <span key={i} className="community-detail__tag">
-            #{tag}
+        <header className="community-detail__meta">
+          <Link href={`/profile/${communityDetailData.userId}`}>
+            <Image
+              src={communityDetailData.profileImageUrl}
+              alt={`${communityDetailData.author}의 프로필 이미지`}
+              width={24}
+              height={24}
+              className="community-detail__profile-image"
+            />
+          </Link>
+          <Link
+            href={`/profile/${communityDetailData.userId}`}
+            className="community-detail__nickname"
+          >
+            {communityDetailData.author}
+          </Link>
+          <span className="community-detail__count">
+            조회수 {communityDetailData.visited_count}
           </span>
-        ))}
+          <span className="community-detail__count">
+            추천 {communityDetailData.recommend_count}
+          </span>
+          <span className="community-detail__date">
+            {new Date(communityDetailData.createdAt).toLocaleString()}
+          </span>
+        </header>
+
+        <div className="community-detail__tags">
+          {communityDetailData.tags.map((tag, i) => (
+            <span key={i} className="community-detail__tag">
+              #{tag}
+            </span>
+          ))}
+        </div>
       </div>
 
-      <div
+      <section
         className="community-detail__content"
         onCopy={async (e) => {
           e.preventDefault();
           await navigator.clipboard.writeText(communityDetailData.content);
         }}
       >
-        <Markdown>{communityDetailData.content}</Markdown>
-      </div>
+        <Markdown
+          components={{
+            code({ className, children, ...rest }) {
+              const match = /language-(\w+)/.exec(className || '');
+              if (match) {
+                return (
+                  <SyntaxHighlighter
+                    style={whiteTheme}
+                    language={match[1]}
+                    PreTag="div"
+                    customStyle={{
+                      padding: '1rem',
+                      borderRadius: '0.5rem',
+                      fontSize: '0.875rem',
+                      backgroundColor: '#ffffff',
+                    }}
+                  >
+                    {String(children).replace(/\n$/, '')}
+                  </SyntaxHighlighter>
+                );
+              }
+
+              return (
+                <code className={className} {...rest}>
+                  {children}
+                </code>
+              );
+            },
+          }}
+        >
+          {communityDetailData.content}
+        </Markdown>
+      </section>
 
       <button
         className={`community-detail__like-button ${
@@ -148,7 +211,7 @@ const CommunityDetailPage = () => {
       >
         추천 {communityDetailData.recommend_count}
       </button>
-    </div>
+    </article>
   );
 };
 

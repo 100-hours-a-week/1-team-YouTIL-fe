@@ -1,4 +1,4 @@
-'use client';
+'use client'
 
 import { useQuery } from '@tanstack/react-query';
 import { useFetch } from '@/hooks/useFetch';
@@ -42,14 +42,14 @@ const TechNews = () => {
       return response.data?.news ?? [];
     },
     enabled: existAccess,
-    staleTime: Infinity,
+    staleTime: 3600000,
     gcTime: 3600000,
   });
 
   const { scrollRef, scrollByItem, isSliding } = useTechNewsSlider(data);
 
   return (
-    <div className="technews">
+    <section className="technews" aria-label="기술 뉴스 슬라이드">
       <div className="technews__controls">
         <button onClick={() => scrollByItem('left', true)}>&lt;</button>
         <button onClick={() => scrollByItem('right', true)}>&gt;</button>
@@ -70,14 +70,15 @@ const TechNews = () => {
               width={300}
               height={180}
               className="technews__thumbnail"
-              unoptimized
-            />
+              fetchPriority='high'
+              priority
+              />
             <div className="technews__gradient" />
             <div className="technews__headline">{news.title}</div>
           </a>
         ))}
       </div>
-    </div>
+    </section>
   );
 };
 

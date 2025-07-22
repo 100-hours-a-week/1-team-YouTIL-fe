@@ -178,7 +178,8 @@
     }
     &-edit-confirm {
       font-size: 0.85rem;
-      padding: 4px 10px;
+      padding-left: 8px;
+      padding-right: 8px;
       background-color: #00b6fa;
       color: white;
       border: none;
@@ -204,7 +205,6 @@
 
     &-generate-button {
       font-size: 0.8rem;
-      padding: 4px 10px;
       background-color: #00b6fa;
       color: #fff;
       border: none;
@@ -220,7 +220,6 @@
 
     &-upload-button {
       font-size: 0.8rem;
-      padding: 4px 10px;
       background-color: #00b6fa;
       color: #fff;
       border: none;

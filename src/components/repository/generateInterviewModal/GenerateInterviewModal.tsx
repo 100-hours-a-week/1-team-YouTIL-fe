@@ -41,41 +41,45 @@ const GenerateInterviewModal = ({ isError, status, total, position, onClose }: P
   );
 
   return (
-    <div className="generate-interview-modal">
+    <section className="generate-interview-modal">
       <div
         className="generate-interview-modal__overlay"
         onClick={(isError || status === 'ERROR') && onClose ? onClose : undefined}
       />
-      <div className="generate-interview-modal__content">
+      <article className="generate-interview-modal__content" role="dialog" aria-modal="true">
         {(isError || status === 'ERROR') ? (
           <div className="generate-interview-modal__result generate-interview-modal__result--error">
-            <div className="generate-interview-modal__text-group">
+            <header  className="generate-interview-modal__text-group">
               <p className="generate-interview-modal__line1">면접질문 생성에 실패하였습니다</p>
               <p className="generate-interview-modal__line2">다시 시도해주세요</p>
-            </div>
+            </header>
             <FailedIcon />
           </div>
         ) : (
           <>
+          <header>
             <p className="generate-interview-modal__text">
               {status === 'WAITING'
                 ? `현재 ${total}명 중 ${position}번째 입니다`
                 : statusMessage ?? '면접질문 생성 중...'}
             </p>
+            </header>
             <div className="generate-interview-modal__progress-wrapper">
               <div
                 className="generate-interview-modal__progress-bar"
                 style={{ width: `${progressPercent}%` }}
               />
             </div>
+            <footer>
             <p className="generate-interview-modal__subtext">
               <span className="generate-interview-modal__spinner" />
               면접질문 생성 시 1분 정도의 시간이 소요됩니다
             </p>
+            </footer>
           </>
         )}
-      </div>
-    </div>
+      </article>
+    </section>
   );
 };
 

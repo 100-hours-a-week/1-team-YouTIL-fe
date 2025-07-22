@@ -1,7 +1,7 @@
 'use client';
 import './BackgroundImage.scss';
 const BackgroundImage = () => (
-  <div className="background-image" aria-hidden="true" />
+  <div className="background-image"/>
 );
 
 export default BackgroundImage;

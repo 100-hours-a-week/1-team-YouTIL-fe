@@ -62,22 +62,22 @@ const NewTILList = () => {
   }
 
   return (
-    <div className="til-list">
+    <section  className="til-list">
       {tils?.map((til) => (
-        <div
+        <article
           key={til.id}
           className="til-list__card"
           onClick={() => saveAndPush(`/community/${til.id}`)}
         >
-          <div className="til-list__header">
+          <header className="til-list__header">
             <p className="til-list__title">{til.title}</p>
-          </div>
+          </header>
           <div className="til-list__tags">
             {til.tags.map((tag, i) => (
               <span key={i} className="til-list__tag">#{tag}</span>
             ))}
           </div>
-          <div className="til-list__footer">
+          <footer  className="til-list__footer">
             <Link
               href={`/profile/${til.userId}`}
               onClick={(e) => e.stopPropagation()}
@@ -104,10 +104,10 @@ const NewTILList = () => {
             <span className="til-list__date">
               {format(parseISO(til.createdAt), 'yyyy-MM-dd : HH:mm:ss')}
             </span>
-          </div>
-        </div>
+          </footer >
+        </article>
       ))}
-    </div>
+    </section >
   );
 };
 

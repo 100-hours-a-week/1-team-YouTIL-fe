@@ -70,7 +70,7 @@ const UserTILList = () => {
   });
 
   return (
-    <div className="usertil-list">
+    <section className="usertil-list">
       {data?.pages.map((page, pageIndex) =>
         page.data.tils.map((til, tilIndex) => {
           const isLastItem =
@@ -78,15 +78,15 @@ const UserTILList = () => {
             tilIndex === page.data.tils.length - 1;
 
           return (
-            <div
+            <article
               key={til.tilId}
               className="usertil-list__item"
               ref={isLastItem ? lastItemRef : undefined}
               onClick={() => saveAndNavigate(`/community/${til.tilId}`)}
             >
-              <div className="usertil-list__header">
+              <header className="usertil-list__header">
                 <p className="usertil-list__title">{til.title}</p>
-              </div>
+              </header>
 
               <div className="usertil-list__tags">
                 {til.tags.map((tag, i) => (
@@ -96,7 +96,7 @@ const UserTILList = () => {
                 ))}
               </div>
 
-              <div className="usertil-list__footer">
+              <footer className="usertil-list__footer">
                 <Link
                   href={`/profile/${userId}`}
                   onClick={(e) => e.stopPropagation()}
@@ -123,12 +123,12 @@ const UserTILList = () => {
                 <span className="usertil-list__date">
                   {format(parseISO(til.createdAt), 'yyyy-MM-dd : HH:mm:ss')}
                 </span>
-              </div>
-            </div>
+              </footer>
+            </article>
           );
         })
       )}
-    </div>
+    </section>
   );
 };
 
