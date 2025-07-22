@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useRef } from 'react';
 import { useParams } from 'next/navigation';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useFetch } from '@/hooks/useFetch';
@@ -25,6 +26,10 @@ const whiteTheme = {
   },
 };
 
+interface Props {
+  onRendered?: () => void;
+}
+
 interface CommunityDetail {
   postId: number;
   title: string;
@@ -48,13 +53,15 @@ interface CommunityDetailResponse {
   data: CommunityDetail;
 }
 
-const CommunityDetailPage = () => {
+const CommunityDetailPage = ( { onRendered }: Props ) => {
   const { tilId } = useParams();
   const tilIdNumber = Number(tilId);
   const { callApi } = useFetch();
   const accessToken = useGetAccessToken();
   const existAccess = useCheckAccess(accessToken);
   const queryClient = useQueryClient();
+
+  const contentRef = useRef<HTMLDivElement>(null);
 
   const {
     data: communityDetailData,
@@ -103,17 +110,24 @@ const CommunityDetailPage = () => {
     },
   });
 
-  if (isLoading || !communityDetailData) {
-    return <article className="community-detail community-detail--skeleton" />;
-  }
+  useEffect(() => {
+    if (!contentRef.current) return;
+
+    const handle = requestAnimationFrame(() => {
+      if (onRendered) onRendered();
+    });
+
+    return () => cancelAnimationFrame(handle);
+  }, [onRendered]);
+  if (isLoading || !communityDetailData) return;
 
   return (
     <article className="community-detail">
-      <h1 className="community-detail__title">{communityDetailData.title}</h1>
+      <div className="community-detail__head">
+        <h1 className="community-detail__title">{communityDetailData.title}</h1>
 
-      <header className="community-detail__meta">
-        <Link href={`/profile/${communityDetailData.userId}`}>
-          <div style={{ width: 24, height: 24, position: 'relative' }}>
+        <header className="community-detail__meta">
+          <Link href={`/profile/${communityDetailData.userId}`}>
             <Image
               src={communityDetailData.profileImageUrl}
               alt={`${communityDetailData.author}의 프로필 이미지`}
@@ -121,36 +135,35 @@ const CommunityDetailPage = () => {
               height={24}
               className="community-detail__profile-image"
             />
-          </div>
-        </Link>
-        <Link
-          href={`/profile/${communityDetailData.userId}`}
-          className="community-detail__nickname"
-        >
-          {communityDetailData.author}
-        </Link>
-        <span className="community-detail__count">
-          조회수 {communityDetailData.visited_count}
-        </span>
-        <span className="community-detail__count">
-          추천 {communityDetailData.recommend_count}
-        </span>
-        <span className="community-detail__date">
-          {new Date(communityDetailData.createdAt).toLocaleString()}
-        </span>
-      </header>
-
-      <div className="community-detail__tags">
-        {communityDetailData.tags.map((tag, i) => (
-          <span key={i} className="community-detail__tag">
-            #{tag}
+          </Link>
+          <Link
+            href={`/profile/${communityDetailData.userId}`}
+            className="community-detail__nickname"
+          >
+            {communityDetailData.author}
+          </Link>
+          <span className="community-detail__count">
+            조회수 {communityDetailData.visited_count}
           </span>
-        ))}
+          <span className="community-detail__count">
+            추천 {communityDetailData.recommend_count}
+          </span>
+          <span className="community-detail__date">
+            {new Date(communityDetailData.createdAt).toLocaleString()}
+          </span>
+        </header>
+
+        <div className="community-detail__tags">
+          {communityDetailData.tags.map((tag, i) => (
+            <span key={i} className="community-detail__tag">
+              #{tag}
+            </span>
+          ))}
+        </div>
       </div>
 
       <section
         className="community-detail__content"
-        style={{ minHeight: 300 }}
         onCopy={async (e) => {
           e.preventDefault();
           await navigator.clipboard.writeText(communityDetailData.content);
@@ -177,6 +190,7 @@ const CommunityDetailPage = () => {
                   </SyntaxHighlighter>
                 );
               }
+
               return (
                 <code className={className} {...rest}>
                   {children}
