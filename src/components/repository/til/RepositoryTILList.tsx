@@ -427,7 +427,7 @@ const RepositoryTILList = () => {
 
               {expandedTilId === til.tilId && tilDetailData && (
                 <div className="repository-til-list__item-detail">
-                  <MarkdownRenderer content={tilDetailData.content} />
+                  <MarkdownRenderer content={tilDetailData.content}/>
                     <p className="repository-til-list__item-tags">
                       {tilDetailData.tag.map((tag, i) => (
                         <span key={i} className="repository-til-list__item-tag">#{tag}</span>
