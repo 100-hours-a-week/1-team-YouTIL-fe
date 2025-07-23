@@ -114,11 +114,11 @@ const CommunityDetailPage = ({ onRendered }: Props) => {
   if (isLoading || !communityDetailData) return;
 
   return (
-    <article className="community-detail">
+    <div className="community-detail">
       <div className="community-detail__head">
         <h1 className="community-detail__title">{communityDetailData.title}</h1>
 
-        <header className="community-detail__meta">
+        <div className="community-detail__meta">
           <Link href={`/profile/${communityDetailData.userId}`}>
             <Image
               src={communityDetailData.profileImageUrl}
@@ -143,7 +143,7 @@ const CommunityDetailPage = ({ onRendered }: Props) => {
           <span className="community-detail__date">
             {new Date(communityDetailData.createdAt).toLocaleString()}
           </span>
-        </header>
+        </div>
 
         <div className="community-detail__tags">
           {communityDetailData.tags.map((tag, i) => (
@@ -154,7 +154,7 @@ const CommunityDetailPage = ({ onRendered }: Props) => {
         </div>
       </div>
 
-      <section
+      <div
         className="community-detail__content"
         onCopy={async (e) => {
           e.preventDefault();
@@ -163,7 +163,7 @@ const CommunityDetailPage = ({ onRendered }: Props) => {
         ref={contentRef}
       >
         <MarkdownRenderer content={communityDetailData.content} />
-      </section>
+      </div>
 
       <button
         className={`community-detail__like-button ${
@@ -173,7 +173,7 @@ const CommunityDetailPage = ({ onRendered }: Props) => {
       >
         추천 {communityDetailData.recommend_count}
       </button>
-    </article>
+    </div>
   );
 };
 
