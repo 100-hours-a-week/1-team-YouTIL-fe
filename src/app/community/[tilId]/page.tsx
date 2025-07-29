@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import CommunityDetail from '@/components/community/communityDetail/CommunityDetail';
 import CommunityComment from '@/components/community/communityComment/CommunityComment';
@@ -22,6 +23,8 @@ interface UserInfoResponse {
 }
 
 const CommunityDetailPage = () => {
+  const [isDetailRendered, setIsDetailRendered] = useState(false);
+
   useLayoutEffect(() => {
     window.scrollTo({ top: 0, behavior: 'auto' });
   }, []);
@@ -62,8 +65,8 @@ const CommunityDetailPage = () => {
 
   return (
     <div>
-      <CommunityDetail />
-      <CommunityComment />
+      <CommunityDetail onRendered={() => setIsDetailRendered(true)} />
+      {isDetailRendered && <CommunityComment />}
     </div>
   );
 };

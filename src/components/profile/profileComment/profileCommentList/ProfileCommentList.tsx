@@ -156,11 +156,11 @@ const ProfileCommentList = () => {
     const isReplying = replyingToId === item.id;
 
     return (
-      <div
+      <article
         key={`comment-${item.id}-${isReply ? 'reply' : 'parent'}`}
         className="profile-comment-list__item"
       >
-        <div className="profile-comment-list__header">
+        <header className="profile-comment-list__header">
           {isReply && (
             <Image
               src="/images/replyIcon.png"
@@ -187,7 +187,7 @@ const ProfileCommentList = () => {
                 {item.guestNickname}
               </span>
               <div className="profile-comment-list__meta-right">
-                <span className="profile-comment-list__date">{formatDate(item.createdAt)}</span>
+                <time className="profile-comment-list__date">{formatDate(item.createdAt)}</time>
                 <div
                   className="profile-comment-list__menu-wrapper"
                   ref={(el) => {
@@ -196,6 +196,7 @@ const ProfileCommentList = () => {
                 >
                   <button
                     className="profile-comment-list__menu-button"
+                    aria-label="댓글 옵션 열기"
                     onClick={(e) => {
                       e.stopPropagation();
                       setOpenMenuId((prev) => (prev === item.id ? null : item.id));
@@ -249,19 +250,19 @@ const ProfileCommentList = () => {
               />
             )}
           </div>
-        </div>
-      </div>
+        </header>
+      </article>
     );
   };
 
   return (
-    <div className="profile-comment-list">
+    <section className="profile-comment-list">
       {data?.pages.flatMap((page) =>
         page.data.guestbooks.map((comment) => (
-          <div key={`group-${comment.id}`}>
+          <article key={`group-${comment.id}`}>
             {renderItem(comment)}
             {comment.replies?.map((reply) => renderItem(reply, true))}
-          </div>
+          </article>
         ))
       )}
 
@@ -280,7 +281,7 @@ const ProfileCommentList = () => {
       )}
 
       <div ref={loadMoreRef} style={{ height: '1px' }} />
-    </div>
+    </section>
   );
 };
 

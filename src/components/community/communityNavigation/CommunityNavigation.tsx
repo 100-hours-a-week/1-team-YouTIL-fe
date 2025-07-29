@@ -24,7 +24,7 @@ const CommunityNavigation = () => {
     categories.find((c) => c.value === value)?.label ?? '';
 
   return (
-    <div className="community-nav">
+    <nav className="community-nav">
       <div className="community-nav__button-wrapper">
         {categories.map((category) => (
           <button
@@ -46,7 +46,7 @@ const CommunityNavigation = () => {
           </p>
         </div>
       )}
-    </div>
+    </nav>
   );
 };
 

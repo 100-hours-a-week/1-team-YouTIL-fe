@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useRef } from 'react';
 import { useParams } from 'next/navigation';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useFetch } from '@/hooks/useFetch';
@@ -7,9 +8,18 @@ import Link from 'next/link';
 import Image from 'next/image';
 import useGetAccessToken from '@/hooks/useGetAccessToken';
 import useCheckAccess from '@/hooks/useCheckExistAccess';
-import Markdown from 'react-markdown';
 import './CommunityDetail.scss';
 import { communityKeys } from '@/querykey/community.querykey';
+import dynamic from 'next/dynamic';
+
+const MarkdownRenderer = dynamic(() => import('@/components/common/MarkdownRenderer'), {
+  ssr: false,
+  loading: () => <p>로딩 중...</p>,
+});
+
+interface Props {
+  onRendered?: () => void;
+}
 
 interface CommunityDetail {
   postId: number;
@@ -34,13 +44,15 @@ interface CommunityDetailResponse {
   data: CommunityDetail;
 }
 
-const CommunityDetailPage = () => {
+const CommunityDetailPage = ({ onRendered }: Props) => {
   const { tilId } = useParams();
   const tilIdNumber = Number(tilId);
   const { callApi } = useFetch();
   const accessToken = useGetAccessToken();
   const existAccess = useCheckAccess(accessToken);
   const queryClient = useQueryClient();
+
+  const contentRef = useRef<HTMLDivElement>(null);
 
   const {
     data: communityDetailData,
@@ -89,45 +101,57 @@ const CommunityDetailPage = () => {
     },
   });
 
-  if (isLoading || !communityDetailData) return <p>Loading...</p>;
+  useEffect(() => {
+    if (!contentRef.current) return;
+
+    const handle = requestAnimationFrame(() => {
+      if (onRendered) onRendered();
+    });
+
+    return () => cancelAnimationFrame(handle);
+  }, [onRendered]);
+
+  if (isLoading || !communityDetailData) return;
 
   return (
     <div className="community-detail">
-      <h1 className="community-detail__title">{communityDetailData.title}</h1>
+      <div className="community-detail__head">
+        <h1 className="community-detail__title">{communityDetailData.title}</h1>
 
-      <div className="community-detail__meta">
-        <Link href={`/profile/${communityDetailData.userId}`}>
-          <Image
-            src={communityDetailData.profileImageUrl}
-            alt={`${communityDetailData.author}의 프로필 이미지`}
-            width={24}
-            height={24}
-            className="community-detail__profile-image"
-          />
-        </Link>
-        <Link
-          href={`/profile/${communityDetailData.userId}`}
-          className="community-detail__nickname"
-        >
-          {communityDetailData.author}
-        </Link>
-        <span className="community-detail__count">
-          조회수 {communityDetailData.visited_count}
-        </span>
-        <span className="community-detail__count">
-          추천 {communityDetailData.recommend_count}
-        </span>
-        <span className="community-detail__date">
-          {new Date(communityDetailData.createdAt).toLocaleString()}
-        </span>
-      </div>
-
-      <div className="community-detail__tags">
-        {communityDetailData.tags.map((tag, i) => (
-          <span key={i} className="community-detail__tag">
-            #{tag}
+        <div className="community-detail__meta">
+          <Link href={`/profile/${communityDetailData.userId}`}>
+            <Image
+              src={communityDetailData.profileImageUrl}
+              alt={`${communityDetailData.author}의 프로필 이미지`}
+              width={24}
+              height={24}
+              className="community-detail__profile-image"
+            />
+          </Link>
+          <Link
+            href={`/profile/${communityDetailData.userId}`}
+            className="community-detail__nickname"
+          >
+            {communityDetailData.author}
+          </Link>
+          <span className="community-detail__count">
+            조회수 {communityDetailData.visited_count}
           </span>
-        ))}
+          <span className="community-detail__count">
+            추천 {communityDetailData.recommend_count}
+          </span>
+          <span className="community-detail__date">
+            {new Date(communityDetailData.createdAt).toLocaleString()}
+          </span>
+        </div>
+
+        <div className="community-detail__tags">
+          {communityDetailData.tags.map((tag, i) => (
+            <span key={i} className="community-detail__tag">
+              #{tag}
+            </span>
+          ))}
+        </div>
       </div>
 
       <div
@@ -136,8 +160,9 @@ const CommunityDetailPage = () => {
           e.preventDefault();
           await navigator.clipboard.writeText(communityDetailData.content);
         }}
+        ref={contentRef}
       >
-        <Markdown>{communityDetailData.content}</Markdown>
+        <MarkdownRenderer content={communityDetailData.content} />
       </div>
 
       <button

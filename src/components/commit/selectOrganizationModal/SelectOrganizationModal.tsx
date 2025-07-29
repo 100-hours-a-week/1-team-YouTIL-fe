@@ -100,10 +100,12 @@ const SelectOrganizationModal = ({ onClose, onComplete }: Props) => {
   const organizations = data?.pages.flatMap((page) => page.data.organizations) ?? [];
 
   return (
-    <div className="organization-modal">
+    <section className="organization-modal">
       <div className="organization-modal__overlay" onClick={onClose} />
-      <div className="organization-modal__content">
+      <article className="organization-modal__content">
+        <header>
         <h2 className="organization-modal__title">조직 선택</h2>
+        </header>
 
         {isLoading ? (
           <p className="organization-modal__loading">로딩 중...</p>
@@ -134,18 +136,19 @@ const SelectOrganizationModal = ({ onClose, onComplete }: Props) => {
                 조직을 선택하지 않음
               </label>
             </div>
-
+              <footer>
             <button
               className="organization-modal__close"
               onClick={onComplete}
               disabled={!isCompleteEnabled}
-            >
+              >
               선택 완료
             </button>
+              </footer>
           </>
         )}
-      </div>
-    </div>
+      </article>
+    </section>
   );
 };
 

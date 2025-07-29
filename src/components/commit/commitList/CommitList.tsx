@@ -83,29 +83,29 @@ const CommitList = () => {
     commits.length > 0 && selectedRepository && selectedBranchName && selectedDate;
 
   return (
-    <div className="commit-list">
+    <section className="commit-list">
       {canShowGenerateButton && (
-        <div className="commit-list__actions">
+        <section className="commit-list__actions" aria-label="TIL 생성 버튼">
           <button
             className={`commit-list__button ${shake ? 'shake error' : ''}`}
             onClick={handleGenerateClick}
           >
             생성
           </button>
-        </div>
+        </section>
       )}
 
       {isLoading ? (
-        <p className="commit-list__loading">
+        <p className="commit-list__loading" aria-live="polite">
           <span className="commit-list__spinner" />
           로딩 중...
         </p>
       ) : commits.length === 0 ? (
-        <div className="commit-list__desc">
+        <article className="commit-list__desc">
           <NoCommitDescription />
-        </div>
+        </article>
       ) : (
-        <ul className="commit-list__ul">
+        <ul className="commit-list__ul" aria-label="커밋 목록">
           {commits.map((commit, idx) => (
             <li
               key={commit.sha}
@@ -119,7 +119,7 @@ const CommitList = () => {
           ))}
         </ul>
       )}
-    </div>
+    </section>
   );
 };
 

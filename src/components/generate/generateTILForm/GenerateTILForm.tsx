@@ -192,7 +192,7 @@ const GenerateTILForm = () => {
             />
           </label>
 
-          <label className="generate__label">
+          <div className="generate__label">
             카테고리
             <select
               value={category}
@@ -203,7 +203,7 @@ const GenerateTILForm = () => {
               <option value="AI">인공지능</option>
               <option value="CLOUD">클라우드</option>
             </select>
-          </label>
+          </div>
 
           <div className="generate__visibility">
             <label>

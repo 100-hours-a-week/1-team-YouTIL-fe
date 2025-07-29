@@ -22,9 +22,12 @@ const RepositoryConnectResultModal = ({ isSuccess, onClose }: Props) => {
   }, [isSuccess, onClose]);
 
   return (
-    <div className="github-upload-modal">
+    <section className="github-upload-modal">
       <div className="github-upload-modal__overlay" onClick={onClose} />
-      <div className="github-upload-modal__content">
+      <article className="github-upload-modal__content"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="github-modal-title">
         <div
           className={`github-upload-modal__result ${
             isSuccess ? 'success' : 'error'
@@ -49,8 +52,8 @@ const RepositoryConnectResultModal = ({ isSuccess, onClose }: Props) => {
             </>
           )}
         </div>
-      </div>
-    </div>
+      </article>
+    </section>
   );
 };
 

@@ -57,10 +57,8 @@ const Main = () => {
     <div className="main-page">
       <WelcomeDescription />
       <TechNews />
-      <div className="main-page__space--top" />
       <TILRecordDescription />
       <Heatmap />
-      <div className="main-page__space--top" />
       <NewTILDescription />
       <NewTILList />
     </div>
