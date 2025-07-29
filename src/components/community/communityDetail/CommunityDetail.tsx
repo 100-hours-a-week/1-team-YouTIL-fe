@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useRef } from 'react';
 import { useParams } from 'next/navigation';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useFetch } from '@/hooks/useFetch';
@@ -17,9 +17,6 @@ const MarkdownRenderer = dynamic(() => import('@/components/common/MarkdownRende
   loading: () => <p>로딩 중...</p>,
 });
 
-interface Props {
-  onRendered?: () => void;
-}
 
 interface CommunityDetail {
   postId: number;
@@ -44,7 +41,7 @@ interface CommunityDetailResponse {
   data: CommunityDetail;
 }
 
-const CommunityDetailPage = ({ onRendered }: Props) => {
+const CommunityDetailPage = () => {
   const { tilId } = useParams();
   const tilIdNumber = Number(tilId);
   const { callApi } = useFetch();
@@ -100,16 +97,6 @@ const CommunityDetailPage = ({ onRendered }: Props) => {
       );
     },
   });
-
-  useEffect(() => {
-    if (!contentRef.current) return;
-
-    const handle = requestAnimationFrame(() => {
-      if (onRendered) onRendered();
-    });
-
-    return () => cancelAnimationFrame(handle);
-  }, []);
 
   if (isLoading || !communityDetailData) return;
 
