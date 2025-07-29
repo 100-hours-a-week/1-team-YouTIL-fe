@@ -98,6 +98,7 @@ const CommunityDetailPage = () => {
     },
   });
 
+
   if (isLoading || !communityDetailData) return;
 
   return (
