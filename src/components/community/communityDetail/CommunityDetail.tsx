@@ -8,23 +8,14 @@ import Link from 'next/link';
 import Image from 'next/image';
 import useGetAccessToken from '@/hooks/useGetAccessToken';
 import useCheckAccess from '@/hooks/useCheckExistAccess';
-import Markdown from 'react-markdown';
 import './CommunityDetail.scss';
 import { communityKeys } from '@/querykey/community.querykey';
-import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
-import { oneLight } from 'react-syntax-highlighter/dist/cjs/styles/prism';
+import dynamic from 'next/dynamic';
 
-const whiteTheme = {
-  ...oneLight,
-  'pre[class*="language-"]': {
-    ...oneLight['pre[class*="language-"]'],
-    background: '#ffffff',
-  },
-  'code[class*="language-"]': {
-    ...oneLight['code[class*="language-"]'],
-    background: '#ffffff',
-  },
-};
+const MarkdownRenderer = dynamic(() => import('@/components/common/MarkdownRenderer'), {
+  ssr: false,
+  loading: () => <p>로딩 중...</p>,
+});
 
 interface Props {
   onRendered?: () => void;
@@ -53,7 +44,7 @@ interface CommunityDetailResponse {
   data: CommunityDetail;
 }
 
-const CommunityDetailPage = ( { onRendered }: Props ) => {
+const CommunityDetailPage = ({ onRendered }: Props) => {
   const { tilId } = useParams();
   const tilIdNumber = Number(tilId);
   const { callApi } = useFetch();
@@ -119,14 +110,15 @@ const CommunityDetailPage = ( { onRendered }: Props ) => {
 
     return () => cancelAnimationFrame(handle);
   }, [onRendered]);
+
   if (isLoading || !communityDetailData) return;
 
   return (
-    <article className="community-detail">
+    <div className="community-detail">
       <div className="community-detail__head">
         <h1 className="community-detail__title">{communityDetailData.title}</h1>
 
-        <header className="community-detail__meta">
+        <div className="community-detail__meta">
           <Link href={`/profile/${communityDetailData.userId}`}>
             <Image
               src={communityDetailData.profileImageUrl}
@@ -151,7 +143,7 @@ const CommunityDetailPage = ( { onRendered }: Props ) => {
           <span className="community-detail__date">
             {new Date(communityDetailData.createdAt).toLocaleString()}
           </span>
-        </header>
+        </div>
 
         <div className="community-detail__tags">
           {communityDetailData.tags.map((tag, i) => (
@@ -162,46 +154,16 @@ const CommunityDetailPage = ( { onRendered }: Props ) => {
         </div>
       </div>
 
-      <section
+      <div
         className="community-detail__content"
         onCopy={async (e) => {
           e.preventDefault();
           await navigator.clipboard.writeText(communityDetailData.content);
         }}
+        ref={contentRef}
       >
-        <Markdown
-          components={{
-            code({ className, children, ...rest }) {
-              const match = /language-(\w+)/.exec(className || '');
-              if (match) {
-                return (
-                  <SyntaxHighlighter
-                    style={whiteTheme}
-                    language={match[1]}
-                    PreTag="div"
-                    customStyle={{
-                      padding: '1rem',
-                      borderRadius: '0.5rem',
-                      fontSize: '0.875rem',
-                      backgroundColor: '#ffffff',
-                    }}
-                  >
-                    {String(children).replace(/\n$/, '')}
-                  </SyntaxHighlighter>
-                );
-              }
-
-              return (
-                <code className={className} {...rest}>
-                  {children}
-                </code>
-              );
-            },
-          }}
-        >
-          {communityDetailData.content}
-        </Markdown>
-      </section>
+        <MarkdownRenderer content={communityDetailData.content} />
+      </div>
 
       <button
         className={`community-detail__like-button ${
@@ -211,7 +173,7 @@ const CommunityDetailPage = ( { onRendered }: Props ) => {
       >
         추천 {communityDetailData.recommend_count}
       </button>
-    </article>
+    </div>
   );
 };
 

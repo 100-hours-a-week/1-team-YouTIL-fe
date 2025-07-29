@@ -9,7 +9,6 @@ import { useRepositoryTILList } from '@/hooks/repository/til/useRepositoryTILLis
 import { useFetch } from '@/hooks/useFetch';
 import SelectInterviewLevelModal from '../selectInterviewLevelModal/SelectInterviewLevelModal';
 import CheckDeleteTILModal from '../checkDeleteModal/checkDeleteTILModal/CheckDeleteTILModal';
-import Markdown from 'react-markdown';
 import { mainKeys } from '@/querykey/main.querykey';
 import { repositoryKeys } from '@/querykey/repository.querykey';
 import { profileKeys } from '@/querykey/profile.querykey';
@@ -23,10 +22,12 @@ import { useToastStore } from '@/store/useToastStore';
 import UploadCompleteToast from './uploadCompleteToast/UploadCompleteToast';
 import { useRepositoryDateStore } from '@/store/useRepositoryDateStore';
 import GenerateInterviewModal from '../generateInterviewModal/GenerateInterviewModal';
-import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
-import { oneLight } from 'react-syntax-highlighter/dist/cjs/styles/prism';
+import dynamic from 'next/dynamic';
 
-
+const MarkdownRenderer = dynamic(() => import('@/components/common/MarkdownRenderer'), {
+  ssr: false,
+  loading: () => <p>로딩 중...</p>,
+});
 
 interface TILItem {
   tilId: number;
@@ -88,18 +89,6 @@ const RepositoryTILList = () => {
     handleDeleteClick,
     setIsConnectSuccess
   } = useRepositoryTILList();
-
-  const whiteTheme = {
-    ...oneLight,
-    'pre[class*="language-"]': {
-      ...oneLight['pre[class*="language-"]'],
-      background: '#ffffff',
-    },
-    'code[class*="language-"]': {
-      ...oneLight['code[class*="language-"]'],
-      background: '#ffffff',
-    },
-  };
 
   const { callApi } = useFetch();
   const queryClient = useQueryClient();
@@ -297,8 +286,8 @@ const RepositoryTILList = () => {
   };
 
   return (
-    <section className="repository-til-list">
-      <header className="repository-til-list__header">
+    <div className="repository-til-list">
+      <div className="repository-til-list__header">
         <h2 className="repository-til-list__title">TIL 목록</h2>
         {allTils.length > 0 && (
           <button
@@ -308,7 +297,7 @@ const RepositoryTILList = () => {
             삭제
           </button>
         )}
-      </header>
+      </div>
       <ul className="repository-til-list__items">
         {allTils.map((til, index) => {
           const parsedDate = parseISO(til.createdAt);
@@ -322,7 +311,7 @@ const RepositoryTILList = () => {
               className={`repository-til-list__item${isSelected ? ' selected' : ''}`}
               ref={isLastItem ? loadMoreRef : null}
             >
-              <article className="repository-til-list__item-header-wrapper">
+              <div className="repository-til-list__item-header-wrapper">
                 <div
                   className="repository-til-list__item-header"
                   onClick={() => {
@@ -434,61 +423,27 @@ const RepositoryTILList = () => {
                     onChange={() => toggleTILSelection(til.tilId)}
                   />
                 )}
-              </article>
+              </div>
 
               {expandedTilId === til.tilId && tilDetailData && (
-                <section className="repository-til-list__item-detail">
-                 <Markdown
-                    components={{
-                      code({ className, children, ...rest }) {
-                        const match = /language-(\w+)/.exec(className || '');
-
-                        if (match) {
-                          return (
-                            <SyntaxHighlighter
-                              style={whiteTheme}
-                              language={match[1]}
-                              PreTag="div"
-                              customStyle={{
-                                padding: '1rem',
-                                borderRadius: '0.5rem',
-                                fontSize: '0.875rem',
-                                backgroundColor: '#ffffff',
-                              }}
-                            >
-                              {String(children).replace(/\n$/, '')}
-                            </SyntaxHighlighter>
-                          );
-                        }
-
-                        return (
-                          <code className={className} {...rest}>
-                            {children}
-                          </code>
-                        );
-                      },
-                    }}
-                  >
-                    {tilDetailData.content}
-                  </Markdown>
-                  <footer>
-                  <p className="repository-til-list__item-tags">
-                    {tilDetailData.tag.map((tag, i) => (
-                      <span key={i} className="repository-til-list__item-tag">#{tag}</span>
-                    ))}
-                  </p>
-                  <p className="repository-til-list__item-meta">
-                    조회수 {tilDetailData.visitedCount} · 추천 {tilDetailData.recommendCount} · 댓글 {tilDetailData.commentsCount}
-                  </p>
-                </footer>
-                </section>
+                <div className="repository-til-list__item-detail">
+                  <MarkdownRenderer content={tilDetailData.content}/>
+                    <p className="repository-til-list__item-tags">
+                      {tilDetailData.tag.map((tag, i) => (
+                        <span key={i} className="repository-til-list__item-tag">#{tag}</span>
+                      ))}
+                    </p>
+                    <p className="repository-til-list__item-meta">
+                      조회수 {tilDetailData.visitedCount} · 추천 {tilDetailData.recommendCount} · 댓글 {tilDetailData.commentsCount}
+                    </p>
+                </div>
               )}
             </li>
           );
         })}
       </ul>
 
-      <aside className="repository-til-list__floating-wrapper" ref={floatingRef}>
+      <div className="repository-til-list__floating-wrapper" ref={floatingRef}>
         <button
           className="repository-til-list__floating-button"
           onClick={() => {
@@ -502,7 +457,7 @@ const RepositoryTILList = () => {
             height={24}
           />
         </button>
-      </aside>
+      </div>
 
       {(currentStatus !== null || isError) && (
         <GenerateInterviewModal
@@ -575,7 +530,7 @@ const RepositoryTILList = () => {
         />
       )}
 
-    </section>
+    </div>
   );
 };
 

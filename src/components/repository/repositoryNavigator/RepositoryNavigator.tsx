@@ -9,7 +9,7 @@ const RepositoryNavigator = () => {
   const { activeTab, setActiveTab } = useRepositoryDateStore();
 
   return (
-    <section className={`repository-navigator ${activeTab}-active`}>
+    <div className={`repository-navigator ${activeTab}-active`}>
       <nav className="repository-navigator__tabs" aria-label="리포지토리 콘텐츠 탭">
         <button
           className={`repository-navigator__tab ${activeTab === 'til' ? 'active' : ''}`}
@@ -26,15 +26,15 @@ const RepositoryNavigator = () => {
         <div className="repository-navigator__underline" />
       </nav>
 
-      <section className="repository-navigator__content">
-        <article>
+      <div className="repository-navigator__content">
+        <div>
           {activeTab === 'til' && <RepositoryTILList />}
-        </article>
-        <article>
+        </div>
+        <div>
           {activeTab === 'interview' && <RepositoryInterviewList />}
-        </article>
-      </section>
-    </section>
+        </div>
+      </div>
+    </div>
   );
 };
 
