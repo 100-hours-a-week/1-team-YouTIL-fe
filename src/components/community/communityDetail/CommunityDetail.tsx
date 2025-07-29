@@ -109,7 +109,7 @@ const CommunityDetailPage = ({ onRendered }: Props) => {
     });
 
     return () => cancelAnimationFrame(handle);
-  }, [onRendered]);
+  }, []);
 
   if (isLoading || !communityDetailData) return;
 
