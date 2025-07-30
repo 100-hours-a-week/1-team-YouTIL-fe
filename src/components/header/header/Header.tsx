@@ -6,13 +6,13 @@ import './Header.scss';
 
 const Header =() =>{
     return(
-        <div className="header__place">
-            <div className="header__button">
-                <HeaderBackButton/>
-                <HeaderLogo/>
-                <HeaderLogoutButton/>
-            </div>
-        </div>
+        <header className="header__place">
+            <nav className="header__button">
+                <HeaderBackButton />
+                <HeaderLogo />
+                <HeaderLogoutButton />
+            </nav>
+        </header>
     )
 }
 

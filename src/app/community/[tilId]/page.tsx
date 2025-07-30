@@ -22,6 +22,7 @@ interface UserInfoResponse {
 }
 
 const CommunityDetailPage = () => {
+
   useLayoutEffect(() => {
     window.scrollTo({ top: 0, behavior: 'auto' });
   }, []);
@@ -62,8 +63,8 @@ const CommunityDetailPage = () => {
 
   return (
     <div>
-      <CommunityDetail />
-      <CommunityComment />
+      <CommunityDetail/>
+       <CommunityComment />
     </div>
   );
 };

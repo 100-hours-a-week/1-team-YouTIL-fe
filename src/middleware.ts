@@ -4,7 +4,10 @@ const PUBLIC_PATHS = ['/login'];
 const PROTECTED_PATHS = ['/', '/commit', '/generate', '/repository', '/profile', '/community'];
 
 export const config = {
-  matcher: ['/', '/((?!_next|favicon.ico|static|assets|api|images|fonts).*)'],
+  matcher: [
+    '/',
+    '/((?!_next|favicon.ico|robots.txt|static|assets|api|images|fonts).*)',
+  ],
 };
 
 export function middleware(request: NextRequest) {

@@ -1,0 +1,11 @@
+User-agent: *
+Allow: /
+
+Disallow: /api/
+Disallow: /login
+Disallow: /signup
+Disallow: /generate
+Disallow: /_next/
+Disallow: /static/
+Disallow: /fonts/
+Allow: /images/
