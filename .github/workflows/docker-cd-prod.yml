@@ -1,8 +1,8 @@
-name: FE Docker CD Prod
+name: FE Docker CD Prod GCP
 
 on:
   workflow_run:
-    workflows: ["FE Docker CI PROD"]
+    workflows: ["FE Docker CI Prod GCP"]
     types:
       - completed
   workflow_dispatch:
@@ -16,23 +16,14 @@ jobs:
       - name: Set Image Tag
         run: echo "IMAGE_TAG=asia-northeast3-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/youtil-docker-registry/youtil-fe-prod:latest" >> $GITHUB_ENV
 
-      - name: Prepare SSH Keys
+      - name: Prepare SSH Key
         run: |
-          echo "${{ secrets.YOUTIL_PROD_SSH_KEY }}" > prod_key.pem
-          echo "${{ secrets.YOUTIL_BASTION_SSH_KEY }}" > bastion_key.pem
-          chmod 600 prod_key.pem bastion_key.pem
+          echo "${{ secrets.YOUTIL_DEV_SSH_KEY }}" > key.pem
+          chmod 600 key.pem
 
-      - name: Deploy via SSH Tunnel
+      - name: Deploy via SSH
         run: |
-          # Create SSH tunnel through bastion host
-          ssh -i bastion_key.pem -o StrictHostKeyChecking=no -N -L 2222:${{ secrets.YOUTIL_PROD_HOST }}:22 ubuntu@${{ secrets.YOUTIL_BASTION_HOST }} &
-          TUNNEL_PID=$!
-          
-          # Wait for tunnel to establish
-          sleep 5
-          
-          # Execute commands through the tunnel
-          ssh -i prod_key.pem -o StrictHostKeyChecking=no -p 2222 ubuntu@localhost << EOF
+          ssh -i key.pem -o StrictHostKeyChecking=no ubuntu@${{ secrets.YOUTIL_PROD_HOST }} << EOF
             docker pull $IMAGE_TAG
 
             docker stop youtil-fe-prod || true
@@ -40,8 +31,6 @@ jobs:
 
             docker run -d --name youtil-fe-prod \
               -p 3000:3000 \
+              -e NODE_OPTIONS="--max-old-space-size=4096" \
               $IMAGE_TAG
           EOF
-          
-          # Clean up tunnel
-          kill $TUNNEL_PID

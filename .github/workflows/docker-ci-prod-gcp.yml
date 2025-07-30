@@ -1,9 +1,9 @@
-name: Test Cloud Run
+name: FE Docker CI Prod GCP
 
 on:
   push:
     branches:
-      - dev
+      - main
     paths-ignore:
       - '.github/workflows/**'
   workflow_dispatch:
@@ -30,7 +30,7 @@ jobs:
       - name: Set Docker Image Tag
         run: |
           TIMESTAMP=$(date +%Y%m%d-%H%M%S)
-          IMAGE=asia-northeast3-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/youtil-docker-registry/youtil-fe-test
+          IMAGE=asia-northeast3-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/youtil-docker-registry/youtil-fe-prod
           echo "IMAGE_TAG=${IMAGE}:${TIMESTAMP}" >> $GITHUB_ENV
           echo "IMAGE_LATEST=${IMAGE}:latest" >> $GITHUB_ENV
 
@@ -43,7 +43,7 @@ jobs:
         run: gcloud auth configure-docker asia-northeast3-docker.pkg.dev
 
       - name: Create .env.production file
-        run: echo "${{ secrets.ENV_TEST }}" > .env
+        run: echo "${{ secrets.ENV_PROD }}" > .env
 
       - name: Build Docker Image
         run: docker build -t ${{ env.IMAGE_TAG }} -t ${{ env.IMAGE_LATEST }} .
